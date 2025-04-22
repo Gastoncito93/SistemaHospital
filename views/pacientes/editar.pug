@@ -1,0 +1,16 @@
+extends ../layout
+
+block content
+  h2 Editar Paciente
+  form(method="POST", action=`/pacientes/editar/${paciente.id}`)
+    .mb-3
+      label.form-label Nombre
+      input.form-control(type="text", name="nombre", value=paciente.nombre, required)
+    .mb-3
+      label.form-label Apellido
+      input.form-control(type="text", name="apellido", value=paciente.apellido, required)
+    .mb-3
+      label.form-label DNI
+      input.form-control(type="text", name="dni", value=paciente.dni, required)
+    button.btn.btn-primary(type="submit") Actualizar
+    a.btn.btn-secondary.ms-2(href="/pacientes") Cancelar

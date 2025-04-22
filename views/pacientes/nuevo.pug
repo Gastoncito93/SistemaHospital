@@ -1,0 +1,16 @@
+extends ../layout
+
+block content
+  h2 Nuevo Paciente
+  form(method="POST", action="/pacientes/nuevo")
+    .mb-3
+      label.form-label Nombre
+      input.form-control(type="text", name="nombre", required)
+    .mb-3
+      label.form-label Apellido
+      input.form-control(type="text", name="apellido", required)
+    .mb-3
+      label.form-label DNI
+      input.form-control(type="text", name="dni", required)
+    button.btn.btn-success(type="submit") Guardar
+    a.btn.btn-secondary.ms-2(href="/pacientes") Cancelar

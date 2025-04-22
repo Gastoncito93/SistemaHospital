@@ -1,0 +1,24 @@
+extends ../layout
+
+block content
+  a.btn.btn-primary.mb-3(href="/pacientes/nuevo") + Nuevo Paciente
+
+  if pacientes.length > 0
+    table.table.table-striped
+      thead
+        tr
+          th Nombre
+          th Apellido
+          th DNI
+          th Acciones
+      tbody
+        each paciente in pacientes
+          tr
+            td= paciente.nombre
+            td= paciente.apellido
+            td= paciente.dni
+            td
+              a.btn.btn-sm.btn-warning(href=`/pacientes/editar/${paciente.id}`) Editar
+              a.btn.btn-sm.btn-danger.ms-2(href=`/pacientes/eliminar/${paciente.id}`) Eliminar
+  else
+    p No hay pacientes cargados.
