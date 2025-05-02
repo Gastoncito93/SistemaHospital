@@ -22,7 +22,6 @@ module.exports = {
     // Guardar nuevo paciente
     guardar: async (req, res) => {
         try {
-          console.log('BODY:', req.body); // <-- Agregar esto
           await Paciente.insertar(req.body);
           res.redirect('/pacientes');
         } catch (error) {
@@ -59,7 +58,6 @@ module.exports = {
     // Guardar cambios de edición
     actualizar: async (req, res) => {
         try {
-          console.log('BODY:', req.body); // <-- Agregar esto
           await Paciente.actualizar(req.params.id, req.body);
           res.redirect('/pacientes');
         } catch (error) {

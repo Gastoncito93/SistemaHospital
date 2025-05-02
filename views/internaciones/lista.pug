@@ -1,0 +1,27 @@
+extends ../layout
+
+block content
+  h2 Internaciones Registradas
+  a.btn.btn-primary.mb-3(href="/internaciones/nueva") + Nueva Internación
+
+  if internaciones.length > 0
+    table.table.table-striped
+      thead
+        tr
+          th Paciente
+          th Habitación
+          th Ala
+          th Tipo
+          th Fecha Ingreso
+          th Motivo
+      tbody
+        each internacion in internaciones
+          tr
+            td= internacion.paciente_nombre + ' ' + internacion.paciente_apellido
+            td= internacion.habitacion_numero
+            td= internacion.ala
+            td= internacion.tipo
+            td= internacion.fecha_ingreso.toISOString().substring(0, 10)
+            td= internacion.motivo
+  else
+    p No hay internaciones registradas.

@@ -4,6 +4,8 @@ const app = express();
 
 // Rutas
 const pacienteRoutes = require('./routes/pacienteRoutes');
+const internacionRoutes = require('./routes/internacionRoutes');
+
 
 // Middleware para leer datos de formularios
 app.use(express.urlencoded({ extended: true }));
@@ -17,6 +19,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Usar las rutas
 app.use('/pacientes', pacienteRoutes);
+app.use('/internaciones', internacionRoutes);
 
 // Ruta raíz redirige a /pacientes
 app.get('/', (req, res) => {

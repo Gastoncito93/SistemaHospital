@@ -1,0 +1,29 @@
+extends ../layout
+
+block content
+  h2 Nueva Internación
+  form(method="POST", action="/internaciones/nueva")
+    .mb-3
+      label.form-label Paciente
+      select.form-select(name="paciente_id", required)
+        option(value="" disabled selected) -- Seleccione un paciente --
+        each paciente in pacientes
+          option(value=paciente.id)= paciente.nombre + ' ' + paciente.apellido
+
+    .mb-3
+      label.form-label Habitación
+      select.form-select(name="habitacion_id", required)
+        option(value="" disabled selected) -- Seleccione una habitación --
+        each habitacion in habitaciones
+          option(value=habitacion.id)= 'N° ' + habitacion.numero + ' (' + habitacion.ala + ' - ' + habitacion.tipo + ')'
+
+    .mb-3
+      label.form-label Fecha de ingreso
+      input.form-control(type="date", name="fecha_ingreso", required)
+
+    .mb-3
+      label.form-label Motivo de internación
+      textarea.form-control(name="motivo", rows="3", required)
+
+    button.btn.btn-success(type="submit") Registrar
+    a.btn.btn-secondary.ms-2(href="/internaciones") Cancelar
