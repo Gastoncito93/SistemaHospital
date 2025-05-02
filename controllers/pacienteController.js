@@ -12,21 +12,24 @@ module.exports = {
         }
     },
 
+    
+
     // Formulario para crear nuevo paciente
     mostrarFormularioNuevo: (req, res) => {
-        res.render('pacientes/nuevo');
-    },
+        res.render('pacientes/nuevo', { paciente: {} });
+      },
 
     // Guardar nuevo paciente
     guardar: async (req, res) => {
         try {
-            await Paciente.insertar(req.body);
-            res.redirect('/pacientes');
+          console.log('BODY:', req.body); // <-- Agregar esto
+          await Paciente.insertar(req.body);
+          res.redirect('/pacientes');
         } catch (error) {
-            console.error(error);
-            res.status(500).send('Error al guardar el paciente');
+          console.error(error);
+          res.status(500).send('Error al guardar el paciente');
         }
-    },
+      },
 
     mostrarFormularioEditar: async (req, res) => {
         try {
@@ -56,13 +59,14 @@ module.exports = {
     // Guardar cambios de edición
     actualizar: async (req, res) => {
         try {
-            await Paciente.actualizar(req.params.id, req.body);
-            res.redirect('/pacientes');
+          console.log('BODY:', req.body); // <-- Agregar esto
+          await Paciente.actualizar(req.params.id, req.body);
+          res.redirect('/pacientes');
         } catch (error) {
-            console.error(error);
-            res.status(500).send('Error al actualizar el paciente');
+          console.error(error);
+          res.status(500).send('Error al actualizar el paciente');
         }
-    },
+      },
 
     // Eliminar paciente
     eliminar: async (req, res) => {

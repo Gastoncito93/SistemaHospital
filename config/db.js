@@ -1,21 +1,19 @@
 const mysql = require('mysql2/promise');
 
-const connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',        
-    password: '',        
-    database: 'his_db',
-    port: 3306
-});
+let connection;
 
-connection.connect(function(error){
-    if(error){
-        throw error;
-    }else{
-        console.log('Conexion Correcta.');
+async function conectar() {
+    if (!connection) {
+        connection = await mysql.createConnection({
+            host: 'localhost',
+            user: 'root',
+            password: '',
+            database: 'his_db',
+            port: 3306
+        });
+        console.log('Conexión correcta.');
     }
-});
+    return connection;
+}
 
-connection.end();
-
-module.exports = connection;
+module.exports = conectar;

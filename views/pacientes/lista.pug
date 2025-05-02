@@ -10,6 +10,7 @@ block content
           th Nombre
           th Apellido
           th DNI
+          th Sexo
           th Acciones
       tbody
         each paciente in pacientes
@@ -17,6 +18,7 @@ block content
             td= paciente.nombre
             td= paciente.apellido
             td= paciente.dni
+            td= paciente.sexo
             td
               a.btn.btn-sm.btn-warning(href=`/pacientes/editar/${paciente.id}`) Editar
               a.btn.btn-sm.btn-danger.ms-2(href=`/pacientes/eliminar/${paciente.id}`) Eliminar

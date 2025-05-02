@@ -12,5 +12,12 @@ block content
     .mb-3
       label.form-label DNI
       input.form-control(type="text", name="dni", required)
+    .mb-3
+      label.form-label Sexo
+      select.form-select(name="sexo", required)
+        option(value="" disabled selected) -- Seleccione --
+        option(value="masculino") Masculino
+        option(value="femenino") Femenino
+
     button.btn.btn-success(type="submit") Guardar
     a.btn.btn-secondary.ms-2(href="/pacientes") Cancelar
