@@ -7,12 +7,10 @@ const Habitacion = {
     return rows;
   },
 
+
   async obtenerDisponibles() {
     const db = await getConnection();
-    const [rows] = await db.query(`
-      SELECT * FROM habitaciones
-      WHERE estado = 'libre'
-    `);
+    const [rows] = await db.query("SELECT * FROM habitaciones WHERE estado = 'libre'");
     return rows;
   },
 

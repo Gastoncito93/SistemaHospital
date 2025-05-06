@@ -8,7 +8,8 @@ const Internacion = {
              p.nombre AS paciente_nombre, 
              p.apellido AS paciente_apellido,
              h.numero AS habitacion_numero, 
-             h.ala, h.tipo
+             h.ala, 
+             h.tipo
       FROM internaciones i
       JOIN pacientes p ON i.paciente_id = p.id
       JOIN habitaciones h ON i.habitacion_id = h.id
@@ -29,21 +30,15 @@ const Internacion = {
   async obtenerHabitacionesDisponiblesPorSexo(sexo) {
     const db = await getConnection();
     const [rows] = await db.query(`
-      SELECT h.*
-      FROM habitaciones h
-      WHERE h.estado = 'libre'
-
-      UNION
-
-      SELECT h.*
-      FROM habitaciones h
-      WHERE h.tipo = 'doble'
-        AND h.estado = 'ocupada'
-        AND NOT EXISTS (
-          SELECT 1 FROM internaciones i
-          JOIN pacientes p ON i.paciente_id = p.id
-          WHERE i.habitacion_id = h.id AND p.sexo != ?
-        )
+      SELECT * FROM habitaciones
+      WHERE estado = 'libre'
+         OR (
+           tipo = 'doble' AND estado = 'ocupada' AND NOT EXISTS (
+             SELECT 1 FROM internaciones i
+             JOIN pacientes p ON i.paciente_id = p.id
+             WHERE i.habitacion_id = habitaciones.id AND p.sexo != ?
+           )
+         )
     `, [sexo]);
     return rows;
   }

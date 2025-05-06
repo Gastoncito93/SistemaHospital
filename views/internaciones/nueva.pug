@@ -15,7 +15,7 @@ block content
       select.form-select(name="habitacion_id", required)
         option(value="" disabled selected) -- Seleccione una habitación --
         each habitacion in habitaciones
-          option(value=habitacion.id)= 'N° ' + habitacion.numero + ' (' + habitacion.ala + ' - ' + habitacion.tipo + ')'
+          option(value=habitacion.id)= 'N° ' + habitacion.numero
 
     .mb-3
       label.form-label Fecha de ingreso

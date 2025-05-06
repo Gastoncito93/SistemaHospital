@@ -1,6 +1,7 @@
 const Internacion = require('../models/internacionModel');
 const getConnection = require('../config/db');
 const Paciente = require('../models/pacienteModel')
+const Habitacion = require('../models//habitacionModel')
 
 module.exports = {
   // Mostrar todas las internaciones
@@ -15,17 +16,16 @@ module.exports = {
   },
 
   // Mostrar formulario para nueva internación
-  mostrarFormulario: async (req, res) => {
-    try {
-      const pacientes = await Paciente.obtenerTodos();
-      const sexoPaciente = 'masculino'; // esto lo vas a obtener del paciente seleccionado en otro paso
-      const habitaciones = await Internacion.obtenerHabitacionesDisponiblesPorSexo(sexoPaciente);
-      res.render('internaciones/nueva', { pacientes, habitaciones });
-    } catch (error) {
-      console.error(error);
-      res.status(500).send('Error al cargar formulario de internación');
-    }
-  },
+    mostrarFormulario: async (req, res) => {
+      try {
+        const pacientes = await Paciente.obtenerTodos();         // trae todos los pacientes desde la base de datos
+        const habitaciones = await Habitacion.obtenerTodas();    // trae todas las habitaciones
+        res.render('internaciones/nueva', { pacientes, habitaciones }); // renderiza la vista PUG y le pasa los datos
+      } catch (error) {
+        console.error(error);
+        res.status(500).send('Error al cargar formulario de internación');
+      }
+    },
 
   // Registrar nueva internación
   registrar: async (req, res) => {
