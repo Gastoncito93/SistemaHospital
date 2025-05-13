@@ -9,10 +9,17 @@ CREATE TABLE pacientes (
   nombre VARCHAR(50) NOT NULL,
   apellido VARCHAR(50) NOT NULL,
   dni VARCHAR(20) NOT NULL
+  sexo ENUM('masculino', 'femenino') NOT NULL,
 );
 
 -- Datos de prueba
-INSERT INTO pacientes (nombre, apellido, dni) VALUES 
-('Juan', 'Pérez', '12345678'),
-('Ana', 'Gómez', '87654321'),
-('Luis', 'Martínez', '11223344');
+INSERT INTO pacientes (nombre, apellido, dni, sexo) VALUES 
+('Juan', 'Pérez', '12345678','masculino'),
+('María', 'López', '23456789','femenino'),
+('Carlos', 'García', '34567890','masculino'),
+('Ana', 'Martínez', '45678901','femenino'),
+('Pedro', 'Sánchez', '56789012','masculino'),
+('Laura', 'Fernández', '67890123','femenino'),
+('Javier', 'Ramírez', '78901234','masculino'),
+('Lucía', 'Torres', '89012345','femenino'),
+('Diego', 'Hernández', '90123456','masculino');

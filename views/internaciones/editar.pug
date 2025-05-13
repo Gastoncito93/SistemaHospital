@@ -1,0 +1,34 @@
+extends ../layout
+
+block content
+  h2 Editar Internación
+  form(method="POST", action=`/internaciones/editar/${internacion.id}`)
+    .mb-3
+      label.form-label Paciente
+      input.form-control(type="text", value=internacion.paciente_nombre + ' ' + internacion.paciente_apellido, disabled)
+
+    .mb-3
+      label.form-label Habitación
+      select.form-select(name="habitacion_id", required)
+        option(value="" disabled) -- Seleccione una habitación --
+        each habitacion in habitaciones
+          option(
+            value=habitacion.id,
+            selected=habitacion.id === internacion.habitacion_id
+          )= 'N° ' + habitacion.numero + ' (' + habitacion.ala + ' - ' + habitacion.tipo + ')'
+
+    .mb-3
+      label.form-label Fecha de ingreso
+      input.form-control(
+        type="date",
+        name="fecha_ingreso",
+        value=internacion.fecha_ingreso.toISOString().substring(0,10),
+        required
+      )
+
+    .mb-3
+      label.form-label Motivo
+      textarea.form-control(name="motivo", rows="3", required)= internacion.motivo
+
+    button.btn.btn-primary(type="submit") Actualizar
+    a.btn.btn-secondary.ms-2(href="/internaciones") Cancelar

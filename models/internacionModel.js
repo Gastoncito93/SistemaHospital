@@ -17,6 +17,17 @@ const Internacion = {
     return rows;
   },
 
+  async obtenerPorId(id) {
+    const db = await getConnection();
+    const [rows] = await db.query(`
+      SELECT i.*, p.nombre AS paciente_nombre, p.apellido AS paciente_apellido
+      FROM internaciones i
+      JOIN pacientes p ON i.paciente_id = p.id
+      WHERE i.id = ?
+    `, [id]);
+    return rows[0];
+  },
+
   async insertar(data) {
     const db = await getConnection();
     const { paciente_id, habitacion_id, fecha_ingreso, motivo } = data;
@@ -41,7 +52,22 @@ const Internacion = {
          )
     `, [sexo]);
     return rows;
+  },
+
+  async actualizar(id, data) {
+    const db = await getConnection();
+    const { habitacion_id, fecha_ingreso, motivo } = data;
+    await db.query(
+      'UPDATE internaciones SET habitacion_id = ?, fecha_ingreso = ?, motivo = ? WHERE id = ?',
+      [habitacion_id, fecha_ingreso, motivo, id]
+    );
+  },
+
+  async eliminar(id) {
+    const db = await getConnection();
+    await db.query('DELETE FROM internaciones WHERE id = ?', [id]);
   }
+
 };
 
 module.exports = Internacion;

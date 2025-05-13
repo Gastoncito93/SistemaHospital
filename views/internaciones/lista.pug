@@ -23,5 +23,8 @@ block content
             td= internacion.tipo
             td= internacion.fecha_ingreso.toISOString().substring(0, 10)
             td= internacion.motivo
+            td
+              a.btn.btn-sm.btn-warning(href=`/internaciones/editar/${internacion.id}`) Editar
+              a.btn.btn-sm.btn-danger.ms-2(href=`/internaciones/eliminar/${internacion.id}`) Eliminar
   else
     p No hay internaciones registradas.
