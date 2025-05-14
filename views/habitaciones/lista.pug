@@ -1,0 +1,65 @@
+extends ../layout
+
+block content
+  h2 Habitaciones Registradas
+  .d-flex.justify-content-between.align-items-center.mb-3
+    a.btn.btn-primary(href="/habitaciones/nueva") + Nueva Habitación
+    button.btn.btn-outline-primary(type="button", data-bs-toggle="modal", data-bs-target="#modalFiltro") Filtrar por estado
+
+  if habitaciones.length > 0
+    table.table.table-striped#tablaHabitaciones
+      thead
+        tr
+          th N°
+          th Ala
+          th Tipo
+          th Estado
+          th Acciones
+      tbody
+        each habitacion in habitaciones
+          tr(data-estado=habitacion.estado)
+            td= habitacion.numero
+            td= habitacion.ala
+            td= habitacion.tipo
+            td= habitacion.estado
+            td
+              a.btn.btn-sm.btn-warning(href=`/habitaciones/editar/${habitacion.id}`) Editar
+              a.btn.btn-sm.btn-danger.ms-2(href=`/habitaciones/eliminar/${habitacion.id}`) Eliminar
+  else
+    p No hay habitaciones registradas.
+
+  // Modal de filtro
+  div.modal.fade(id="modalFiltro", tabindex="-1")
+    div.modal-dialog
+      div.modal-content
+        div.modal-header
+          h5.modal-title Filtrar habitaciones
+          button.btn-close(type="button", data-bs-dismiss="modal", aria-label="Close")
+        div.modal-body
+          select.form-select(id="filtroEstado")
+            option(value="") Mostrar todas
+            option(value="libre") Libre
+            option(value="ocupada") Ocupada
+            option(value="limpieza") Limpieza
+        div.modal-footer
+          button.btn.btn-primary(type="button", onclick="filtrarTabla()") Aplicar filtro
+          button.btn.btn-secondary(type="button", data-bs-dismiss="modal") Cerrar
+
+  // Script para filtrar
+  script.
+    function filtrarTabla() {
+      const filtro = document.getElementById('filtroEstado').value;
+      const filas = document.querySelectorAll('#tablaHabitaciones tbody tr');
+
+      filas.forEach(fila => {
+        const estado = fila.getAttribute('data-estado');
+        if (!filtro || estado === filtro) {
+          fila.style.display = '';
+        } else {
+          fila.style.display = 'none';
+        }
+      });
+
+      const modal = bootstrap.Modal.getInstance(document.getElementById('modalFiltro'));
+      modal.hide();
+    }

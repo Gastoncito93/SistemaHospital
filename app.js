@@ -5,25 +5,32 @@ const app = express();
 // Rutas
 const pacienteRoutes = require('./routes/pacienteRoutes');
 const internacionRoutes = require('./routes/internacionRoutes');
+const habitacionesRoutes = require('./routes/habitacionesRutes');
+
 
 
 // Middleware para leer datos de formularios
 app.use(express.urlencoded({ extended: true }));
 
+
 // Configurar motor de vistas
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
 
+
 // Servir archivos estáticos (por si usás CSS, imágenes, etc.)
 app.use(express.static(path.join(__dirname, 'public')));
+
 
 // Usar las rutas
 app.use('/pacientes', pacienteRoutes);
 app.use('/internaciones', internacionRoutes);
+app.use('/habitaciones', habitacionesRoutes);
 
 // Ruta raíz redirige a /pacientes
 app.get('/', (req, res) => {
     res.redirect('/pacientes');
+    
 });
 
 // Iniciar el servidor

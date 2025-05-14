@@ -1,0 +1,34 @@
+extends ../layout
+
+block content
+  h2 Editar Habitación
+
+  form(method="POST", action=`/habitaciones/editar/${habitacion.id}`)
+    .mb-3
+      label.form-label Número
+      input.form-control(type="number", name="numero", value=habitacion.numero, disabled)
+
+    .mb-3
+      label.form-label Ala
+      select.form-select(name="ala", disabled)
+        option(value="" disabled selected=!(habitacion.ala)) -- Seleccione un ala --
+        option(value="Norte", selected=habitacion.ala === 'Norte') Norte
+        option(value="Sur", selected=habitacion.ala === 'Sur') Sur
+
+    .mb-3
+      label.form-label Tipo
+      select.form-select(name="tipo", disabled)
+        option(value="" disabled selected=!(habitacion.tipo)) -- Seleccione un tipo --
+        option(value="individual", selected=habitacion.tipo === 'individual') Individual
+        option(value="doble", selected=habitacion.tipo === 'doble') Doble
+
+    .mb-3
+      label.form-label Estado
+      select.form-select(name="estado", required)
+        option(value="" disabled selected=!(habitacion.estado)) -- Seleccione un estado --
+        option(value="libre", selected=habitacion.estado === 'libre') Libre
+        option(value="ocupada", selected=habitacion.estado === 'ocupada') Ocupada
+        option(value="limpieza", selected=habitacion.estado === 'limpieza') Limpieza
+
+    button.btn.btn-primary(type="submit") Actualizar
+    a.btn.btn-secondary.ms-2(href="/habitaciones") Cancelar

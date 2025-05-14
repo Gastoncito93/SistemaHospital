@@ -1,7 +1,7 @@
 const Internacion = require('../models/internacionModel');
 const getConnection = require('../config/db');
 const Paciente = require('../models/pacienteModel');
-const Habitacion = require('../models//habitacionModel');
+const Habitacion = require('../models/habitacionModel');
 
 module.exports = {
   // Mostrar todas las internaciones
@@ -32,7 +32,7 @@ module.exports = {
     try {
       const id = parseInt(req.params.id, 10);
       const internacion = await Internacion.obtenerPorId(id);
-      const habitaciones = await Habitacion.obtenerTodas();
+      const habitaciones = await Habitacion.obtenerDisponibles();
 
       if (!internacion) {
         return res.status(404).send('Internación no encontrada');
