@@ -1,6 +1,7 @@
 extends ../layout
 
 block content
+  h1 Bienvenido Admin : #{usuario}
   a.btn.btn-primary.mb-3(href="/pacientes/nuevo") + Nuevo Paciente
 
   if pacientes.length > 0

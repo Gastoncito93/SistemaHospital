@@ -6,29 +6,28 @@ block content
   form(method="POST", action="/habitaciones/nueva")
     .mb-3
       label.form-label Número
-      input.form-control(type="number", name="numero", required)
+      input.form-control(type="text", name="numero", required)
 
     .mb-3
       label.form-label Ala
-      select.form-select(name="ala", required)
+      select.form-select(name="ala_id", required)
         option(value="" disabled selected) -- Seleccione un ala --
-        option(value="Norte") Norte
-        option(value="Sur") Sur
+        each ala in alas
+          option(value=ala.id)= ala.nombre
 
     .mb-3
       label.form-label Tipo
-      select.form-select(name="tipo", required)
+      select.form-select(name="tipo_id", required)
         option(value="" disabled selected) -- Seleccione un tipo --
-        option(value="individual") Individual
-        option(value="doble") Doble
+        each tipo in tipos
+          option(value=tipo.id)= tipo.nombre
 
     .mb-3
       label.form-label Estado
-      select.form-select(name="estado", required)
+      select.form-select(name="estado_id", required)
         option(value="" disabled selected) -- Seleccione un estado --
-        option(value="libre") Libre
-        option(value="ocupada") Ocupada
-        option(value="limpieza") Limpieza
+        each estado in estados
+          option(value=estado.id)= estado.nombre
 
     button.btn.btn-success(type="submit") Guardar
     a.btn.btn-secondary.ms-2(href="/habitaciones") Cancelar

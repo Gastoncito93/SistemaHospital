@@ -1,21 +1,24 @@
 const getConnection = require('../config/db');
 
 const Internacion = {
-  async obtenerTodas() {
-    const db = await getConnection();
-    const [rows] = await db.query(`
-      SELECT i.*, 
-             p.nombre AS paciente_nombre, 
-             p.apellido AS paciente_apellido,
-             h.numero AS habitacion_numero, 
-             h.ala, 
-             h.tipo
-      FROM internaciones i
-      JOIN pacientes p ON i.paciente_id = p.id
-      JOIN habitaciones h ON i.habitacion_id = h.id
-    `);
-    return rows;
-  },
+ async obtenerTodas() {
+  const db = await getConnection();
+  const [rows] = await db.query(`
+    SELECT i.*, 
+           p.nombre AS paciente_nombre, 
+           p.apellido AS paciente_apellido,
+           h.numero AS habitacion_numero, 
+           a.nombre AS ala,
+           t.nombre AS tipo
+    FROM internaciones i
+    JOIN pacientes p ON i.paciente_id = p.id
+    JOIN habitaciones h ON i.habitacion_id = h.id
+    JOIN alas a ON h.ala_id = a.id
+    JOIN tipos t ON h.tipo_id = t.id
+  `);
+  return rows;
+},
+
 
   async obtenerPorId(id) {
     const db = await getConnection();
