@@ -11,6 +11,9 @@ router.get('/nueva', internacionController.mostrarFormulario);
 // Procesar registro de internación
 router.post('/nueva', internacionController.registrar);
 
+// Obtener habitaciones disponibles segun sexo del paciente
+router.get('/habitaciones-disponibles/:pacienteId', internacionController.obtenerHabitacionesDisponibles);
+
 // Mostrar formulario de edición
 //Actualizar internacion
 router.get('/editar/:id', internacionController.mostrarFormularioEditar);

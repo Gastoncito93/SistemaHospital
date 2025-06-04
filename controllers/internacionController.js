@@ -2,6 +2,7 @@ const Internacion = require('../models/internacionModel');
 const getConnection = require('../config/db');
 const Paciente = require('../models/pacienteModel');
 const Habitacion = require('../models/habitacionModel');
+const Estado = require('../models/estadoModel');
 
 module.exports = {
   // Mostrar todas las internaciones
@@ -19,8 +20,8 @@ module.exports = {
     mostrarFormulario: async (req, res) => {
       try {
         const pacientes = await Paciente.obtenerNoInternados();         // trae solo pacientes sin internaciones        // trae todos los pacientes desde la base de datos
-        const habitaciones = await Habitacion.obtenerTodas();    // trae todas las habitaciones
-        res.render('internaciones/nueva', { pacientes, habitaciones }); // renderiza la vista PUG y le pasa los datos
+         const habitaciones = await Habitacion.obtenerDisponibles();
+      res.render('internaciones/nueva', { pacientes, habitaciones }); // renderiza la vista PUG y le pasa los datos
       } catch (error) {
         console.error(error);
         res.status(500).send('Error al cargar formulario de internación');
@@ -32,10 +33,9 @@ module.exports = {
     try {
       const id = parseInt(req.params.id, 10);
       const internacion = await Internacion.obtenerPorId(id);
-      const habitaciones = await Habitacion.obtenerDisponibles();
-
-      if (!internacion) {
-        return res.status(404).send('Internación no encontrada');
+      let habitaciones = [];
+      if (internacion) {
+        habitaciones = await Internacion.obtenerHabitacionesDisponiblesPorSexo(internacion.paciente_sexo);
       }
 
       res.render('internaciones/editar', { internacion, habitaciones });
@@ -45,10 +45,42 @@ module.exports = {
     }
   },
 
+  // Obtener habitaciones disponibles filtradas por sexo del paciente
+  obtenerHabitacionesDisponibles: async (req, res) => {
+    try {
+      const pacienteId = parseInt(req.params.pacienteId, 10);
+      const paciente = await Paciente.obtenerPorId(pacienteId);
+      if (!paciente) {
+        return res.status(404).json({ error: 'Paciente no encontrado' });
+      }
+      const habitaciones = await Internacion.obtenerHabitacionesDisponiblesPorSexo(paciente.sexo);
+      res.json(habitaciones);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Error al obtener habitaciones' });
+    }
+  },
+
   // Registrar nueva internación
   registrar: async (req, res) => {
     try {
       await Internacion.insertar(req.body);
+       const habitacionId = parseInt(req.body.habitacion_id, 10);
+      const habitacion = await Habitacion.obtenerPorId(habitacionId);
+      const ocupacion = await Internacion.contarPorHabitacion(habitacionId);
+
+      let nombreEstado;
+      if (habitacion.tipo === 'individual') {
+        nombreEstado = 'ocupada';
+      } else {
+        nombreEstado = ocupacion >= 2 ? 'ocupada' : 'semi ocupado';
+      }
+
+      const estado = await Estado.obtenerPorNombre(nombreEstado);
+      if (estado) {
+        await Habitacion.actualizarEstado(habitacionId, estado.id);
+      }
+      
       res.redirect('/internaciones');
     } catch (error) {
       console.error(error);

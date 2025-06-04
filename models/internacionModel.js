@@ -23,7 +23,10 @@ const Internacion = {
   async obtenerPorId(id) {
     const db = await getConnection();
     const [rows] = await db.query(`
-      SELECT i.*, p.nombre AS paciente_nombre, p.apellido AS paciente_apellido
+      SELECT i.*,
+             p.nombre AS paciente_nombre,
+             p.apellido AS paciente_apellido,
+             p.sexo AS paciente_sexo
       FROM internaciones i
       JOIN pacientes p ON i.paciente_id = p.id
       WHERE i.id = ?
@@ -44,15 +47,25 @@ const Internacion = {
   async obtenerHabitacionesDisponiblesPorSexo(sexo) {
     const db = await getConnection();
     const [rows] = await db.query(`
-      SELECT * FROM habitaciones
-      WHERE estado = 'libre'
-         OR (
-           tipo = 'doble' AND estado = 'ocupada' AND NOT EXISTS (
-             SELECT 1 FROM internaciones i
-             JOIN pacientes p ON i.paciente_id = p.id
-             WHERE i.habitacion_id = habitaciones.id AND p.sexo != ?
-           )
-         )
+      SELECT h.id, h.numero,
+             a.nombre AS ala,
+             t.nombre AS tipo,
+             e.nombre AS estado
+      FROM habitaciones h
+      JOIN alas a ON h.ala_id = a.id
+      JOIN tipos t ON h.tipo_id = t.id
+      JOIN estados e ON h.estado_id = e.id
+      LEFT JOIN internaciones i ON i.habitacion_id = h.id
+      LEFT JOIN pacientes p ON p.id = i.paciente_id
+      GROUP BY h.id
+      HAVING (
+        e.nombre = 'libre' AND COUNT(i.id) = 0
+      ) OR (
+        t.nombre = 'doble'
+        AND e.nombre <> 'limpieza'
+        AND COUNT(i.id) = 1
+        AND SUM(CASE WHEN p.sexo != ? THEN 1 ELSE 0 END) = 0
+      )
     `, [sexo]);
     return rows;
   },
@@ -69,6 +82,15 @@ const Internacion = {
   async eliminar(id) {
     const db = await getConnection();
     await db.query('DELETE FROM internaciones WHERE id = ?', [id]);
+  },
+
+  async contarPorHabitacion(habitacionId) {
+    const db = await getConnection();
+    const [rows] = await db.query(
+      'SELECT COUNT(*) AS cantidad FROM internaciones WHERE habitacion_id = ?',
+      [habitacionId]
+    );
+    return rows[0].cantidad;
   }
 
 };
