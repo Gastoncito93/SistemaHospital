@@ -18,7 +18,7 @@ module.exports = {
   // Mostrar formulario para nueva internación
     mostrarFormulario: async (req, res) => {
       try {
-        const pacientes = await Paciente.obtenerTodos();         // trae todos los pacientes desde la base de datos
+        const pacientes = await Paciente.obtenerNoInternados();         // trae solo pacientes sin internaciones        // trae todos los pacientes desde la base de datos
         const habitaciones = await Habitacion.obtenerTodas();    // trae todas las habitaciones
         res.render('internaciones/nueva', { pacientes, habitaciones }); // renderiza la vista PUG y le pasa los datos
       } catch (error) {

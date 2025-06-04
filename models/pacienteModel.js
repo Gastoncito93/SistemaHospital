@@ -16,6 +16,18 @@ const Paciente = {
         return rows[0];
     },
 
+    async obtenerNoInternados() {
+        const db = await getConnection();
+        const [rows] = await db.query(`
+            SELECT p.* FROM pacientes p
+            WHERE NOT EXISTS (
+                SELECT 1 FROM internaciones i
+                WHERE i.paciente_id = p.id
+            )
+        `);
+        return rows;
+    },
+
     async insertar(paciente) {
         const db = await getConnection();
         const { nombre, apellido, dni, sexo } = paciente;
