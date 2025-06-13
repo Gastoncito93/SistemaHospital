@@ -1,0 +1,6 @@
+require('./alaModel');
+require('./habitacionModel');
+require('./estadoModel');
+require('./internacionModel');
+require('./pacienteModel');
+require('./tipoModel');

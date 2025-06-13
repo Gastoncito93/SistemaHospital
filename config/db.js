@@ -5,11 +5,11 @@ let connection;
 async function conectar() {
     if (!connection) {
         connection = await mysql.createConnection({
-            host: 'localhost',
-            user: 'root',
-            password: '',
-            database: 'his_db',
-            port: 3306
+            host: process.env.DB_HOST,
+            user: process.env.DB_USER,
+            password: process.env.DB_PASSWORD,
+            database: process.env.DB_NAME,
+            port: process.env.DB_PORT
         });
         console.log('Conexión correcta.');
     }

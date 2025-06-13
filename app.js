@@ -2,6 +2,8 @@ const express = require('express');
 const path = require('path');
 const app = express();
 const session = require('express-session');
+require('dotenv').config();
+require('./models/sync');
 
 app.use(session({
   secret: 'secreto-super-seguro',
