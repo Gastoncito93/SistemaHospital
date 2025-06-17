@@ -1,46 +1,53 @@
 extends ../layout
 
 block content
-  h2 Nueva Internación
-  form(method="POST", action="/internaciones/nueva")
-    .mb-3
-      label.form-label Paciente
-      select.form-select(name="paciente_id", required, id="pacienteSelect")
-        option(value="" disabled selected) -- Seleccione un paciente --
-        each paciente in pacientes
-          option(value=paciente.id)= paciente.nombre + ' ' + paciente.apellido
+  h1.text-center.mb-4 Sección Internaciones
 
-    .mb-3
-      label.form-label Habitación
-      select.form-select(name="habitacion_id", required, id="habitacionSelect")
-        option(value="" disabled selected) -- Seleccione una habitación --
-        each habitacion in habitaciones
-          option(value=habitacion.id)= 'N° ' + habitacion.numero
+  .container.d-flex.justify-content-center
+    .p-4.border.rounded-3.shadow-lg(style="border: 2px solid #40e0d0 !important; max-width: 500px; width: 100%; background-color: white;")
+      h2.text-center Nueva Internación
 
-    .mb-3
-      label.form-label Fecha de ingreso
-      input.form-control(type="date", name="fecha_ingreso", required)
+      form(method="POST", action="/internaciones/nueva")
+        .mb-3
+          label.form-label Paciente
+          select.form-select(name="paciente_id", required, id="pacienteSelect")
+            option(value="" disabled selected) -- Seleccione un paciente --
+            each paciente in pacientes
+              option(value=paciente.id)= paciente.nombre + ' ' + paciente.apellido
 
-    .mb-3
-      label.form-label Motivo de internación
-      textarea.form-control(name="motivo", rows="3", required)
+        .mb-3
+          label.form-label Habitación
+          select.form-select(name="habitacion_id", required, id="habitacionSelect")
+            option(value="" disabled selected) -- Seleccione una habitación --
+            each habitacion in habitaciones
+              option(value=habitacion.id)= 'N° ' + habitacion.numero
 
-    button.btn.btn-success(type="submit") Registrar
-    a.btn.btn-secondary.ms-2(href="/internaciones") Cancelar
+        .mb-3
+          label.form-label Fecha de ingreso
+          input.form-control(type="date", name="fecha_ingreso", required)
 
-    script.
-      const pacienteSelect = document.getElementById('pacienteSelect');
-      const habitacionSelect = document.getElementById('habitacionSelect');
-      pacienteSelect.addEventListener('change', async function() {
-        const id = this.value;
-        if (!id) return;
-        const res = await fetch(`/internaciones/habitaciones-disponibles/${id}`);
-        const data = await res.json();
-        habitacionSelect.innerHTML = '<option value="" disabled selected>-- Seleccione una habitación --</option>';
-        data.forEach(h => {
-          const opt = document.createElement('option');
-          opt.value = h.id;
-          opt.textContent = 'N° ' + h.numero;
-          habitacionSelect.appendChild(opt);
-        });
+        .mb-3
+          label.form-label Motivo de internación
+          textarea.form-control(name="motivo", rows="3", required)
+
+        .text-center.mt-4
+          button.btn.btn-success(type="submit") Registrar
+          a.btn.btn-secondary.ms-2(href="/internaciones") Cancelar
+
+  // Script para actualizar habitaciones disponibles
+  script.
+    const pacienteSelect = document.getElementById('pacienteSelect');
+    const habitacionSelect = document.getElementById('habitacionSelect');
+    pacienteSelect.addEventListener('change', async function() {
+      const id = this.value;
+      if (!id) return;
+      const res = await fetch(`/internaciones/habitaciones-disponibles/${id}`);
+      const data = await res.json();
+      habitacionSelect.innerHTML = '<option value="" disabled selected>-- Seleccione una habitación --</option>';
+      data.forEach(h => {
+        const opt = document.createElement('option');
+        opt.value = h.id;
+        opt.textContent = 'N° ' + h.numero;
+        habitacionSelect.appendChild(opt);
       });
+    });
