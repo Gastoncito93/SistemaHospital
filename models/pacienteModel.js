@@ -16,6 +16,12 @@ const Paciente = {
         return rows[0];
     },
 
+    async buscarPorDNI(dni) {
+        const db = await getConnection();
+        const [rows] = await db.query('SELECT * FROM pacientes WHERE dni = ?', [dni]);
+        return rows[0]; // retorna el paciente si existe, undefined/null si no
+    },
+
     async obtenerNoInternados() {
         const db = await getConnection();
         const [rows] = await db.query(`

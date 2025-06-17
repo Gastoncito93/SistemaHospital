@@ -20,15 +20,18 @@ module.exports = {
       },
 
     // Guardar nuevo paciente
-    guardar: async (req, res) => {
-        try {
-          await Paciente.insertar(req.body);
-          res.redirect('/pacientes');
-        } catch (error) {
-          console.error(error);
-          res.status(500).send('Error al guardar el paciente');
-        }
-      },
+   guardar: async (req, res) => {
+      try {
+        await Paciente.insertar(req.body);
+        res.redirect('/pacientes');
+      } catch (error) {
+        console.error(error);
+        res.status(500).send('Error al guardar el paciente');
+      }
+    },
+
+
+
 
     mostrarFormularioEditar: async (req, res) => {
         try {
@@ -57,14 +60,25 @@ module.exports = {
 
     // Guardar cambios de edición
     actualizar: async (req, res) => {
-        try {
-          await Paciente.actualizar(req.params.id, req.body);
-          res.redirect('/pacientes');
-        } catch (error) {
-          console.error(error);
-          res.status(500).send('Error al actualizar el paciente');
-        }
-      },
+    try {
+      const { nombre, apellido, dni, sexo } = req.body;
+
+      if (!nombre || !apellido || !dni || !sexo) {
+        return res.status(400).send('Todos los campos son obligatorios');
+      }
+
+      if (!/^\d+$/.test(dni)) {
+        return res.status(400).send('El DNI debe ser un número entero');
+      }
+
+      await Paciente.actualizar(req.params.id, req.body);
+      res.redirect('/pacientes');
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Error al actualizar el paciente');
+    }
+  },
+
 
     // Eliminar paciente
     eliminar: async (req, res) => {

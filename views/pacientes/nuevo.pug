@@ -1,24 +1,35 @@
 extends ../layout
 
 block content
-  h1 Seccion Pacientes
-  h2 Nuevo Paciente
-  form(method="POST", action="/pacientes/nuevo")
-    .mb-3
-      label.form-label Nombre
-      input.form-control(type="text", name="nombre", required)
-    .mb-3
-      label.form-label Apellido
-      input.form-control(type="text", name="apellido", required)
-    .mb-3
-      label.form-label DNI
-      input.form-control(type="text", name="dni", required)
-    .mb-3
-      label.form-label Sexo
-      select.form-select(name="sexo", required)
-        option(value="" disabled selected) -- Seleccione --
-        option(value="masculino") Masculino
-        option(value="femenino") Femenino
+  h1.text-center.mb-4 Sección Pacientes
 
-    button.btn.btn-success(type="submit") Guardar
-    a.btn.btn-secondary.ms-2(href="/pacientes") Cancelar
+  .container.d-flex.justify-content-center
+    .p-4.border.rounded-3.shadow-lg(style="border: 2px solid #40e0d0 !important; max-width: 400px; width: 100%; background-color: white;")
+      h2.text-center Nuevo Paciente
+
+      form(method="POST", action="/pacientes/nuevo")
+        .mb-3
+          label.form-label Nombre
+          input.form-control(type="text", name="nombre", required)
+          div.invalid-feedback(id="nombre-error")
+
+        .mb-3
+          label.form-label Apellido
+          input.form-control(type="text", name="apellido", required)
+          div.invalid-feedback(id="apellido-error")
+
+        .mb-3
+          label.form-label DNI
+          input.form-control(type="text", name="dni", required)
+          div.invalid-feedback(id="dni-error")
+
+        .mb-3
+          label.form-label Sexo
+          select.form-select(name="sexo", required)
+            option(value="" disabled selected) -- Seleccione --
+            option(value="masculino") Masculino
+            option(value="femenino") Femenino
+
+        .text-center.mt-4
+          button.btn.btn-success(type="submit") Guardar
+          a.btn.btn-secondary.ms-2(href="/pacientes") Cancelar

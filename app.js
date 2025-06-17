@@ -36,6 +36,7 @@ app.use((req, res, next) => {
 
 
 // Usar las rutas
+app.use(express.static('public'));
 app.use('/pacientes', pacienteRoutes);
 app.use('/internaciones', internacionRoutes);
 app.use('/habitaciones', habitacionesRoutes);
@@ -47,8 +48,6 @@ app.get('/', (req, res) => {
 });
 
 //Acceso al Login
-
-
 // Ruta para procesar login
 app.post('/login', (req, res) => {
   const { usuario, password } = req.body;
