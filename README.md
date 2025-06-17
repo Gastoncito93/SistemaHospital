@@ -12,6 +12,7 @@ Este proyecto corresponde al Trabajo Práctico Integrador de la materia **Progra
 - MySQL (mysql2)
 - PUG (motor de plantillas)
 - Bootstrap (estilado básico)
+- Nodemon
 
 ---
 
@@ -26,9 +27,17 @@ Este proyecto corresponde al Trabajo Práctico Integrador de la materia **Progra
 
 ---
 
-## ⚙️ Instalación
-
-1. Clonar el repositorio:
-```bash
-git clone https://github.com/tuusuario/SistemaHospital.git
+## 🚀 Flujo correcto de instalación
+bash
+git clone https://github.com/Gastoncito93/SistemaHospital.git
 cd SistemaHospital
+npm install
+⚠️ Luego podés configurar la base de datos y ejecutar con:
+
+bash
+npm run dev
+
+
+## Inicio de Sesion:
+
+Aun no tiene Validaciones, va cualquier Usuario y Contraseña
