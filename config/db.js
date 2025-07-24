@@ -1,21 +1,14 @@
-const mysql = require('mysql2/promise');
+// config/db.js
+const mysql = require('mysql2');
+const connection = mysql.createConnection({
+  host:     process.env.DB_HOST,
+  port:     process.env.DB_PORT,
+  user:     process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME
+});
 
-let connection;
+// Obtienes un objeto idéntico, pero con métodos promise: .query() y .execute()
+const db = connection.promise();
 
-async function conectar() {
-  // Si no existe o está cerrada (ej: destroyed, ended), reconectar
-  if (!connection || connection.connection._closing || connection.connection._fatalError) {
-    connection = await mysql.createConnection({
-      host: process.env.DB_HOST,
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
-      port: process.env.DB_PORT
-    });
-    console.log('Conexión correcta.');
-  }
-
-  return connection;
-}
-
-module.exports = conectar;
+module.exports = db;
