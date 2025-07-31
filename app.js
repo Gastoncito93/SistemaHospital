@@ -3,7 +3,7 @@ const express = require('express');
 const path    = require('path');
 const session = require('express-session');
 require('./models/sync');
-
+const pacienteRoutes = require('./routes/pacienteRoutes');
 const autRoutes = require('./routes/aut');
 
 const app = express();
@@ -23,12 +23,13 @@ app.set('view engine', 'pug');
 
 // Variable local para plantillas
 app.use((req, res, next) => {
-  res.locals.usuario = req.session.userId || null;
+  res.locals.usuario = req.session.usuario || null;
   next();
 });
 
 // Rutas
 app.use('/', autRoutes);
+app.use('/pacientes', pacienteRoutes);
 
 // Redirigir raíz a /login
 app.get('/', (req, res) => res.redirect('/login'));

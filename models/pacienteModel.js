@@ -1,14 +1,13 @@
-const getConnection = require('../config/db.js');
+const db = require('../config/db');
 
 const Paciente = {
-    async obtenerTodos() {
-        const db = await getConnection();
-        const [rows] = await db.query('SELECT * FROM pacientes');
-        return rows;
-    },
+  obtenerTodos: async () => {
+    // Ejecuta la query y devuelve sólo las filas
+    const [rows] = await db.query('SELECT * FROM pacientes');
+    return rows;
+  },
 
     async obtenerPorId(id) {
-        const db = await getConnection();
         const [rows] = await db.query('SELECT * FROM pacientes WHERE id = ?', [id]);
         if (rows.length === 0) {
             throw new Error('Paciente no encontrado');
@@ -17,7 +16,6 @@ const Paciente = {
     },
 
     async buscarPorDNI(dni) {
-        const db = await getConnection();
         const [rows] = await db.query('SELECT * FROM pacientes WHERE dni = ?', [dni]);
         return rows[0]; // retorna el paciente si existe, undefined/null si no
     },
@@ -34,17 +32,16 @@ const Paciente = {
         return rows;
     },
 
-    async insertar(paciente) {
-        const db = await getConnection();
-        const { nombre, apellido, dni, sexo } = paciente;
-        await db.query(
-            'INSERT INTO pacientes (nombre, apellido, dni, sexo) VALUES (?, ?, ?, ?)',
-            [nombre, apellido, dni, sexo]
-        );
+    insertar: async (datos) => {
+    const { nombre, apellido, dni, sexo } = datos;
+    const [result] = await db.query(
+      'INSERT INTO pacientes (nombre, apellido, dni, sexo) VALUES (?, ?, ?, ?)',
+      [nombre, apellido, dni, sexo]
+    );
+    return result.insertId;
     },
 
     async actualizar(id, paciente) {
-        const db = await getConnection();
         const { nombre, apellido, dni, sexo } = paciente;
         await db.query(
             'UPDATE pacientes SET nombre = ?, apellido = ?, dni = ?, sexo = ? WHERE id = ?',
@@ -52,10 +49,14 @@ const Paciente = {
         );
     },
 
-    async eliminar(id) {
-        const db = await getConnection();
-        await db.query('DELETE FROM pacientes WHERE id = ?', [id]);
-    }
+    eliminar: async (id) => {
+    const [result] = await db.query(
+      'DELETE FROM pacientes WHERE id = ?',
+      [id]
+    );
+    // Opcional: puedes devolver cuántas filas se eliminaron
+    return result.affectedRows;
+  }
 };
 
 module.exports = Paciente;

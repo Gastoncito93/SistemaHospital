@@ -22,13 +22,19 @@ exports.getLogin = (req, res) => {
 
 exports.postLogin = async (req, res) => {
   const { email, pass } = req.body;
-  const user = await Usuario.findByCredentials(email, pass);
-  if (user) {
-    req.session.userId = user.id;
-    // Redirige ahora a la página de pacientes
+  try {
+    const user = await Usuario.findByCredentials(email, pass);
+    if (!user) {
+      return res.render('login', { error: 'Credenciales inválidas' });
+    }
+    // guardamos el usuario en sesión
+    req.session.userId   = user.id;
+    req.session.usuario  = user.nombre;
+    // redirigimos a /pacientes (ten en cuenta que en app.js montas pacienteRoutes en '/pacientes')
     return res.redirect('/pacientes');
-  } else {
-    return res.render('login', { error: 'Credenciales inválidas' });
+  } catch (err) {
+    console.error(err);
+    return res.render('login', { error: 'Error al iniciar sesión' });
   }
 };
 

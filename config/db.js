@@ -8,7 +8,5 @@ const connection = mysql.createConnection({
   database: process.env.DB_NAME
 });
 
-// Obtienes un objeto idéntico, pero con métodos promise: .query() y .execute()
-const db = connection.promise();
-
-module.exports = db;
+// Exporta la conexión en modo promise
+module.exports = connection.promise();

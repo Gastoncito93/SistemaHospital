@@ -3,14 +3,14 @@ const Paciente = require('../models/pacienteModel');
 module.exports = {
     // Mostrar todos los pacientes
     listar: async (req, res) => {
-        try {
-            const pacientes = await Paciente.obtenerTodos();
-            res.render('pacientes/lista', { pacientes });
-        } catch (error) {
-            console.error(error);
-            res.status(500).send('Error al obtener pacientes');
-        }
-    },
+  try {
+    const pacientes = await Paciente.obtenerTodos();
+    return res.render('pacientes/lista', { pacientes });
+  } catch (error) {
+    console.error('Error en listar pacientes:', error);
+    return res.render('pacientes/lista', { pacientes: [], error: error.message });
+  }
+},
 
     
 
@@ -20,18 +20,21 @@ module.exports = {
       },
 
     // Guardar nuevo paciente
-   guardar: async (req, res) => {
-      try {
-        await Paciente.insertar(req.body);
-        res.redirect('/pacientes');
-      } catch (error) {
-        console.error(error);
-        res.status(500).send('Error al guardar el paciente');
-      }
-    },
-
-
-
+   // controllers/pacienteController.js
+guardar: async (req, res) => {
+  console.log('📥 GUARDAR BODY:', req.body);
+  try {
+    await Paciente.insertar(req.body);
+    return res.redirect('/pacientes');
+  } catch (error) {
+    console.error('🚨 ERROR AL GUARDAR:', error);
+    // renderiza la misma vista con el mensaje
+    return res.render('pacientes/nuevo', { 
+      paciente: req.body, 
+      error: error.message 
+    });
+  }
+},
 
     mostrarFormularioEditar: async (req, res) => {
         try {
