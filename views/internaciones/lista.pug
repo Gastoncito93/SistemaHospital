@@ -14,6 +14,10 @@ block content
           th Tipo
           th Fecha Ingreso
           th Motivo
+          th Tipo Ingreso
+          th Origen
+          th Observaciones
+          th Acciones
       tbody
         each internacion in internaciones
           tr
@@ -23,6 +27,9 @@ block content
             td= internacion.tipo
             td= internacion.fecha_ingreso.toISOString().substring(0, 10)
             td= internacion.motivo
+            td= internacion.tipo_ingreso || ""
+            td= internacion.origen_paciente || ""
+            td= internacion.observaciones || ""
             td
               a.btn.btn-sm.btn-warning(href=`/internaciones/editar/${internacion.id}`) Editar
               a.btn.btn-sm.btn-danger.ms-2(href=`/internaciones/eliminar/${internacion.id}`) Eliminar

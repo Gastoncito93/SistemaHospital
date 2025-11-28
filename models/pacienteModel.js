@@ -21,17 +21,16 @@ const Paciente = {
     },
 
     async obtenerNoInternados() {
-        const db = await getConnection();
-        const [rows] = await db.query(`
-            SELECT p.* FROM pacientes p
-            WHERE NOT EXISTS (
-                SELECT 1 FROM internaciones i
-                WHERE i.paciente_id = p.id
-            )
-        `);
-        return rows;
-    },
-
+    const [rows] = await db.query(`
+        SELECT p.* 
+        FROM pacientes p
+        WHERE NOT EXISTS (
+            SELECT 1 FROM internaciones i
+            WHERE i.paciente_id = p.id
+        )
+    `);
+    return rows;
+},
     insertar: async (datos) => {
     const { nombre, apellido, dni, sexo } = datos;
     const [result] = await db.query(

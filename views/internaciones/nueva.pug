@@ -4,10 +4,12 @@ block content
   h1.text-center.mb-4 Sección Internaciones
 
   .container.d-flex.justify-content-center
-    .p-4.border.rounded-3.shadow-lg(style="border: 2px solid #40e0d0 !important; max-width: 500px; width: 100%; background-color: white;")
+    .p-4.border.rounded-3.shadow-lg(style="border: 2px solid #40e0d0 !important; max-width: 600px; width: 100%; background-color: white;")
       h2.text-center Nueva Internación
 
       form(method="POST", action="/internaciones/nueva")
+
+        // PACIENTE
         .mb-3
           label.form-label Paciente
           select.form-select(name="paciente_id", required, id="pacienteSelect")
@@ -15,6 +17,7 @@ block content
             each paciente in pacientes
               option(value=paciente.id)= paciente.nombre + ' ' + paciente.apellido
 
+        // HABITACIÓN
         .mb-3
           label.form-label Habitación
           select.form-select(name="habitacion_id", required, id="habitacionSelect")
@@ -22,19 +25,49 @@ block content
             each habitacion in habitaciones
               option(value=habitacion.id)= 'N° ' + habitacion.numero
 
+        // FECHA
         .mb-3
           label.form-label Fecha de ingreso
           input.form-control(type="date", name="fecha_ingreso", required)
 
+        // MOTIVO GENERAL
         .mb-3
           label.form-label Motivo de internación
           textarea.form-control(name="motivo", rows="3", required)
+
+        // TIPO DE INGRESO (nuevo)
+        .mb-3
+          label.form-label Tipo de ingreso
+          select.form-select(name="tipo_ingreso", required)
+            option(value="" disabled selected) -- Seleccione el tipo de ingreso --
+            option(value="Guardia") Guardia
+            option(value="Derivación médica") Derivación médica
+            option(value="Cita programada") Cita programada
+            option(value="Ambulancia") Ambulancia
+            option(value="Cirugía programada") Cirugía programada
+            option(value="Otro") Otro
+
+        // ORIGEN DEL PACIENTE (nuevo)
+        .mb-3
+          label.form-label Origen del paciente
+          select.form-select(name="origen_paciente", required)
+            option(value="" disabled selected) -- Seleccione el origen --
+            option(value="Domicilio") Domicilio
+            option(value="Consultorio externo") Consultorio externo
+            option(value="Otro hospital") Otro hospital / derivación
+            option(value="SAME / Ambulancia") SAME / Ambulancia
+            option(value="Otro") Otro
+
+        // OBSERVACIONES (nuevo)
+        .mb-3
+          label.form-label Observaciones
+          textarea.form-control(name="observaciones", rows="3")
 
         .text-center.mt-4
           button.btn.btn-success(type="submit") Registrar
           a.btn.btn-secondary.ms-2(href="/internaciones") Cancelar
 
-  // Script para actualizar habitaciones disponibles
+  // Script habitaciones dinámicas
   script.
     const pacienteSelect = document.getElementById('pacienteSelect');
     const habitacionSelect = document.getElementById('habitacionSelect');

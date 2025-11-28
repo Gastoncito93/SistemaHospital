@@ -3,7 +3,10 @@ const express = require('express');
 const path    = require('path');
 const session = require('express-session');
 require('./models/sync');
+
 const pacienteRoutes = require('./routes/pacienteRoutes');
+const internacionRoutes = require('./routes/internacionRoutes');
+const habitacionesRoutes = require('./routes/habitacionesRoutes');
 const autRoutes = require('./routes/aut');
 
 const app = express();
@@ -30,15 +33,11 @@ app.use((req, res, next) => {
 // Rutas
 app.use('/', autRoutes);
 app.use('/pacientes', pacienteRoutes);
+app.use('/internaciones', internacionRoutes);
+app.use('/habitaciones', habitacionesRoutes);
 
 // Redirigir raíz a /login
 app.get('/', (req, res) => res.redirect('/login'));
-
-// Ejemplo de dashboard protegido
-app.get('/dashboard', (req, res) => {
-  if (!req.session.userId) return res.redirect('/login');
-  res.send('¡Bienvenido al Dashboard!');
-});
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () =>

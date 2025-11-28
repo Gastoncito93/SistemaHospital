@@ -1,51 +1,63 @@
-const getConnection = require('../config/db');
+const db = require('../config/db'); // conexión promise()
 
 const Internacion = {
- async obtenerTodas() {
-  const db = await getConnection();
+
+  async obtenerTodas() {
   const [rows] = await db.query(`
-    SELECT i.*, 
-           p.nombre AS paciente_nombre, 
-           p.apellido AS paciente_apellido,
-           h.numero AS habitacion_numero, 
-           a.nombre AS ala,
-           t.nombre AS tipo
+    SELECT 
+      i.*, 
+      p.nombre AS paciente_nombre, 
+      p.apellido AS paciente_apellido,
+      h.numero AS habitacion_numero, 
+      a.nombre AS ala,
+      t.nombre AS tipo,
+      e.nombre AS estado
     FROM internaciones i
     JOIN pacientes p ON i.paciente_id = p.id
     JOIN habitaciones h ON i.habitacion_id = h.id
     JOIN alas a ON h.ala_id = a.id
     JOIN tipos t ON h.tipo_id = t.id
+    JOIN estados e ON h.estado_id = e.id
   `);
   return rows;
 },
 
 
   async obtenerPorId(id) {
-    const db = await getConnection();
-    const [rows] = await db.query(`
-      SELECT i.*,
-             p.nombre AS paciente_nombre,
-             p.apellido AS paciente_apellido,
-             p.sexo AS paciente_sexo
-      FROM internaciones i
-      JOIN pacientes p ON i.paciente_id = p.id
-      WHERE i.id = ?
-    `, [id]);
-    return rows[0];
-  },
+  const [rows] = await db.query(`
+    SELECT 
+      i.*,
+      p.nombre AS paciente_nombre,
+      p.apellido AS paciente_apellido,
+      p.sexo AS paciente_sexo
+    FROM internaciones i
+    JOIN pacientes p ON i.paciente_id = p.id
+    WHERE i.id = ?
+  `, [id]);
 
-  async insertar(data) {
-    const db = await getConnection();
-    const { paciente_id, habitacion_id, fecha_ingreso, motivo } = data;
+  return rows[0];
+},
 
-    await db.query(
-      'INSERT INTO internaciones (paciente_id, habitacion_id, fecha_ingreso, motivo) VALUES (?, ?, ?, ?)',
-      [paciente_id, habitacion_id, fecha_ingreso, motivo]
+
+  async insertar({ paciente_id, habitacion_id, fecha_ingreso, motivo, tipo_ingreso, origen_paciente, observaciones }) {
+  await db.query(
+    `INSERT INTO internaciones 
+      (paciente_id, habitacion_id, fecha_ingreso, motivo, tipo_ingreso, origen_paciente, observaciones)
+      VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [
+        paciente_id,
+        habitacion_id,
+        fecha_ingreso,
+        motivo,
+        tipo_ingreso,
+        origen_paciente,
+        observaciones
+      ]
     );
   },
 
+
   async obtenerHabitacionesDisponiblesPorSexo(sexo) {
-    const db = await getConnection();
     const [rows] = await db.query(`
       SELECT h.id, h.numero,
              a.nombre AS ala,
@@ -70,22 +82,34 @@ const Internacion = {
     return rows;
   },
 
-  async actualizar(id, data) {
-    const db = await getConnection();
-    const { habitacion_id, fecha_ingreso, motivo } = data;
-    await db.query(
-      'UPDATE internaciones SET habitacion_id = ?, fecha_ingreso = ?, motivo = ? WHERE id = ?',
-      [habitacion_id, fecha_ingreso, motivo, id]
-    );
-  },
+  async actualizar(id, { habitacion_id, fecha_ingreso, motivo, tipo_ingreso, origen_paciente, observaciones }) {
+  await db.query(
+    `UPDATE internaciones
+     SET habitacion_id = ?, 
+         fecha_ingreso = ?, 
+         motivo = ?, 
+         tipo_ingreso = ?, 
+         origen_paciente = ?, 
+         observaciones = ?
+     WHERE id = ?`,
+    [
+      habitacion_id,
+      fecha_ingreso,
+      motivo,
+      tipo_ingreso,
+      origen_paciente,
+      observaciones,
+      id
+    ]
+  );
+},
+
 
   async eliminar(id) {
-    const db = await getConnection();
     await db.query('DELETE FROM internaciones WHERE id = ?', [id]);
   },
 
   async contarPorHabitacion(habitacionId) {
-    const db = await getConnection();
     const [rows] = await db.query(
       'SELECT COUNT(*) AS cantidad FROM internaciones WHERE habitacion_id = ?',
       [habitacionId]

@@ -1,8 +1,7 @@
-const getConnection = require('../config/db');
+const db = require('../config/db'); // conexión promise()
 
 const Tipo = {
   async obtenerTodos() {
-    const db = await getConnection();
     const [rows] = await db.query('SELECT * FROM tipos');
     return rows;
   }

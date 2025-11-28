@@ -1,5 +1,4 @@
 const Internacion = require('../models/internacionModel');
-const getConnection = require('../config/db');
 const Paciente = require('../models/pacienteModel');
 const Habitacion = require('../models/habitacionModel');
 const Estado = require('../models/estadoModel');
@@ -61,38 +60,79 @@ module.exports = {
     }
   },
 
-  // Registrar nueva internación
   registrar: async (req, res) => {
-    try {
-      await Internacion.insertar(req.body);
-       const habitacionId = parseInt(req.body.habitacion_id, 10);
-      const habitacion = await Habitacion.obtenerPorId(habitacionId);
-      const ocupacion = await Internacion.contarPorHabitacion(habitacionId);
+  try {
 
-      let nombreEstado;
-      if (habitacion.tipo === 'individual') {
-        nombreEstado = 'ocupada';
-      } else {
-        nombreEstado = ocupacion >= 2 ? 'ocupada' : 'semi ocupado';
-      }
+    // Extraemos los nuevos campos además de los existentes
+    const {
+      paciente_id,
+      habitacion_id,
+      fecha_ingreso,
+      motivo,
+      tipo_ingreso,
+      origen_paciente,
+      observaciones
+    } = req.body;
 
-      const estado = await Estado.obtenerPorNombre(nombreEstado);
-      if (estado) {
-        await Habitacion.actualizarEstado(habitacionId, estado.id);
-      }
-      
-      res.redirect('/internaciones');
-    } catch (error) {
-      console.error(error);
-      res.status(500).send('Error al registrar internación');
+    // Guardamos la internación con los nuevos datos
+    await Internacion.insertar({
+      paciente_id,
+      habitacion_id,
+      fecha_ingreso,
+      motivo,
+      tipo_ingreso,
+      origen_paciente,
+      observaciones
+    });
+
+    // Lógica de actualización del estado de la habitación (tu lógica existente)
+    const habitacionId = parseInt(habitacion_id, 10);
+    const habitacion = await Habitacion.obtenerPorId(habitacionId);
+    const ocupacion = await Internacion.contarPorHabitacion(habitacionId);
+
+    let nombreEstado;
+    if (habitacion.tipo === 'individual') {
+      nombreEstado = 'ocupada';
+    } else {
+      nombreEstado = ocupacion >= 2 ? 'ocupada' : 'semi ocupado';
     }
-  },
+
+    const estado = await Estado.obtenerPorNombre(nombreEstado);
+    if (estado) {
+      await Habitacion.actualizarEstado(habitacionId, estado.id);
+    }
+
+    res.redirect('/internaciones');
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error al registrar internación');
+  }
+},
 
   // Actualizar internacion
   actualizar: async (req, res) => {
     try {
       const id = parseInt(req.params.id, 10);
-      await Internacion.actualizar(id, req.body);
+
+      const {
+        habitacion_id,
+        fecha_ingreso,
+        motivo,
+        tipo_ingreso,
+        origen_paciente,
+        observaciones
+      } = req.body;
+
+      await Internacion.actualizar(id, {
+        habitacion_id,
+        fecha_ingreso,
+        motivo,
+        tipo_ingreso,
+        origen_paciente,
+        observaciones
+      });
+
       res.redirect('/internaciones');
     } catch (error) {
       console.error(error);

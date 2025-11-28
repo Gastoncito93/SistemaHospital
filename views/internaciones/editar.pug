@@ -1,34 +1,80 @@
 extends ../layout
 
 block content
-  h2 Editar Internación
-  form(method="POST", action=`/internaciones/editar/${internacion.id}`)
-    .mb-3
-      label.form-label Paciente
-      input.form-control(type="text", value=internacion.paciente_nombre + ' ' + internacion.paciente_apellido, disabled)
+  h1.mb-4 Editar Internación
 
-    .mb-3
-      label.form-label Habitación
-      select.form-select(name="habitacion_id", required)
-        option(value="" disabled) -- Seleccione una habitación --
-        each habitacion in habitaciones
-          option(
-            value=habitacion.id,
-            selected=habitacion.id === internacion.habitacion_id
-          )= 'N° ' + habitacion.numero + ' (' + habitacion.ala + ' - ' + habitacion.tipo + ')'
+  .container.d-flex.justify-content-center
+    .p-4.border.rounded-3.shadow-lg(style="border: 2px solid #40e0d0 !important; max-width: 600px; width: 100%; background-color: white;")
 
-    .mb-3
-      label.form-label Fecha de ingreso
-      input.form-control(
-        type="date",
-        name="fecha_ingreso",
-        value=internacion.fecha_ingreso.toISOString().substring(0,10),
-        required
-      )
+      h2.text-center.mb-3 Editar Internación
 
-    .mb-3
-      label.form-label Motivo
-      textarea.form-control(name="motivo", rows="3", required)= internacion.motivo
+      form(method="POST", action=`/internaciones/editar/${internacion.id}`)
 
-    button.btn.btn-primary(type="submit") Actualizar
-    a.btn.btn-secondary.ms-2(href="/internaciones") Cancelar
+        // PACIENTE (solo lectura)
+        .mb-3
+          label.form-label Paciente
+          input.form-control(
+            type="text"
+            readonly
+            value=`${internacion.paciente_nombre} ${internacion.paciente_apellido}`
+          )
+
+        // HABITACIÓN
+        .mb-3
+          label.form-label Habitación
+          select.form-select(name="habitacion_id", required)
+            option(value="" disabled) -- Seleccione una habitación --
+            each h in habitaciones
+              option(
+                value=h.id
+                selected=(h.id === internacion.habitacion_id)
+              )= `N° ${h.numero} (${h.ala} - ${h.tipo})`
+
+        // FECHA DE INGRESO
+        .mb-3
+          label.form-label Fecha de ingreso
+          input.form-control(
+            type="date"
+            name="fecha_ingreso"
+            required
+            value=internacion.fecha_ingreso.toISOString().substring(0, 10)
+          )
+
+        // MOTIVO
+        .mb-3
+          label.form-label Motivo de internación
+          textarea.form-control(name="motivo", rows="3", required)= internacion.motivo
+
+        // TIPO DE INGRESO (nuevo)
+        .mb-3
+          label.form-label Tipo de ingreso
+          select.form-select(name="tipo_ingreso", required)
+            option(value="" disabled selected=!internacion.tipo_ingreso) -- Seleccione el tipo de ingreso --
+            - const tiposIngreso = ['Guardia','Derivación médica','Cita programada','Ambulancia','Cirugía programada','Otro']
+            each t in tiposIngreso
+              option(
+                value=t
+                selected=(internacion.tipo_ingreso === t)
+              )= t
+
+        // ORIGEN DEL PACIENTE (nuevo)
+        .mb-3
+          label.form-label Origen del paciente
+          select.form-select(name="origen_paciente", required)
+            option(value="" disabled selected=!internacion.origen_paciente) -- Seleccione el origen --
+            - const origenes = ['Domicilio','Consultorio externo','Otro hospital','SAME / Ambulancia','Otro']
+            each o in origenes
+              option(
+                value=o
+                selected=(internacion.origen_paciente === o)
+              )= o
+
+        // OBSERVACIONES (nuevo)
+        .mb-3
+          label.form-label Observaciones
+          textarea.form-control(name="observaciones", rows="3")= internacion.observaciones || ''
+
+        // BOTONES
+        .text-center.mt-4
+          button.btn.btn-primary(type="submit") Actualizar
+          a.btn.btn-secondary.ms-2(href="/internaciones") Cancelar

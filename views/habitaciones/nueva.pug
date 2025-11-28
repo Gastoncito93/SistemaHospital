@@ -7,32 +7,63 @@ block content
     .p-4.border.rounded-3.shadow-lg(style="border: 2px solid #40e0d0 !important; max-width: 500px; width: 100%; background-color: white;")
       h2.text-center Nueva Habitación
 
+      // Mensaje de error (duplicado u otro)
+      if error
+        .alert.alert-danger.text-center= error
+
+      // Mensaje de recomendación (si existe sugerencia)
+      if sugerido
+        .alert.alert-info.text-center
+          strong Sugerencia: 
+          | Puedes usar el número 
+          strong= sugerido
+
       form(method="POST", action="/habitaciones/nueva")
+        
+        // Número
         .mb-3
           label.form-label Número
-          input.form-control(type="text", name="numero", required)
+          input.form-control(
+            type="text"
+            name="numero"
+            required
+            value=(habitacion && habitacion.numero ? habitacion.numero : "")
+          )
 
+        // Ala
         .mb-3
           label.form-label Ala
           select.form-select(name="ala_id", required)
-            option(value="" disabled selected) -- Seleccione un ala --
+            option(value="" disabled selected)= "-- Seleccione un ala --"
             each ala in alas
-              option(value=ala.id)= ala.nombre
+              option(
+                value=ala.id
+                selected=(habitacion && habitacion.ala_id == ala.id)
+              )= ala.nombre
 
+        // Tipo
         .mb-3
           label.form-label Tipo
           select.form-select(name="tipo_id", required)
-            option(value="" disabled selected) -- Seleccione un tipo --
+            option(value="" disabled selected)= "-- Seleccione un tipo --"
             each tipo in tipos
-              option(value=tipo.id)= tipo.nombre
+              option(
+                value=tipo.id
+                selected=(habitacion && habitacion.tipo_id == tipo.id)
+              )= tipo.nombre
 
+        // Estado
         .mb-3
           label.form-label Estado
           select.form-select(name="estado_id", required)
-            option(value="" disabled selected) -- Seleccione un estado --
+            option(value="" disabled selected)= "-- Seleccione un estado --"
             each estado in estados
-              option(value=estado.id)= estado.nombre
+              option(
+                value=estado.id
+                selected=(habitacion && habitacion.estado_id == estado.id)
+              )= estado.nombre
 
+        // Botones
         .text-center.mt-4
           button.btn.btn-success(type="submit") Guardar
           a.btn.btn-secondary.ms-2(href="/habitaciones") Cancelar

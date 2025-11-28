@@ -1,8 +1,7 @@
 const Habitacion = require('../models/habitacionModel');
-const Estado = require('../models/estadoModel'); // Asegurate de tener este archivo
+const Estado = require('../models/estadoModel');
 const Ala = require('../models/alaModel');
 const Tipo = require('../models/tipoModel');
-
 
 module.exports = {
   // Mostrar todas las habitaciones
@@ -17,32 +16,57 @@ module.exports = {
   },
 
   mostrarFormularioNuevo: async (req, res) => {
-        try {
-            const alas = await Ala.obtenerTodos();
-            const tipos = await Tipo.obtenerTodos();
-            const estados = await Estado.obtenerTodos();
+    try {
+      const alas = await Ala.obtenerTodos();
+      const tipos = await Tipo.obtenerTodos();
+      const estados = await Estado.obtenerTodos();
 
-            res.render('habitaciones/nueva', {
-            habitacion: {},
-            alas,
-            tipos,
-            estados
-            });
-        } catch (error) {
-            console.error(error);
-            res.status(500).send('Error al cargar el formulario de nueva habitación');
-        }
-        },
+      res.render('habitaciones/nueva', {
+        habitacion: {},
+        alas,
+        tipos,
+        estados
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Error al cargar el formulario de nueva habitación');
+    }
+  },
 
-
-  // Guardar nueva habitación
   guardar: async (req, res) => {
     try {
       await Habitacion.insertar(req.body);
-      res.redirect('/habitaciones');
+      return res.redirect('/habitaciones');
+
     } catch (error) {
       console.error(error);
-      res.status(500).send('Error al guardar la habitación');
+
+      // Cargamos otra vez los selects
+      const alas = await Ala.obtenerTodos();
+      const tipos = await Tipo.obtenerTodos();
+      const estados = await Estado.obtenerTodos();
+
+      // Si es número duplicado
+      if (error.code === 'ER_DUP_ENTRY') {
+
+        // --- NUEVO --- obtener números y calcular sugerido
+        const numeros = await Habitacion.obtenerNumeros();
+        let sugerido = Number(req.body.numero) + 1;
+
+        while (numeros.includes(sugerido)) {
+          sugerido++;
+        }
+
+        return res.render('habitaciones/nueva', {
+          error: `El número de habitación ya existe. Puedes usar: ${sugerido}`,
+          habitacion: req.body,
+          alas,
+          tipos,
+          estados
+        });
+      }
+
+      return res.status(500).send('Error al guardar la habitación');
     }
   },
 
@@ -56,8 +80,9 @@ module.exports = {
         return res.status(404).send('Habitación no encontrada');
       }
 
-      const estados = await Estado.obtenerTodos(); // ⚠️ Nuevo: trae los estados
-      res.render('habitaciones/editar', { habitacion, estados }); // ⚠️ Pasamos ambos
+      const estados = await Estado.obtenerTodos();
+      res.render('habitaciones/editar', { habitacion, estados });
+
     } catch (error) {
       console.error(error);
       res.status(500).send('Error al cargar la habitación');
