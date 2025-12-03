@@ -25,13 +25,18 @@ const Internacion = {
 
   async obtenerPorId(id) {
   const [rows] = await db.query(`
-    SELECT 
-      i.*,
-      p.nombre AS paciente_nombre,
-      p.apellido AS paciente_apellido,
-      p.sexo AS paciente_sexo
+    SELECT i.*,
+           p.nombre AS paciente_nombre,
+           p.apellido AS paciente_apellido,
+           p.sexo AS paciente_sexo,
+           h.numero AS habitacion_numero,
+           a.nombre AS ala,
+           t.nombre AS tipo
     FROM internaciones i
     JOIN pacientes p ON i.paciente_id = p.id
+    JOIN habitaciones h ON i.habitacion_id = h.id
+    JOIN alas a ON h.ala_id = a.id
+    JOIN tipos t ON h.tipo_id = t.id
     WHERE i.id = ?
   `, [id]);
 

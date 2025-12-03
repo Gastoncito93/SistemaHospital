@@ -1,0 +1,58 @@
+extends ../layout
+
+block content
+  h2 Evaluaciones de Enfermería
+
+  // 👉 Encabezado con información del paciente
+  if internacion
+    h4.mt-3.text-secondary 
+      | Paciente: #{internacion.paciente_apellido} #{internacion.paciente_nombre}
+
+    h5.text-muted.mb-4
+      | Habitación #{internacion.habitacion_numero} — #{internacion.ala} — #{internacion.tipo}
+  else
+    p.text-danger ERROR: No se recibió una internación válida.
+
+
+  // 👉 Botón NUEVA evaluación
+  a.btn.btn-primary.mb-3(href=`/enfermeria/nueva/${internacion.id}`) + Nueva Evaluación
+
+
+  // 👉 Tabla de evaluaciones
+  if evaluaciones.length > 0
+    table.table.table-striped
+      thead
+        tr
+          th Fecha y Hora
+          th Presión
+          th FC
+          th FR
+          th Temp
+          th SpO2
+          th Dolor
+          th Motivo
+          th Síntomas
+          th Alergias
+          th Medicación
+          th Notas
+          th Acciones
+      tbody
+        each ev in evaluaciones
+          tr
+            td= ev.fecha_hora.toLocaleString('es-AR')
+            td= ev.presion_arterial
+            td= ev.frecuencia_cardiaca
+            td= ev.frecuencia_respiratoria
+            td= ev.temperatura
+            td= ev.saturacion_oxigeno
+            td= ev.dolor
+            td= ev.motivo
+            td= ev.sintomas
+            td= ev.alergias
+            td= ev.medicacion_actual
+            td= ev.notas
+            td
+              a.btn.btn-warning.btn-sm(href=`/enfermeria/editar/${ev.id}`) Editar
+              a.btn.btn-danger.btn-sm.ms-2(href=`/enfermeria/eliminar/${ev.id}`) Eliminar
+  else
+    p.text-muted No hay evaluaciones registradas para esta internación.

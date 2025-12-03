@@ -1,0 +1,94 @@
+extends ../layout
+
+block content
+  h1.text-center.mb-4 Editar Evaluación de Enfermería
+
+  .container
+    .p-4.border.rounded-3.shadow-lg(style="border: 2px solid #40e0d0; max-width: 800px; margin: auto; background: white;")
+
+      h3.text-center Paciente: #{evaluacion.paciente_nombre} #{evaluacion.paciente_apellido}
+      h5.text-center.mb-4 Habitación #{evaluacion.habitacion_numero} – #{evaluacion.ala} – #{evaluacion.tipo}
+
+      form(method="POST", action=`/enfermeria/editar/${evaluacion.id}`)
+        input(type="hidden", name="internacion_id", value=evaluacion.internacion_id)
+
+        .mb-3
+          label.form-label Fecha y Hora
+          input.form-control(
+            type="datetime-local",
+            name="fecha_hora",
+            value=(datos ? datos.fecha_hora : evaluacion.fecha_hora.toISOString().slice(0,16))
+          )
+          if errores && errores.fecha_hora
+            small.text-danger= errores.fecha_hora
+
+        // === FILA 1 ===
+        .row
+          .col-md-4.mb-3
+            label.form-label Presión Arterial
+            input.form-control(type="text", placeholder="120/80", name="presion_arterial",
+              value=(datos ? datos.presion_arterial : evaluacion.presion_arterial))
+            if errores && errores.presion_arterial
+              small.text-danger= errores.presion_arterial
+
+          .col-md-4.mb-3
+            label.form-label Frecuencia Cardíaca
+            input.form-control(type="number", placeholder="80", name="frecuencia_cardiaca",
+              value=(datos ? datos.frecuencia_cardiaca : evaluacion.frecuencia_cardiaca))
+            if errores && errores.frecuencia_cardiaca
+              small.text-danger= errores.frecuencia_cardiaca
+
+          .col-md-4.mb-3
+            label.form-label Frecuencia Respiratoria
+            input.form-control(type="number", placeholder="16", name="frecuencia_respiratoria",
+              value=(datos ? datos.frecuencia_respiratoria : evaluacion.frecuencia_respiratoria))
+            if errores && errores.frecuencia_respiratoria
+              small.text-danger= errores.frecuencia_respiratoria
+
+        // === FILA 2 ===
+        .row
+          .col-md-4.mb-3
+            label.form-label Temperatura
+            input.form-control(type="number", step="0.1", placeholder="36.5", name="temperatura",
+              value=(datos ? datos.temperatura : evaluacion.temperatura))
+            if errores && errores.temperatura
+              small.text-danger= errores.temperatura
+
+          .col-md-4.mb-3
+            label.form-label Saturación O₂
+            input.form-control(type="number", placeholder="97", name="saturacion_oxigeno",
+              value=(datos ? datos.saturacion_oxigeno : evaluacion.saturacion_oxigeno))
+            if errores && errores.saturacion_oxigeno
+              small.text-danger= errores.saturacion_oxigeno
+
+          .col-md-4.mb-3
+            label.form-label Dolor (1–10)
+            input.form-control(type="number", placeholder="5", name="dolor",
+              value=(datos ? datos.dolor : evaluacion.dolor))
+            if errores && errores.dolor
+              small.text-danger= errores.dolor
+
+        // TEXTOS LARGOS
+        .mb-3
+          label.form-label Motivo
+          textarea.form-control(name="motivo", rows="2")= datos ? datos.motivo : evaluacion.motivo
+
+        .mb-3
+          label.form-label Síntomas
+          textarea.form-control(name="sintomas", rows="2")= datos ? datos.sintomas : evaluacion.sintomas
+
+        .mb-3
+          label.form-label Alergias
+          textarea.form-control(name="alergias", rows="2")= datos ? datos.alergias : evaluacion.alergias
+
+        .mb-3
+          label.form-label Medicación Actual
+          textarea.form-control(name="medicacion_actual", rows="2")= datos ? datos.medicacion_actual : evaluacion.medicacion_actual
+
+        .mb-3
+          label.form-label Notas
+          textarea.form-control(name="notas", rows="2")= datos ? datos.notas : evaluacion.notas
+
+        .text-center.mt-4
+          button.btn.btn-primary(type="submit") Actualizar
+          a.btn.btn-secondary.ms-2(href=`/enfermeria/internacion/${evaluacion.internacion_id}`) Cancelar
