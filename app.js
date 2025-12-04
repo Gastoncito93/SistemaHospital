@@ -8,6 +8,7 @@ const pacienteRoutes = require('./routes/pacienteRoutes');
 const internacionRoutes = require('./routes/internacionRoutes');
 const habitacionesRoutes = require('./routes/habitacionesRoutes');
 const enfermeriaRoutes = require('./routes/enfermeriaRoutes');
+const medicoRoutes = require('./routes/medicoRoutes');
 const autRoutes = require('./routes/aut');
 
 const app = express();
@@ -37,6 +38,7 @@ app.use('/pacientes', pacienteRoutes);
 app.use('/internaciones', internacionRoutes);
 app.use('/habitaciones', habitacionesRoutes);
 app.use('/enfermeria', enfermeriaRoutes);
+app.use('/medico', medicoRoutes);
 
 // Redirigir raíz a /login
 app.get('/', (req, res) => res.redirect('/login'));

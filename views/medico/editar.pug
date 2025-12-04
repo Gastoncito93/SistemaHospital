@@ -1,0 +1,78 @@
+extends ../layout
+
+block content
+  h2.text-center.mb-4 Editar Evaluación Médica
+
+  // Contenedor angosto
+  .container(style="max-width: 900px; margin: 0 auto;")
+
+    // Encabezado informativo
+    if evaluacion
+      .p-3.rounded.mb-4(style="background-color: #e6f7ff; border-left: 4px solid #0d6efd;")
+        p.mb-1
+          strong Paciente:
+          |  #{evaluacion.paciente_nombre} #{evaluacion.paciente_apellido}
+        p.mb-0
+          strong Habitación:
+          |  #{evaluacion.habitacion_numero} (#{evaluacion.ala} – #{evaluacion.tipo})
+
+    form(method="POST", action=`/medico/editar/${evaluacion.id}`)
+      input(type="hidden", name="internacion_id", value=evaluacion.internacion_id)
+
+      .card.shadow.p-4(style="border-radius: 12px;")
+
+        // ==========================
+        // FILA: Fecha y Diagnóstico
+        // ==========================
+        .row
+          .col-md-4.mb-3
+            label.form-label Fecha y Hora
+            input.form-control(
+              type="datetime-local",
+              name="fecha_hora",
+              required,
+              value=evaluacion.fecha_hora.toISOString().slice(0,16)
+            )
+            if errors && errors.fecha_hora
+              small.text-danger= errors.fecha_hora
+
+          .col-md-8.mb-3
+            label.form-label Diagnóstico Médico
+            textarea.form-control(name="diagnostico", rows="2")= evaluacion.diagnostico
+            if errors && errors.diagnostico
+              small.text-danger= errors.diagnostico
+
+        // ==========================
+        // FILA: Evolución + Tratamiento
+        // ==========================
+        .row
+          .col-md-6.mb-3
+            label.form-label Evolución
+            textarea.form-control(name="evolucion", rows="3")= evaluacion.evolucion
+
+          .col-md-6.mb-3
+            label.form-label Tratamiento Indicado
+            textarea.form-control(name="tratamiento", rows="3")= evaluacion.tratamiento
+
+        // ==========================
+        // FILA: Medicación + Estudios
+        // ==========================
+        .row
+          .col-md-6.mb-3
+            label.form-label Medicación
+            textarea.form-control(name="medicacion", rows="2")= evaluacion.medicacion
+
+          .col-md-6.mb-3
+            label.form-label Estudios Solicitados
+            textarea.form-control(name="estudios_solicitados", rows="2")= evaluacion.estudios_solicitados
+
+        // ==========================
+        // NOTAS
+        // ==========================
+        .mb-3
+          label.form-label Observaciones
+          textarea.form-control(name="notas", rows="3")= evaluacion.notas
+
+        .text-center.mt-4
+          button.btn.btn-success(type="submit") Actualizar
+          a.btn.btn-secondary.ms-2(href=`/medico/internacion/${evaluacion.internacion_id}`) Cancelar

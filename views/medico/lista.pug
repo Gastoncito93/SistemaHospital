@@ -1,0 +1,41 @@
+extends ../layout
+
+block content
+  h2 Evaluaciones Médicas del Paciente
+
+  .alert.alert-info
+    b Paciente: 
+    | #{internacion.paciente_nombre} #{internacion.paciente_apellido}
+    br
+    b Habitación: 
+    | #{internacion.habitacion_numero} (#{internacion.ala} – #{internacion.tipo})
+
+  a.btn.btn-primary.mb-3(href=`/medico/nueva/${internacion.id}`) + Nueva Evaluación Médica
+
+  if evaluaciones.length > 0
+    table.table.table-bordered.table-striped
+      thead
+        tr
+          th Fecha y Hora
+          th Diagnóstico
+          th Evolución
+          th Tratamiento
+          th Medicación
+          th Estudios
+          th Notas
+          th Acciones
+      tbody
+        each ev in evaluaciones
+          tr
+            td= ev.fecha_hora.toLocaleString('es-AR')
+            td= ev.diagnostico
+            td= ev.evolucion
+            td= ev.tratamiento
+            td= ev.medicacion
+            td= ev.estudios_solicitados
+            td= ev.notas
+            td
+              a.btn.btn-warning.btn-sm(href=`/medico/editar/${ev.id}`) Editar
+              a.btn.btn-danger.btn-sm.ms-1(href=`/medico/eliminar/${ev.id}`) Eliminar
+  else
+    p.text-muted No hay evaluaciones registradas.

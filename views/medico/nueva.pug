@@ -1,0 +1,115 @@
+extends ../layout
+
+block content
+  // Título
+  h1.text-center.mb-4 Nueva Evolución Médica
+
+  // Banner paciente
+  .container.mb-4
+    .p-3.rounded(style="background-color: #e6f7ff; border-left: 4px solid #0d6efd;")
+      p.mb-1
+        strong Paciente:
+        |  #{internacion.paciente_nombre} #{internacion.paciente_apellido}
+      p.mb-0
+        strong Habitación:
+        |  #{internacion.habitacion_numero} (#{internacion.ala} – #{internacion.tipo})
+
+  // Valores previos
+  - const fechaValor = datos && datos.fecha_hora ? datos.fecha_hora : '';
+  - const diagValor = datos?.diagnostico || '';
+  - const evoValor = datos?.evolucion || '';
+  - const tratValor = datos?.tratamiento || '';
+  - const medValor = datos?.medicacion || '';
+  - const estValor = datos?.estudios_solicitados || '';
+  - const notValor = datos?.notas || '';
+
+  // FORMULARIO
+  form(method="POST", action="/medico/nueva")
+    input(type="hidden", name="internacion_id", value=internacion.id)
+
+    .card.shadow.p-4(style="max-width: 900px; margin: 0 auto; border-radius: 12px;")
+
+      // =======================
+      // FILA 1 → Fecha y Diagnóstico
+      // =======================
+      .row
+        .col-md-4.mb-3
+          label.form-label Fecha y Hora
+          input.form-control(
+            type="datetime-local",
+            name="fecha_hora",
+            required,
+            value=fechaValor
+          )
+          if errores && errores.fecha_hora
+            small.text-danger= errores.fecha_hora
+
+        .col-md-8.mb-3
+          label.form-label Diagnóstico
+          textarea.form-control(
+            name="diagnostico",
+            rows="2",
+            placeholder="Ej: Neumonía adquirida en la comunidad..."
+          )= diagValor
+          if errores && errores.diagnostico
+            small.text-danger= errores.diagnostico
+
+      // =======================
+      // FILA 2 → Evolución y Tratamiento
+      // =======================
+      .row
+        .col-md-6.mb-3
+          label.form-label Evolución
+          textarea.form-control(
+            name="evolucion",
+            rows="3",
+            placeholder="Ej: Paciente con buena respuesta al tratamiento..."
+          )= evoValor
+          if errores && errores.evolucion
+            small.text-danger= errores.evolucion
+
+        .col-md-6.mb-3
+          label.form-label Tratamiento
+          textarea.form-control(
+            name="tratamiento",
+            rows="3",
+            placeholder="Ej: Amoxicilina 500mg cada 8hs..."
+          )= tratValor
+          if errores && errores.tratamiento
+            small.text-danger= errores.tratamiento
+
+      // =======================
+      // FILA 3 → Medicación y Estudios
+      // =======================
+      .row
+        .col-md-6.mb-3
+          label.form-label Medicación
+          textarea.form-control(
+            name="medicacion",
+            rows="2",
+            placeholder="Ej: Ibuprofeno 400mg si dolor..."
+          )= medValor
+
+        .col-md-6.mb-3
+          label.form-label Estudios Solicitados
+          textarea.form-control(
+            name="estudios_solicitados",
+            rows="2",
+            placeholder="Ej: Radiografía de tórax, hemograma..."
+          )= estValor
+
+      // =======================
+      // NOTAS
+      // =======================
+      .mb-3
+        label.form-label Notas
+        textarea.form-control(
+          name="notas",
+          rows="2",
+          placeholder="Notas adicionales del médico..."
+        )= notValor
+
+      // Botones
+      .text-center.mt-3
+        button.btn.btn-primary(type="submit") Guardar Evolución
+        a.btn.btn-secondary.ms-2(href=`/medico/internacion/${internacion.id}`) Cancelar
