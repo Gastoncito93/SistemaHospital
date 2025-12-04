@@ -1,41 +1,521 @@
 extends ../layout
 
 block content
-  h2 Evaluaciones Médicas del Paciente
+  style.
+    :root {
+      --hospital-blue: #0d8abc;
+      --hospital-teal: #00c2cb;
+      --hospital-light: #e8f4f8;
+      --hospital-white: #ffffff;
+      --hospital-gray: #f8f9fa;
+      --hospital-dark: #2c3e50;
+      --hospital-green: #2ecc71;
+      --hospital-red: #e74c3c;
+      --hospital-medico: #27ae60;
+    }
+    
+    .hospital-header {
+      background: linear-gradient(135deg, var(--hospital-medico), #2ecc71);
+      color: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 6px 15px rgba(39, 174, 96, 0.15);
+    }
+    
+    .hospital-title {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .hospital-title i {
+      font-size: 1.8rem;
+    }
+    
+    .patient-card {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      border-left: 5px solid var(--hospital-medico);
+    }
+    
+    .patient-info-header {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 1rem;
+    }
+    
+    .patient-avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--hospital-medico), #27ae60);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+    
+    .patient-details h3 {
+      color: var(--hospital-dark);
+      margin-bottom: 0.25rem;
+    }
+    
+    .patient-room-info {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid #eee;
+    }
+    
+    .room-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--hospital-dark);
+    }
+    
+    .room-badge i {
+      color: var(--hospital-medico);
+    }
+    
+    .btn-medico {
+      background: linear-gradient(to right, var(--hospital-medico), #2ecc71);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 0.6rem 1.5rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 8px rgba(39, 174, 96, 0.2);
+    }
+    
+    .btn-medico:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(39, 174, 96, 0.25);
+      color: white;
+    }
+    
+    .hospital-table {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      border: none;
+    }
+    
+    .hospital-table thead {
+      background: linear-gradient(to right, #f8f9fa, #e9ecef);
+      color: var(--hospital-dark);
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+      letter-spacing: 0.5px;
+    }
+    
+    .hospital-table th {
+      border-bottom: 2px solid var(--hospital-medico);
+      padding: 1rem;
+      white-space: nowrap;
+    }
+    
+    .hospital-table td {
+      padding: 0.75rem;
+      vertical-align: middle;
+      border-top: 1px solid #f0f0f0;
+    }
+    
+    .hospital-table tbody tr {
+      transition: all 0.2s ease;
+    }
+    
+    .hospital-table tbody tr:hover {
+      background-color: rgba(39, 174, 96, 0.05);
+    }
+    
+    .action-buttons {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    
+    .btn-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+    }
+    
+    .btn-icon:hover {
+      transform: scale(1.1);
+    }
+    
+    .btn-edit {
+      background-color: #fff8e6;
+      color: #e67e22;
+    }
+    
+    .btn-delete {
+      background-color: #ffeaea;
+      color: #e74c3c;
+    }
+    
+    .btn-view {
+      background-color: #e8f4fc;
+      color: var(--hospital-blue);
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    }
+    
+    .empty-state-icon {
+      font-size: 3.5rem;
+      color: #d1d8e0;
+      margin-bottom: 1rem;
+    }
+    
+    .empty-state-title {
+      color: #7f8c8d;
+      margin-bottom: 0.5rem;
+    }
+    
+    .empty-state-text {
+      color: #95a5a6;
+      max-width: 400px;
+      margin: 0 auto 1.5rem;
+    }
+    
+    .text-truncate-cell {
+      max-width: 200px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      cursor: help;
+    }
+    
+    .table-responsive {
+      border-radius: 12px;
+    }
+    
+    .status-indicator {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 5px;
+    }
+    
+    .status-stable { background-color: #2ecc71; }
+    .status-serious { background-color: #f39c12; }
+    .status-critical { background-color: #e74c3c; }
+    
+    .evaluation-date {
+      font-weight: 600;
+      color: var(--hospital-dark);
+    }
+    
+    .evaluation-time {
+      font-size: 0.85rem;
+      color: #6c757d;
+    }
+    
+    .diagnosis-badge {
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
+      background-color: #e8f7ef;
+      border-radius: 4px;
+      color: #27ae60;
+      font-size: 0.85rem;
+      font-weight: 500;
+      border-left: 3px solid #27ae60;
+    }
+    
+    @media (max-width: 768px) {
+      .hospital-table {
+        font-size: 0.85rem;
+      }
+      
+      .hospital-table th, 
+      .hospital-table td {
+        padding: 0.5rem;
+      }
+      
+      .patient-room-info {
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+      
+      .action-buttons {
+        flex-direction: column;
+      }
+    }
 
-  .alert.alert-info
-    b Paciente: 
-    | #{internacion.paciente_nombre} #{internacion.paciente_apellido}
-    br
-    b Habitación: 
-    | #{internacion.habitacion_numero} (#{internacion.ala} – #{internacion.tipo})
+  //- Header principal
+  .hospital-header
+    .d-flex.justify-content-between.align-items-center.flex-wrap
+      div
+        h1.hospital-title
+          i.bi.bi-clipboard2-pulse
+          | Evaluaciones Médicas
+        p.mb-0 Historia clínica y seguimiento médico del paciente
 
-  a.btn.btn-primary.mb-3(href=`/medico/nueva/${internacion.id}`) + Nueva Evaluación Médica
+  //- Información del paciente
+  if internacion
+    .patient-card
+      .patient-info-header
+        .patient-avatar= `${internacion.paciente_nombre.charAt(0)}${internacion.paciente_apellido.charAt(0)}`
+        .patient-details
+          h3.mb-0 #{internacion.paciente_apellido}, #{internacion.paciente_nombre}
+          p.text-muted.mb-0 ID Internación: #{internacion.id} | Paciente ID: #{internacion.paciente_id}
+      
+      .patient-room-info
+        .room-badge
+          i.bi.bi-hospital
+          span Habitación #{internacion.habitacion_numero}
+        .room-badge
+          i.bi.bi-compass
+          span Ala #{internacion.ala}
+        .room-badge
+          i.bi.bi-tag
+          span #{internacion.tipo}
+        .room-badge
+          i.bi.bi-calendar
+          span Ingreso: #{internacion.fecha_ingreso.toISOString().substring(0, 10)}
+    
+    //- Botón nueva evaluación
+    .d-flex.justify-content-between.align-items-center.mb-3
+      h4.mb-0
+        i.bi.bi-journal-medical
+        | Historial Médico
+      a.btn.btn-medico(href=`/medico/nueva/${internacion.id}`)
+        i.bi.bi-plus-circle
+        | Nueva Evaluación
 
-  if evaluaciones.length > 0
-    table.table.table-bordered.table-striped
-      thead
-        tr
-          th Fecha y Hora
-          th Diagnóstico
-          th Evolución
-          th Tratamiento
-          th Medicación
-          th Estudios
-          th Notas
-          th Acciones
-      tbody
-        each ev in evaluaciones
-          tr
-            td= ev.fecha_hora.toLocaleString('es-AR')
-            td= ev.diagnostico
-            td= ev.evolucion
-            td= ev.tratamiento
-            td= ev.medicacion
-            td= ev.estudios_solicitados
-            td= ev.notas
-            td
-              a.btn.btn-warning.btn-sm(href=`/medico/editar/${ev.id}`) Editar
-              a.btn.btn-danger.btn-sm.ms-1(href=`/medico/eliminar/${ev.id}`) Eliminar
+    //- Tabla de evaluaciones
+    if evaluaciones.length > 0
+      .table-responsive
+        table.table.table-hover.hospital-table
+          thead
+            tr
+              th Fecha y Hora
+              th Diagnóstico
+              th Evolución
+              th Tratamiento
+              th Medicación
+              th Acciones
+          tbody
+            each ev in evaluaciones
+              - const fecha = new Date(ev.fecha_hora);
+              - const fechaStr = fecha.toLocaleDateString('es-AR');
+              - const horaStr = fecha.toLocaleTimeString('es-AR', {hour: '2-digit', minute:'2-digit'});
+              
+              tr
+                td
+                  .evaluation-date= fechaStr
+                  .evaluation-time= horaStr
+                
+                td.text-truncate-cell(title=ev.diagnostico)= ev.diagnostico || '--'
+                
+                td.text-truncate-cell(title=ev.evolucion)= ev.evolucion || '--'
+                
+                td.text-truncate-cell(title=ev.tratamiento)= ev.tratamiento || '--'
+                
+                td.text-truncate-cell(title=ev.medicacion)= ev.medicacion || '--'
+                
+                td
+                  .action-buttons
+                    button.btn.btn-icon.btn-view(
+                      title="Ver evaluación completa",
+                      onclick=`mostrarEvaluacionCompleta(${JSON.stringify(ev).replace(/'/g, "\\'")})`
+                    )
+                      i.bi.bi-eye
+                    a.btn.btn-icon.btn-edit(
+                      href=`/medico/editar/${ev.id}`,
+                      title="Editar evaluación"
+                    )
+                      i.bi.bi-pencil
+                    a.btn.btn-icon.btn-delete(
+                      href=`/medico/eliminar/${ev.id}`,
+                      title="Eliminar evaluación",
+                      onclick=`return confirm('¿Está seguro de eliminar la evaluación médica del ${fechaStr}?')`
+                    )
+                      i.bi.bi-trash
+    
+    //- Estado vacío
+    else
+      .empty-state
+        .empty-state-icon
+          i.bi.bi-journal-x
+        h3.empty-state-title No hay evaluaciones médicas registradas
+        p.empty-state-text
+          | No se han registrado evaluaciones médicas para esta internación.
+          | La historia clínica del paciente se encuentra vacía.
+        a.btn.btn-medico(href=`/medico/nueva/${internacion.id}`)
+          i.bi.bi-plus-circle
+          | Crear primera evaluación médica
+  
+  //- Error si no hay internación
   else
-    p.text-muted No hay evaluaciones registradas.
+    .empty-state
+      .empty-state-icon
+        i.bi.bi-exclamation-triangle
+      h3.empty-state-title Error en los datos
+      p.empty-state-text
+        | No se recibió una internación válida. Por favor, regrese a la lista de internaciones.
+      a.btn.btn-medico(href="/internaciones")
+        i.bi.bi-arrow-left
+        | Volver a Internaciones
+
+  //- Modal para ver evaluación completa
+  .modal.fade(id="evaluacionModal", tabindex="-1")
+    .modal-dialog.modal-lg
+      .modal-content
+        .modal-header.bg-light
+          h5.modal-title
+            i.bi.bi-clipboard2-pulse
+            | Evaluación Médica Completa
+          button.btn-close(type="button", data-bs-dismiss="modal")
+        .modal-body
+          div(id="evaluacionContenido")
+            //- Contenido dinámico
+        .modal-footer
+          button.btn.btn-secondary(type="button", data-bs-dismiss="modal") Cerrar
+
+  script.
+    // Añadir íconos si no están ya incluidos
+    if (!document.querySelector('link[href*="bootstrap-icons"]')) {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css';
+      document.head.appendChild(link);
+    }
+    
+    // Función para mostrar evaluación completa
+    function mostrarEvaluacionCompleta(evaluacion) {
+      const fecha = new Date(evaluacion.fecha_hora);
+      const fechaStr = fecha.toLocaleDateString('es-AR', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+      const horaStr = fecha.toLocaleTimeString('es-AR');
+      
+      const contenido = `
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <h6><i class="bi bi-calendar"></i> Fecha y Hora</h6>
+            <p class="mb-1"><strong>${fechaStr}</strong></p>
+            <p class="text-muted">${horaStr}</p>
+          </div>
+          <div class="col-md-6">
+            <h6><i class="bi bi-person-badge"></i> Evaluador</h6>
+            <p class="mb-0"><strong>Médico a cargo</strong></p>
+            <small class="text-muted">Registro ID: ${evaluacion.id}</small>
+          </div>
+        </div>
+        
+        <hr>
+        
+        <div class="row mb-3">
+          <div class="col-12">
+            <h6><i class="bi bi-clipboard2-check"></i> Diagnóstico</h6>
+            <div class="p-3 bg-light rounded">
+              <p style="white-space: pre-line;">${evaluacion.diagnostico || 'No especificado'}</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <h6><i class="bi bi-graph-up"></i> Evolución</h6>
+            <div class="p-3 bg-light rounded">
+              <p style="white-space: pre-line;">${evaluacion.evolucion || 'No registrada'}</p>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <h6><i class="bi bi-prescription2"></i> Tratamiento</h6>
+            <div class="p-3 bg-light rounded">
+              <p style="white-space: pre-line;">${evaluacion.tratamiento || 'No especificado'}</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <h6><i class="bi bi-capsule"></i> Medicación Prescrita</h6>
+            <div class="p-3 bg-light rounded">
+              <p style="white-space: pre-line;">${evaluacion.medicacion || 'No prescrita'}</p>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <h6><i class="bi bi-clipboard-data"></i> Estudios Solicitados</h6>
+            <div class="p-3 bg-light rounded">
+              <p style="white-space: pre-line;">${evaluacion.estudios_solicitados || 'No solicitados'}</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="row">
+          <div class="col-12">
+            <h6><i class="bi bi-journal-text"></i> Notas Adicionales</h6>
+            <div class="p-3 bg-light rounded">
+              <p style="white-space: pre-line;">${evaluacion.notas || 'Sin notas adicionales'}</p>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      document.getElementById('evaluacionContenido').innerHTML = contenido;
+      
+      // Mostrar modal (si Bootstrap está disponible)
+      if (typeof bootstrap !== 'undefined') {
+        const modal = new bootstrap.Modal(document.getElementById('evaluacionModal'));
+        modal.show();
+      } else {
+        // Fallback simple si no hay Bootstrap
+        alert('Evaluación médica completa:\n\n' + 
+              `Fecha: ${fechaStr}\n` +
+              `Diagnóstico: ${evaluacion.diagnostico || 'No especificado'}\n` +
+              `Tratamiento: ${evaluacion.tratamiento || 'No especificado'}\n` +
+              `Medicación: ${evaluacion.medicacion || 'No prescrita'}`);
+      }
+    }
+    
+    // Confirmación antes de eliminar (ya está en el onclick)
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('Vista de evaluaciones médicas cargada');
+      
+      // Agregar tooltips a las celdas truncadas
+      const truncatedCells = document.querySelectorAll('.text-truncate-cell');
+      truncatedCells.forEach(cell => {
+        cell.addEventListener('mouseenter', function() {
+          const originalText = this.getAttribute('title');
+          if (originalText && originalText.length > 50) {
+            // Crear tooltip simple si no hay Bootstrap
+            this.setAttribute('data-bs-toggle', 'tooltip');
+            this.setAttribute('data-bs-title', originalText);
+          }
+        });
+      });
+    });

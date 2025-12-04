@@ -1,54 +1,256 @@
 extends ../layout
 
 block content
-  h1.mb-4 Editar Internación
+  style.
+    :root {
+      --hospital-blue: #0d8abc;
+      --hospital-teal: #00c2cb;
+      --hospital-light: #e8f4f8;
+      --hospital-white: #ffffff;
+      --hospital-gray: #f8f9fa;
+      --hospital-dark: #2c3e50;
+      --hospital-yellow: #f39c12;
+    }
+    
+    .hospital-header {
+      background: linear-gradient(135deg, var(--hospital-blue), var(--hospital-teal));
+      color: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 6px 15px rgba(13, 138, 188, 0.15);
+      text-align: center;
+    }
+    
+    .hospital-title {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    
+    .hospital-title i {
+      font-size: 1.8rem;
+    }
+    
+    .hospital-form-container {
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      border: 2px solid var(--hospital-yellow) !important;
+      max-width: 600px;
+      width: 100%;
+      margin: 0 auto;
+    }
+    
+    .form-label {
+      font-weight: 600;
+      color: var(--hospital-dark);
+      margin-bottom: 0.5rem;
+    }
+    
+    .form-control, .form-select {
+      border: 1px solid #dee2e6;
+      border-radius: 8px;
+      padding: 0.6rem 0.75rem;
+      transition: all 0.3s ease;
+    }
+    
+    .form-control[readonly] {
+      background-color: #f8f9fa;
+      border-color: #e9ecef;
+    }
+    
+    .form-control:focus, .form-select:focus {
+      border-color: var(--hospital-yellow);
+      box-shadow: 0 0 0 0.25rem rgba(243, 156, 18, 0.25);
+    }
+    
+    .btn-edit {
+      background: linear-gradient(to right, var(--hospital-yellow), #f1c40f);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 0.6rem 1.5rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 8px rgba(243, 156, 18, 0.2);
+    }
+    
+    .btn-edit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(243, 156, 18, 0.25);
+      color: white;
+    }
+    
+    .btn-secondary {
+      background: #6c757d;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 0.6rem 1.5rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-secondary:hover {
+      background: #5a6268;
+      color: white;
+      transform: translateY(-2px);
+    }
+    
+    .button-group {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 2rem;
+    }
+    
+    .form-section {
+      margin-bottom: 1.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid #eaeaea;
+    }
+    
+    .form-section:last-child {
+      border-bottom: none;
+    }
+    
+    .form-section h5 {
+      color: var(--hospital-blue);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .form-section h5 i {
+      font-size: 1.2rem;
+    }
+    
+    .info-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #e8f4f8;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      margin-bottom: 1.5rem;
+      color: var(--hospital-dark);
+      font-size: 0.9rem;
+    }
+    
+    .info-badge i {
+      color: var(--hospital-blue);
+    }
+    
+    .patient-display {
+      background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border-left: 4px solid var(--hospital-blue);
+    }
+    
+    .patient-display .patient-name {
+      font-weight: 600;
+      color: var(--hospital-dark);
+      font-size: 1.1rem;
+    }
+    
+    .patient-display .patient-id {
+      font-size: 0.85rem;
+      color: #6c757d;
+    }
+    
+    @media (max-width: 768px) {
+      .hospital-form-container {
+        padding: 1.5rem;
+        margin: 0 1rem;
+      }
+      
+      .button-group {
+        flex-direction: column;
+      }
+      
+      .button-group .btn {
+        width: 100%;
+      }
+    }
 
-  .container.d-flex.justify-content-center
-    .p-4.border.rounded-3.shadow-lg(style="border: 2px solid #40e0d0 !important; max-width: 600px; width: 100%; background-color: white;")
+  .hospital-header
+    h1.hospital-title
+      i.bi.bi-clipboard-check
+      | Editar Internación
+    p.mb-0 Actualice la información de la internación
 
-      h2.text-center.mb-3 Editar Internación
-
-      form(method="POST", action=`/internaciones/editar/${internacion.id}`)
-
-        // PACIENTE (solo lectura)
+  .hospital-form-container
+    .info-badge
+      i.bi.bi-info-circle
+      span ID de Internación: #{internacion.id}
+    
+    form(method="POST", action=`/internaciones/editar/${internacion.id}`)
+      
+      // Sección: Paciente (solo lectura)
+      .form-section
+        h5
+          i.bi.bi-person-vcard
+          | Paciente
+        .patient-display
+          .patient-name= `${internacion.paciente_nombre} ${internacion.paciente_apellido}`
+          .patient-id ID Paciente: #{internacion.paciente_id}
+        input.form-control(
+          type="text"
+          name="paciente_id"
+          value=internacion.paciente_id
+          hidden
+        )
+      
+      // Sección: Habitación
+      .form-section
+        h5
+          i.bi.bi-hospital
+          | Habitación
         .mb-3
-          label.form-label Paciente
-          input.form-control(
-            type="text"
-            readonly
-            value=`${internacion.paciente_nombre} ${internacion.paciente_apellido}`
-          )
-
-        // HABITACIÓN
-        .mb-3
-          label.form-label Habitación
-          select.form-select(name="habitacion_id", required)
+          label.form-label(for="habitacion_id") Habitación Actual
+          select.form-select(name="habitacion_id", id="habitacion_id", required)
             option(value="" disabled) -- Seleccione una habitación --
             each h in habitaciones
               option(
                 value=h.id
                 selected=(h.id === internacion.habitacion_id)
               )= `N° ${h.numero} (${h.ala} - ${h.tipo})`
-
-        // FECHA DE INGRESO
+      
+      // Sección: Fechas
+      .form-section
+        h5
+          i.bi.bi-calendar-event
+          | Fechas
         .mb-3
-          label.form-label Fecha de ingreso
+          label.form-label(for="fecha_ingreso") Fecha de ingreso
           input.form-control(
             type="date"
             name="fecha_ingreso"
+            id="fecha_ingreso"
             required
             value=internacion.fecha_ingreso.toISOString().substring(0, 10)
           )
-
-        // MOTIVO
+      
+      // Sección: Datos de Ingreso
+      .form-section
+        h5
+          i.bi.bi-door-open
+          | Datos de Ingreso
         .mb-3
-          label.form-label Motivo de internación
-          textarea.form-control(name="motivo", rows="3", required)= internacion.motivo
-
-        // TIPO DE INGRESO (nuevo)
-        .mb-3
-          label.form-label Tipo de ingreso
-          select.form-select(name="tipo_ingreso", required)
+          label.form-label(for="tipo_ingreso") Tipo de ingreso
+          select.form-select(name="tipo_ingreso", id="tipo_ingreso", required)
             option(value="" disabled selected=!internacion.tipo_ingreso) -- Seleccione el tipo de ingreso --
             - const tiposIngreso = ['Guardia','Derivación médica','Cita programada','Ambulancia','Cirugía programada','Otro']
             each t in tiposIngreso
@@ -56,11 +258,10 @@ block content
                 value=t
                 selected=(internacion.tipo_ingreso === t)
               )= t
-
-        // ORIGEN DEL PACIENTE (nuevo)
+        
         .mb-3
-          label.form-label Origen del paciente
-          select.form-select(name="origen_paciente", required)
+          label.form-label(for="origen_paciente") Origen del paciente
+          select.form-select(name="origen_paciente", id="origen_paciente", required)
             option(value="" disabled selected=!internacion.origen_paciente) -- Seleccione el origen --
             - const origenes = ['Domicilio','Consultorio externo','Otro hospital','SAME / Ambulancia','Otro']
             each o in origenes
@@ -68,13 +269,44 @@ block content
                 value=o
                 selected=(internacion.origen_paciente === o)
               )= o
-
-        // OBSERVACIONES (nuevo)
+      
+      // Sección: Información Médica
+      .form-section
+        h5
+          i.bi.bi-clipboard2-pulse
+          | Información Médica
         .mb-3
-          label.form-label Observaciones
-          textarea.form-control(name="observaciones", rows="3")= internacion.observaciones || ''
+          label.form-label(for="motivo") Motivo de internación
+          textarea.form-control(
+            name="motivo"
+            id="motivo"
+            rows="3"
+            required
+            placeholder="Describa el motivo principal de la internación..."
+          )= internacion.motivo
+        
+        .mb-3
+          label.form-label(for="observaciones") Observaciones adicionales
+          textarea.form-control(
+            name="observaciones"
+            id="observaciones"
+            rows="3"
+            placeholder="Observaciones relevantes para el equipo médico..."
+          )= internacion.observaciones || ''
+      
+      .button-group
+        button.btn.btn-edit(type="submit")
+          i.bi.bi-check-circle
+          | Actualizar Internación
+        a.btn.btn-secondary(href="/internaciones")
+          i.bi.bi-x-circle
+          | Cancelar
 
-        // BOTONES
-        .text-center.mt-4
-          button.btn.btn-primary(type="submit") Actualizar
-          a.btn.btn-secondary.ms-2(href="/internaciones") Cancelar
+  script.
+    // Añadir íconos si no están ya incluidos
+    if (!document.querySelector('link[href*="bootstrap-icons"]')) {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css';
+      document.head.appendChild(link);
+    }

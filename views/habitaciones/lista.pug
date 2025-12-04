@@ -1,65 +1,638 @@
 extends ../layout
 
 block content
-  h2 Habitaciones Registradas
-  .d-flex.justify-content-between.align-items-center.mb-3
-    a.btn.btn-primary(href="/habitaciones/nueva") + Nueva Habitación
-    button.btn.btn-outline-primary(type="button", data-bs-toggle="modal", data-bs-target="#modalFiltro") Filtrar por estado
+  style.
+    :root {
+      --hospital-blue: #0d8abc;
+      --hospital-teal: #00c2cb;
+      --hospital-light: #e8f4f8;
+      --hospital-white: #ffffff;
+      --hospital-gray: #f8f9fa;
+      --hospital-dark: #2c3e50;
+      --hospital-green: #2ecc71;
+      --hospital-red: #e74c3c;
+      --hospital-yellow: #f39c12;
+    }
+    
+    .hospital-header {
+      background: linear-gradient(135deg, var(--hospital-blue), var(--hospital-teal));
+      color: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 6px 15px rgba(13, 138, 188, 0.15);
+    }
+    
+    .hospital-title {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .hospital-title i {
+      font-size: 1.8rem;
+    }
+    
+    .hospital-subtitle {
+      opacity: 0.9;
+      font-size: 0.95rem;
+    }
+    
+    .stats-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+      background: white;
+      border-radius: 10px;
+      padding: 1.2rem;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      transition: transform 0.3s ease;
+    }
+    
+    .stat-card:hover {
+      transform: translateY(-5px);
+    }
+    
+    .stat-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+    
+    .stat-icon.total { background: linear-gradient(135deg, #e3f2fd, #bbdefb); color: var(--hospital-blue); }
+    .stat-icon.libre { background: linear-gradient(135deg, #e8f7ef, #d1f2eb); color: var(--hospital-green); }
+    .stat-icon.ocupada { background: linear-gradient(135deg, #fde8e8, #fadbd8); color: var(--hospital-red); }
+    .stat-icon.limpieza { background: linear-gradient(135deg, #fff8e6, #ffeaa7); color: var(--hospital-yellow); }
+    
+    .stat-content h3 {
+      margin: 0;
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: var(--hospital-dark);
+    }
+    
+    .stat-content p {
+      margin: 0;
+      color: #6c757d;
+      font-size: 0.9rem;
+    }
+    
+    .btn-hospital {
+      background: linear-gradient(to right, var(--hospital-blue), var(--hospital-teal));
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 0.6rem 1.2rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 8px rgba(13, 138, 188, 0.2);
+    }
+    
+    .btn-hospital:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(13, 138, 188, 0.25);
+      color: white;
+    }
+    
+    .btn-filter {
+      background: white;
+      color: var(--hospital-blue);
+      border: 2px solid var(--hospital-blue);
+      border-radius: 8px;
+      padding: 0.6rem 1.2rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .btn-filter:hover {
+      background: var(--hospital-blue);
+      color: white;
+      transform: translateY(-2px);
+    }
+    
+    .hospital-table {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      border: none;
+    }
+    
+    .hospital-table thead {
+      background: linear-gradient(to right, #f8f9fa, #e9ecef);
+      color: var(--hospital-dark);
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+      letter-spacing: 0.5px;
+    }
+    
+    .hospital-table th {
+      border-bottom: 2px solid var(--hospital-teal);
+      padding: 1rem;
+    }
+    
+    .hospital-table td {
+      padding: 1rem;
+      vertical-align: middle;
+      border-top: 1px solid #f0f0f0;
+    }
+    
+    .hospital-table tbody tr {
+      transition: all 0.2s ease;
+    }
+    
+    .hospital-table tbody tr:hover {
+      background-color: rgba(13, 138, 188, 0.05);
+      transform: translateX(4px);
+    }
+    
+    .room-number {
+      font-weight: 600;
+      color: var(--hospital-dark);
+      font-size: 1.1rem;
+    }
+    
+    .badge-ala {
+      display: inline-block;
+      padding: 0.3rem 0.6rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    
+    .badge-ala-norte { background-color: #d1ecf1; color: #0c5460; }
+    .badge-ala-sur { background-color: #f8d7da; color: #721c24; }
+    .badge-ala-este { background-color: #d4edda; color: #155724; }
+    .badge-ala-oeste { background-color: #fff3cd; color: #856404; }
+    
+    .badge-tipo {
+      display: inline-block;
+      padding: 0.3rem 0.6rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    
+    .badge-tipo-comun { background-color: #e8f4fc; color: var(--hospital-blue); }
+    .badge-tipo-privada { background-color: #f0e8fc; color: #9b59b6; }
+    .badge-tipo-suite { background-color: #fff3e6; color: #e67e22; }
+    .badge-tipo-uti { background-color: #ffeaea; color: #e74c3c; }
+    
+    .status-indicator {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 8px;
+    }
+    
+    .status-libre { background-color: #2ecc71; }
+    .status-ocupada { background-color: #e74c3c; }
+    .status-limpieza { background-color: #f39c12; }
+    
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    
+    .status-libre-badge { background-color: #d4edda; color: #155724; }
+    .status-ocupada-badge { background-color: #f8d7da; color: #721c24; }
+    .status-limpieza-badge { background-color: #fff3cd; color: #856404; }
+    
+    .action-buttons {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    
+    .btn-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+    }
+    
+    .btn-icon:hover {
+      transform: scale(1.1);
+    }
+    
+    .btn-edit {
+      background-color: #fff8e6;
+      color: #e67e22;
+    }
+    
+    .btn-delete {
+      background-color: #ffeaea;
+      color: #e74c3c;
+    }
+    
+    .btn-view {
+      background-color: #e8f4fc;
+      color: var(--hospital-blue);
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    }
+    
+    .empty-state-icon {
+      font-size: 3.5rem;
+      color: #d1d8e0;
+      margin-bottom: 1rem;
+    }
+    
+    .empty-state-title {
+      color: #7f8c8d;
+      margin-bottom: 0.5rem;
+    }
+    
+    .empty-state-text {
+      color: #95a5a6;
+      max-width: 400px;
+      margin: 0 auto 1.5rem;
+    }
+    
+    .table-responsive {
+      border-radius: 12px;
+    }
+    
+    .modal-content {
+      border-radius: 12px;
+      border: none;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+    
+    .modal-header {
+      background: linear-gradient(to right, #f8f9fa, #e9ecef);
+      border-radius: 12px 12px 0 0;
+      border-bottom: 2px solid var(--hospital-teal);
+    }
+    
+    @media (max-width: 768px) {
+      .hospital-table th, 
+      .hospital-table td {
+        padding: 0.75rem 0.5rem;
+      }
+      
+      .action-buttons {
+        flex-direction: column;
+      }
+      
+      .stats-cards {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
 
+  //- Header principal
+  .hospital-header
+    .d-flex.justify-content-between.align-items-center.flex-wrap
+      div
+        h1.hospital-title
+          i.bi.bi-hospital
+          | Habitaciones Registradas
+        p.hospital-subtitle.mb-0
+          | Gestión de habitaciones del hospital - Control de disponibilidad y estados
+      a.btn.btn-hospital(href="/habitaciones/nueva")
+        i.bi.bi-plus-circle
+        | Nueva Habitación
+
+  //- Estadísticas
   if habitaciones.length > 0
-    table.table.table-striped#tablaHabitaciones
-      thead
-        tr
-          th N°
-          th Ala
-          th Tipo
-          th Estado
-          th Acciones
-      tbody
-        each habitacion in habitaciones
-          tr(data-estado=habitacion.estado)
-            td= habitacion.numero
-            td= habitacion.ala
-            td= habitacion.tipo
-            td= habitacion.estado
-            td
-              a.btn.btn-sm.btn-warning(href=`/habitaciones/editar/${habitacion.id}`) Editar
-              a.btn.btn-sm.btn-danger.ms-2(href=`/habitaciones/eliminar/${habitacion.id}`) Eliminar
+    - 
+      const total = habitaciones.length;
+      const libres = habitaciones.filter(h => h.estado === 'libre').length;
+      const ocupadas = habitaciones.filter(h => h.estado === 'ocupada').length;
+      const limpieza = habitaciones.filter(h => h.estado === 'limpieza').length;
+    
+    .stats-cards
+      .stat-card
+        .stat-icon.total
+          i.bi.bi-hospital
+        .stat-content
+          h3= total
+          p Total Habitaciones
+      
+      .stat-card
+        .stat-icon.libre
+          i.bi.bi-check-circle
+        .stat-content
+          h3= libres
+          p Habitaciones Libres
+      
+      .stat-card
+        .stat-icon.ocupada
+          i.bi.bi-person-fill
+        .stat-content
+          h3= ocupadas
+          p Habitaciones Ocupadas
+      
+      .stat-card
+        .stat-icon.limpieza
+          i.bi.bi-bucket
+        .stat-content
+          h3= limpieza
+          p En Limpieza
+    
+    //- Filtro y tabla
+    .d-flex.justify-content-between.align-items-center.mb-3
+      h4.mb-0
+        i.bi.bi-list-ul
+        | Listado de Habitaciones
+      button.btn.btn-filter(type="button", data-bs-toggle="modal", data-bs-target="#modalFiltro")
+        i.bi.bi-funnel
+        | Filtrar por Estado
+    
+    .table-responsive
+      table.table.table-hover.hospital-table#tablaHabitaciones
+        thead
+          tr
+            th N° Habitación
+            th Ala
+            th Tipo
+            th Estado
+            th Acciones
+        tbody
+          each habitacion in habitaciones
+            tr(data-estado=habitacion.estado)
+              td
+                .room-number= habitacion.numero
+                small.text-muted ID: #{habitacion.id}
+              
+              td
+                if habitacion.ala === 'Norte'
+                  span.badge.badge-ala.badge-ala-norte= habitacion.ala
+                else if habitacion.ala === 'Sur'
+                  span.badge.badge-ala.badge-ala-sur= habitacion.ala
+                else if habitacion.ala === 'Este'
+                  span.badge.badge-ala.badge-ala-este= habitacion.ala
+                else if habitacion.ala === 'Oeste'
+                  span.badge.badge-ala.badge-ala-oeste= habitacion.ala
+                else
+                  span.badge.bg-secondary= habitacion.ala
+              
+              td
+                if habitacion.tipo === 'Común'
+                  span.badge.badge-tipo.badge-tipo-comun= habitacion.tipo
+                else if habitacion.tipo === 'Privada'
+                  span.badge.badge-tipo.badge-tipo-privada= habitacion.tipo
+                else if habitacion.tipo === 'Suite'
+                  span.badge.badge-tipo.badge-tipo-suite= habitacion.tipo
+                else if habitacion.tipo === 'UTI'
+                  span.badge.badge-tipo.badge-tipo-uti= habitacion.tipo
+                else
+                  span.badge.bg-light.text-dark= habitacion.tipo
+              
+              td
+                if habitacion.estado === 'libre'
+                  span.status-badge.status-libre-badge
+                    span.status-indicator.status-libre
+                    | Libre
+                else if habitacion.estado === 'ocupada'
+                  span.status-badge.status-ocupada-badge
+                    span.status-indicator.status-ocupada
+                    | Ocupada
+                else if habitacion.estado === 'limpieza'
+                  span.status-badge.status-limpieza-badge
+                    span.status-indicator.status-limpieza
+                    | En Limpieza
+                else
+                  span.badge.bg-secondary= habitacion.estado
+              
+              td
+                .action-buttons
+                  a.btn.btn-icon.btn-view(
+                    href=`#`,
+                    title="Ver detalles",
+                    onclick=`verDetallesHabitacion(${JSON.stringify(habitacion).replace(/'/g, "\\'")})`
+                  )
+                    i.bi.bi-eye
+                  a.btn.btn-icon.btn-edit(
+                    href=`/habitaciones/editar/${habitacion.id}`,
+                    title="Editar habitación"
+                  )
+                    i.bi.bi-pencil
+                  a.btn.btn-icon.btn-delete(
+                    href=`/habitaciones/eliminar/${habitacion.id}`,
+                    title="Eliminar habitación",
+                    onclick=`return confirm('¿Está seguro de eliminar la habitación ${habitacion.numero}?')`
+                  )
+                    i.bi.bi-trash
+  
+  //- Estado vacío
   else
-    p No hay habitaciones registradas.
+    .empty-state
+      .empty-state-icon
+        i.bi.bi-hospital
+      h3.empty-state-title No hay habitaciones registradas
+      p.empty-state-text
+        | No se han encontrado habitaciones registradas en el sistema. 
+        | Para agregar una nueva habitación, haga clic en el botón "Nueva Habitación".
+      a.btn.btn-hospital(href="/habitaciones/nueva")
+        i.bi.bi-plus-circle
+        | Crear primera habitación
 
-  // Modal de filtro
-  div.modal.fade(id="modalFiltro", tabindex="-1")
-    div.modal-dialog
-      div.modal-content
-        div.modal-header
-          h5.modal-title Filtrar habitaciones
-          button.btn-close(type="button", data-bs-dismiss="modal", aria-label="Close")
-        div.modal-body
-          select.form-select(id="filtroEstado")
-            option(value="") Mostrar todas
-            option(value="libre") Libre
-            option(value="ocupada") Ocupada
-            option(value="limpieza") Limpieza
-        div.modal-footer
-          button.btn.btn-primary(type="button", onclick="filtrarTabla()") Aplicar filtro
+  //- Modal de filtro
+  .modal.fade(id="modalFiltro", tabindex="-1")
+    .modal-dialog.modal-dialog-centered
+      .modal-content
+        .modal-header
+          h5.modal-title
+            i.bi.bi-funnel
+            | Filtrar Habitaciones
+          button.btn-close(type="button", data-bs-dismiss="modal")
+        .modal-body
+          p.mb-3 Seleccione el estado para filtrar las habitaciones:
+          .mb-3
+            label.form-label Estado de la Habitación
+            select.form-select(id="filtroEstado")
+              option(value="") Mostrar todas las habitaciones
+              option(value="libre") 
+                i.bi.bi-check-circle
+                |  Habitaciones Libres
+              option(value="ocupada") 
+                i.bi.bi-person-fill
+                |  Habitaciones Ocupadas
+              option(value="limpieza") 
+                i.bi.bi-bucket
+                |  Habitaciones en Limpieza
+        .modal-footer
+          button.btn.btn-secondary(type="button", data-bs-dismiss="modal") Cerrar
+          button.btn.btn-hospital(type="button", onclick="aplicarFiltro()") Aplicar Filtro
+
+  //- Modal para detalles
+  .modal.fade(id="detallesModal", tabindex="-1")
+    .modal-dialog.modal-dialog-centered
+      .modal-content
+        .modal-header.bg-light
+          h5.modal-title
+            i.bi.bi-info-circle
+            | Detalles de Habitación
+          button.btn-close(type="button", data-bs-dismiss="modal")
+        .modal-body
+          div(id="detallesContenido")
+        .modal-footer
           button.btn.btn-secondary(type="button", data-bs-dismiss="modal") Cerrar
 
-  // Script para filtrar
   script.
-    function filtrarTabla() {
+    // Añadir íconos si no están ya incluidos
+    if (!document.querySelector('link[href*="bootstrap-icons"]')) {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css';
+      document.head.appendChild(link);
+    }
+    
+    // Función para aplicar filtro
+    function aplicarFiltro() {
       const filtro = document.getElementById('filtroEstado').value;
       const filas = document.querySelectorAll('#tablaHabitaciones tbody tr');
-
+      let contador = 0;
+      
       filas.forEach(fila => {
         const estado = fila.getAttribute('data-estado');
         if (!filtro || estado === filtro) {
           fila.style.display = '';
+          contador++;
         } else {
           fila.style.display = 'none';
         }
       });
-
+      
+      // Actualizar contador en el modal
       const modal = bootstrap.Modal.getInstance(document.getElementById('modalFiltro'));
       modal.hide();
+      
+      // Mostrar mensaje de resultado
+      if (filtro) {
+        let estadoTexto = '';
+        switch(filtro) {
+          case 'libre': estadoTexto = 'libres'; break;
+          case 'ocupada': estadoTexto = 'ocupadas'; break;
+          case 'limpieza': estadoTexto = 'en limpieza'; break;
+        }
+        
+        if (contador === 0) {
+          alert(`No hay habitaciones ${estadoTexto} en este momento.`);
+        } else {
+          alert(`Mostrando ${contador} habitación(es) ${estadoTexto}.`);
+        }
+      }
     }
+    
+    // Función para ver detalles de habitación
+    function verDetallesHabitacion(habitacion) {
+      let estadoIcono = '';
+      let estadoColor = '';
+      
+      switch(habitacion.estado) {
+        case 'libre':
+          estadoIcono = '<i class="bi bi-check-circle text-success"></i>';
+          estadoColor = 'text-success';
+          break;
+        case 'ocupada':
+          estadoIcono = '<i class="bi bi-person-fill text-danger"></i>';
+          estadoColor = 'text-danger';
+          break;
+        case 'limpieza':
+          estadoIcono = '<i class="bi bi-bucket text-warning"></i>';
+          estadoColor = 'text-warning';
+          break;
+      }
+      
+      const contenido = `
+        <div class="text-center mb-4">
+          <div style="font-size: 3rem; color: var(--hospital-blue);">
+            <i class="bi bi-door-closed"></i>
+          </div>
+          <h3 class="mt-2">Habitación ${habitacion.numero}</h3>
+          <p class="text-muted">ID: ${habitacion.id}</p>
+        </div>
+        
+        <div class="row">
+          <div class="col-6 mb-3">
+            <h6><i class="bi bi-compass"></i> Ala</h6>
+            <p class="mb-0"><strong>${habitacion.ala}</strong></p>
+          </div>
+          <div class="col-6 mb-3">
+            <h6><i class="bi bi-tag"></i> Tipo</h6>
+            <p class="mb-0"><strong>${habitacion.tipo}</strong></p>
+          </div>
+        </div>
+        
+        <div class="row">
+          <div class="col-12 mb-3">
+            <h6>${estadoIcono} Estado</h6>
+            <p class="mb-0 ${estadoColor}"><strong>${habitacion.estado.charAt(0).toUpperCase() + habitacion.estado.slice(1)}</strong></p>
+          </div>
+        </div>
+        
+        <hr>
+        
+        <div class="text-center">
+          <a href="/habitaciones/editar/${habitacion.id}" class="btn btn-hospital">
+            <i class="bi bi-pencil"></i> Editar Habitación
+          </a>
+        </div>
+      `;
+      
+      document.getElementById('detallesContenido').innerHTML = contenido;
+      
+      // Mostrar modal (si Bootstrap está disponible)
+      if (typeof bootstrap !== 'undefined') {
+        const modal = new bootstrap.Modal(document.getElementById('detallesModal'));
+        modal.show();
+      } else {
+        // Fallback simple si no hay Bootstrap
+        alert('Detalles de habitación:\n\n' + 
+              `Número: ${habitacion.numero}\n` +
+              `Ala: ${habitacion.ala}\n` +
+              `Tipo: ${habitacion.tipo}\n` +
+              `Estado: ${habitacion.estado}`);
+      }
+    }
+    
+    // Inicializar tooltips si Bootstrap está disponible
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('Vista de habitaciones cargada');
+      
+      // Inicializar tooltips de Bootstrap
+      if (typeof bootstrap !== 'undefined') {
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+          return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+      }
+    });

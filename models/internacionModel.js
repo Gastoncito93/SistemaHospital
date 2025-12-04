@@ -109,6 +109,16 @@ const Internacion = {
   );
 },
 
+async darAlta(id, { fecha_alta, motivo_alta }) {
+  await db.query(
+    `UPDATE internaciones
+     SET fecha_alta = ?, 
+         motivo_alta = ?, 
+         estado_internacion = 'alta'
+     WHERE id = ?`,
+    [fecha_alta, motivo_alta, id]
+  );
+},
 
   async eliminar(id) {
     await db.query('DELETE FROM internaciones WHERE id = ?', [id]);

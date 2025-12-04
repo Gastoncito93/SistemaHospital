@@ -1,94 +1,568 @@
 extends ../layout
 
 block content
-  h1.text-center.mb-4 Editar Evaluación de Enfermería
+  style.
+    :root {
+      --hospital-blue: #0d8abc;
+      --hospital-teal: #00c2cb;
+      --hospital-light: #e8f4f8;
+      --hospital-white: #ffffff;
+      --hospital-gray: #f8f9fa;
+      --hospital-dark: #2c3e50;
+      --hospital-yellow: #f39c12;
+      --hospital-nurse: #3498db;
+      --hospital-red: #e74c3c;
+    }
+    
+    .hospital-header {
+      background: linear-gradient(135deg, var(--hospital-yellow), #f1c40f);
+      color: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 6px 15px rgba(243, 156, 18, 0.15);
+      text-align: center;
+    }
+    
+    .hospital-title {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    
+    .hospital-title i {
+      font-size: 1.8rem;
+    }
+    
+    .hospital-form-container {
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      border: 2px solid var(--hospital-yellow) !important;
+      max-width: 800px;
+      width: 100%;
+      margin: 0 auto;
+    }
+    
+    .patient-banner {
+      background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      text-align: center;
+      border-left: 5px solid var(--hospital-yellow);
+    }
+    
+    .patient-avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--hospital-yellow), #f1c40f);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin: 0 auto 1rem;
+    }
+    
+    .patient-name {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--hospital-dark);
+      margin-bottom: 0.5rem;
+    }
+    
+    .patient-info {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      margin-top: 1rem;
+    }
+    
+    .info-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: white;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      color: var(--hospital-dark);
+      font-size: 0.9rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    
+    .info-badge i {
+      color: var(--hospital-yellow);
+    }
+    
+    .evaluation-info {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid #eee;
+    }
+    
+    .form-section {
+      margin-bottom: 1.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid #eaeaea;
+    }
+    
+    .form-section:last-child {
+      border-bottom: none;
+    }
+    
+    .form-section h5 {
+      color: var(--hospital-blue);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .form-section h5 i {
+      font-size: 1.2rem;
+    }
+    
+    .form-label {
+      font-weight: 600;
+      color: var(--hospital-dark);
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    
+    .form-control, .form-select {
+      border: 1px solid #dee2e6;
+      border-radius: 8px;
+      padding: 0.6rem 0.75rem;
+      transition: all 0.3s ease;
+    }
+    
+    .form-control:focus, .form-select:focus {
+      border-color: var(--hospital-yellow);
+      box-shadow: 0 0 0 0.25rem rgba(243, 156, 18, 0.25);
+    }
+    
+    .vital-input {
+      font-weight: 600;
+      text-align: center;
+    }
+    
+    .vital-input:focus {
+      background-color: #f8f9fa;
+    }
+    
+    .input-with-unit {
+      position: relative;
+    }
+    
+    .input-with-unit .form-control {
+      padding-right: 3rem;
+    }
+    
+    .unit-label {
+      position: absolute;
+      right: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #6c757d;
+      font-size: 0.9rem;
+      pointer-events: none;
+    }
+    
+    .btn-edit {
+      background: linear-gradient(to right, var(--hospital-yellow), #f1c40f);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 0.6rem 1.5rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 8px rgba(243, 156, 18, 0.2);
+    }
+    
+    .btn-edit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(243, 156, 18, 0.25);
+      color: white;
+    }
+    
+    .btn-secondary {
+      background: #6c757d;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 0.6rem 1.5rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-secondary:hover {
+      background: #5a6268;
+      color: white;
+      transform: translateY(-2px);
+    }
+    
+    .button-group {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 2rem;
+    }
+    
+    .error-message {
+      font-size: 0.85rem;
+      color: var(--hospital-red);
+      margin-top: 0.25rem;
+    }
+    
+    .vital-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .vital-card {
+      background: white;
+      border-radius: 10px;
+      padding: 1rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      border-top: 4px solid var(--hospital-yellow);
+    }
+    
+    .vital-card label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 0.75rem;
+      color: var(--hospital-dark);
+      font-weight: 600;
+    }
+    
+    .original-date {
+      font-size: 0.9rem;
+      color: #6c757d;
+      margin-top: 0.25rem;
+    }
+    
+    @media (max-width: 768px) {
+      .hospital-form-container {
+        padding: 1.5rem;
+        margin: 0 1rem;
+      }
+      
+      .vital-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .button-group {
+        flex-direction: column;
+      }
+      
+      .button-group .btn {
+        width: 100%;
+      }
+      
+      .patient-info, .evaluation-info {
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+    }
 
-  .container
-    .p-4.border.rounded-3.shadow-lg(style="border: 2px solid #40e0d0; max-width: 800px; margin: auto; background: white;")
+  //- Header principal
+  .hospital-header
+    h1.hospital-title
+      i.bi.bi-clipboard2-check
+      | Editar Evaluación de Enfermería
+    p.mb-0 Actualice los datos de la evaluación del paciente
 
-      h3.text-center Paciente: #{evaluacion.paciente_nombre} #{evaluacion.paciente_apellido}
-      h5.text-center.mb-4 Habitación #{evaluacion.habitacion_numero} – #{evaluacion.ala} – #{evaluacion.tipo}
-
-      form(method="POST", action=`/enfermeria/editar/${evaluacion.id}`)
-        input(type="hidden", name="internacion_id", value=evaluacion.internacion_id)
-
+  .hospital-form-container
+    //- Banner del paciente
+    .patient-banner
+      .patient-avatar= `${evaluacion.paciente_nombre.charAt(0)}${evaluacion.paciente_apellido.charAt(0)}`
+      .patient-name #{evaluacion.paciente_apellido}, #{evaluacion.paciente_nombre}
+      .patient-info
+        .info-badge
+          i.bi.bi-hospital
+          span Habitación #{evaluacion.habitacion_numero}
+        .info-badge
+          i.bi.bi-compass
+          span Ala #{evaluacion.ala}
+        .info-badge
+          i.bi.bi-tag
+          span #{evaluacion.tipo}
+      
+      .evaluation-info
+        .info-badge
+          i.bi.bi-clipboard2-data
+          span Evaluación ID: #{evaluacion.id}
+        .info-badge
+          i.bi.bi-calendar
+          span Creada: #{new Date(evaluacion.fecha_hora).toLocaleDateString('es-AR')}
+    
+    //- Formulario
+    form(method="POST", action=`/enfermeria/editar/${evaluacion.id}`)
+      input(type="hidden", name="internacion_id", value=evaluacion.internacion_id)
+      
+      //- Sección: Fecha y Hora
+      .form-section
+        h5
+          i.bi.bi-calendar2-check
+          | Fecha y Hora de Evaluación
         .mb-3
-          label.form-label Fecha y Hora
+          label.form-label(for="fecha_hora") Fecha y Hora
           input.form-control(
             type="datetime-local",
             name="fecha_hora",
+            id="fecha_hora",
             value=(datos ? datos.fecha_hora : evaluacion.fecha_hora.toISOString().slice(0,16))
+            required
           )
           if errores && errores.fecha_hora
-            small.text-danger= errores.fecha_hora
-
-        // === FILA 1 ===
-        .row
-          .col-md-4.mb-3
-            label.form-label Presión Arterial
-            input.form-control(type="text", placeholder="120/80", name="presion_arterial",
-              value=(datos ? datos.presion_arterial : evaluacion.presion_arterial))
+            .error-message= errores.fecha_hora
+          .original-date
+            i.bi.bi-clock-history
+            |  Fecha original: #{new Date(evaluacion.fecha_hora).toLocaleString('es-AR')}
+      
+      //- Sección: Signos Vitales
+      .form-section
+        h5
+          i.bi.bi-heart-pulse
+          | Signos Vitales
+        .vital-grid
+          .vital-card
+            label(for="presion_arterial")
+              i.bi.bi-heart
+              | Presión Arterial
+            .input-with-unit
+              input.form-control.vital-input(
+                type="text",
+                id="presion_arterial",
+                name="presion_arterial",
+                placeholder="120/80",
+                value=(datos ? datos.presion_arterial : evaluacion.presion_arterial)
+              )
+              span.unit-label mmHg
             if errores && errores.presion_arterial
-              small.text-danger= errores.presion_arterial
-
-          .col-md-4.mb-3
-            label.form-label Frecuencia Cardíaca
-            input.form-control(type="number", placeholder="80", name="frecuencia_cardiaca",
-              value=(datos ? datos.frecuencia_cardiaca : evaluacion.frecuencia_cardiaca))
+              .error-message= errores.presion_arterial
+          
+          .vital-card
+            label(for="frecuencia_cardiaca")
+              i.bi.bi-heart-half
+              | Frecuencia Cardíaca
+            .input-with-unit
+              input.form-control.vital-input(
+                type="number",
+                id="frecuencia_cardiaca",
+                name="frecuencia_cardiaca",
+                placeholder="80",
+                value=(datos ? datos.frecuencia_cardiaca : evaluacion.frecuencia_cardiaca)
+              )
+              span.unit-label lpm
             if errores && errores.frecuencia_cardiaca
-              small.text-danger= errores.frecuencia_cardiaca
-
-          .col-md-4.mb-3
-            label.form-label Frecuencia Respiratoria
-            input.form-control(type="number", placeholder="16", name="frecuencia_respiratoria",
-              value=(datos ? datos.frecuencia_respiratoria : evaluacion.frecuencia_respiratoria))
+              .error-message= errores.frecuencia_cardiaca
+          
+          .vital-card
+            label(for="frecuencia_respiratoria")
+              i.bi.bi-wind
+              | Frecuencia Respiratoria
+            .input-with-unit
+              input.form-control.vital-input(
+                type="number",
+                id="frecuencia_respiratoria",
+                name="frecuencia_respiratoria",
+                placeholder="16",
+                value=(datos ? datos.frecuencia_respiratoria : evaluacion.frecuencia_respiratoria)
+              )
+              span.unit-label rpm
             if errores && errores.frecuencia_respiratoria
-              small.text-danger= errores.frecuencia_respiratoria
-
-        // === FILA 2 ===
-        .row
-          .col-md-4.mb-3
-            label.form-label Temperatura
-            input.form-control(type="number", step="0.1", placeholder="36.5", name="temperatura",
-              value=(datos ? datos.temperatura : evaluacion.temperatura))
+              .error-message= errores.frecuencia_respiratoria
+          
+          .vital-card
+            label(for="temperatura")
+              i.bi.bi-thermometer-half
+              | Temperatura
+            .input-with-unit
+              input.form-control.vital-input(
+                type="number",
+                step="0.1",
+                id="temperatura",
+                name="temperatura",
+                placeholder="36.5",
+                value=(datos ? datos.temperatura : evaluacion.temperatura)
+              )
+              span.unit-label °C
             if errores && errores.temperatura
-              small.text-danger= errores.temperatura
-
-          .col-md-4.mb-3
-            label.form-label Saturación O₂
-            input.form-control(type="number", placeholder="97", name="saturacion_oxigeno",
-              value=(datos ? datos.saturacion_oxigeno : evaluacion.saturacion_oxigeno))
+              .error-message= errores.temperatura
+          
+          .vital-card
+            label(for="saturacion_oxigeno")
+              i.bi.bi-droplet-half
+              | Saturación O₂
+            .input-with-unit
+              input.form-control.vital-input(
+                type="number",
+                id="saturacion_oxigeno",
+                name="saturacion_oxigeno",
+                placeholder="97",
+                min="0",
+                max="100",
+                value=(datos ? datos.saturacion_oxigeno : evaluacion.saturacion_oxigeno)
+              )
+              span.unit-label %
             if errores && errores.saturacion_oxigeno
-              small.text-danger= errores.saturacion_oxigeno
-
-          .col-md-4.mb-3
-            label.form-label Dolor (1–10)
-            input.form-control(type="number", placeholder="5", name="dolor",
-              value=(datos ? datos.dolor : evaluacion.dolor))
+              .error-message= errores.saturacion_oxigeno
+          
+          .vital-card
+            label(for="dolor")
+              i.bi.bi-emoji-frown
+              | Dolor (Escala 1-10)
+            .input-with-unit
+              input.form-control.vital-input(
+                type="number",
+                id="dolor",
+                name="dolor",
+                placeholder="0",
+                min="0",
+                max="10",
+                value=(datos ? datos.dolor : evaluacion.dolor)
+              )
+              span.unit-label /10
             if errores && errores.dolor
-              small.text-danger= errores.dolor
-
-        // TEXTOS LARGOS
+              .error-message= errores.dolor
+            small.text-muted.mt-1.d-block 0 = Sin dolor, 10 = Máximo dolor imaginable
+      
+      //- Sección: Información Clínica
+      .form-section
+        h5
+          i.bi.bi-clipboard2-data
+          | Información Clínica
         .mb-3
-          label.form-label Motivo
-          textarea.form-control(name="motivo", rows="2")= datos ? datos.motivo : evaluacion.motivo
-
+          label.form-label(for="motivo") Motivo de la evaluación
+          textarea.form-control(
+            name="motivo",
+            id="motivo",
+            rows="2",
+            placeholder="Describa el motivo principal de esta evaluación..."
+          )= datos ? datos.motivo : evaluacion.motivo
+          if errores && errores.motivo
+            .error-message= errores.motivo
+        
         .mb-3
-          label.form-label Síntomas
-          textarea.form-control(name="sintomas", rows="2")= datos ? datos.sintomas : evaluacion.sintomas
-
+          label.form-label(for="sintomas") Síntomas reportados
+          textarea.form-control(
+            name="sintomas",
+            id="sintomas",
+            rows="2",
+            placeholder="Describa los síntomas que presenta el paciente..."
+          )= datos ? datos.sintomas : evaluacion.sintomas
+          if errores && errores.sintomas
+            .error-message= errores.sintomas
+        
         .mb-3
-          label.form-label Alergias
-          textarea.form-control(name="alergias", rows="2")= datos ? datos.alergias : evaluacion.alergias
-
+          label.form-label(for="alergias") Alergias conocidas
+          textarea.form-control(
+            name="alergias",
+            id="alergias",
+            rows="2",
+            placeholder="Especifique alergias a medicamentos, alimentos u otros..."
+          )= datos ? datos.alergias : evaluacion.alergias
+          if errores && errores.alergias
+            .error-message= errores.alergias
+        
         .mb-3
-          label.form-label Medicación Actual
-          textarea.form-control(name="medicacion_actual", rows="2")= datos ? datos.medicacion_actual : evaluacion.medicacion_actual
-
+          label.form-label(for="medicacion_actual") Medicación actual
+          textarea.form-control(
+            name="medicacion_actual",
+            id="medicacion_actual",
+            rows="2",
+            placeholder="Liste la medicación que el paciente está tomando actualmente..."
+          )= datos ? datos.medicacion_actual : evaluacion.medicacion_actual
+          if errores && errores.medicacion_actual
+            .error-message= errores.medicacion_actual
+      
+      //- Sección: Notas Adicionales
+      .form-section
+        h5
+          i.bi.bi-journal-text
+          | Notas Adicionales
         .mb-3
-          label.form-label Notas
-          textarea.form-control(name="notas", rows="2")= datos ? datos.notas : evaluacion.notas
+          label.form-label(for="notas") Observaciones y notas
+          textarea.form-control(
+            name="notas",
+            id="notas",
+            rows="3",
+            placeholder="Registre cualquier observación adicional relevante para el seguimiento del paciente..."
+          )= datos ? datos.notas : evaluacion.notas
+          if errores && errores.notas
+            .error-message= errores.notas
+          small.text-muted.mt-1.d-block Campo opcional para información complementaria
+      
+      .button-group
+        button.btn.btn-edit(type="submit")
+          i.bi.bi-check-circle
+          | Actualizar Evaluación
+        a.btn.btn-secondary(href=`/enfermeria/internacion/${evaluacion.internacion_id}`)
+          i.bi.bi-x-circle
+          | Cancelar
 
-        .text-center.mt-4
-          button.btn.btn-primary(type="submit") Actualizar
-          a.btn.btn-secondary.ms-2(href=`/enfermeria/internacion/${evaluacion.internacion_id}`) Cancelar
+  script.
+    // Añadir íconos si no están ya incluidos
+    if (!document.querySelector('link[href*="bootstrap-icons"]')) {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css';
+      document.head.appendChild(link);
+    }
+    
+    // Validación básica de presión arterial
+    document.addEventListener('DOMContentLoaded', function() {
+      const presionInput = document.getElementById('presion_arterial');
+      if (presionInput) {
+        presionInput.addEventListener('blur', function() {
+          const value = this.value.trim();
+          if (value && !/^\d{2,3}\/\d{2,3}$/.test(value)) {
+            this.style.borderColor = 'var(--hospital-red)';
+          } else {
+            this.style.borderColor = '';
+          }
+        });
+      }
+      
+      // Validación de rangos para dolor (0-10)
+      const dolorInput = document.getElementById('dolor');
+      if (dolorInput) {
+        dolorInput.addEventListener('change', function() {
+          const value = parseInt(this.value);
+          if (value < 0 || value > 10) {
+            this.value = '';
+            alert('El valor de dolor debe estar entre 0 y 10');
+          }
+        });
+      }
+      
+      // Formatear fecha/hora para input datetime-local
+      const fechaHoraInput = document.getElementById('fecha_hora');
+      if (fechaHoraInput && !fechaHoraInput.value) {
+        // Si no hay datos en 'datos', usar la evaluación original
+        const originalDate = new Date('#{evaluacion.fecha_hora}');
+        const tzOffset = originalDate.getTimezoneOffset() * 60000;
+        const localISOTime = new Date(originalDate - tzOffset).toISOString().slice(0, 16);
+        fechaHoraInput.value = localISOTime;
+      }
+    });

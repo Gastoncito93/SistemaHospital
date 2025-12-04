@@ -1,23 +1,188 @@
 extends ../layout
 
 block content
-  h2 Editar Paciente
-  form(method="POST", action=`/pacientes/editar/${paciente.id}`)
-    .mb-3
-      label.form-label Nombre
-      input.form-control(type="text", name="nombre", value=paciente.nombre, required)
-    .mb-3
-      label.form-label Apellido
-      input.form-control(type="text", name="apellido", value=paciente.apellido, required)
-    .mb-3
-      label.form-label DNI
-      input.form-control(type="text", name="dni", value=paciente.dni, required)
-    .mb-3
-      label.form-label Sexo
-      select.form-select(name="sexo", required)
-        option(value="" disabled selected=!(paciente.sexo)) -- Seleccione --
-        option(value="masculino", selected=paciente.sexo === 'masculino') Masculino
-        option(value="femenino", selected=paciente.sexo === 'femenino') Femenino
+  style.
+    :root {
+      --hospital-blue: #0d8abc;
+      --hospital-teal: #00c2cb;
+      --hospital-light: #e8f4f8;
+      --hospital-white: #ffffff;
+      --hospital-gray: #f8f9fa;
+      --hospital-dark: #2c3e50;
+      --hospital-yellow: #f39c12;
+    }
+    
+    .hospital-header {
+      background: linear-gradient(135deg, var(--hospital-blue), var(--hospital-teal));
+      color: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 6px 15px rgba(13, 138, 188, 0.15);
+      text-align: center;
+    }
+    
+    .hospital-title {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    
+    .hospital-title i {
+      font-size: 1.8rem;
+    }
+    
+    .hospital-form-container {
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      border: 2px solid var(--hospital-yellow) !important;
+      max-width: 400px;
+      width: 100%;
+      margin: 0 auto;
+    }
+    
+    .form-label {
+      font-weight: 600;
+      color: var(--hospital-dark);
+      margin-bottom: 0.5rem;
+    }
+    
+    .form-control, .form-select {
+      border: 1px solid #dee2e6;
+      border-radius: 8px;
+      padding: 0.6rem 0.75rem;
+      transition: all 0.3s ease;
+    }
+    
+    .form-control:focus, .form-select:focus {
+      border-color: var(--hospital-yellow);
+      box-shadow: 0 0 0 0.25rem rgba(243, 156, 18, 0.25);
+    }
+    
+    .btn-edit {
+      background: linear-gradient(to right, var(--hospital-yellow), #f1c40f);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 0.6rem 1.5rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 8px rgba(243, 156, 18, 0.2);
+    }
+    
+    .btn-edit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(243, 156, 18, 0.25);
+      color: white;
+    }
+    
+    .btn-secondary {
+      background: #6c757d;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 0.6rem 1.5rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-secondary:hover {
+      background: #5a6268;
+      color: white;
+      transform: translateY(-2px);
+    }
+    
+    .button-group {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 2rem;
+    }
+    
+    .patient-info-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #e8f4f8;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      margin-bottom: 1.5rem;
+      color: var(--hospital-dark);
+      font-size: 0.9rem;
+    }
+    
+    .patient-info-badge i {
+      color: var(--hospital-blue);
+    }
+    
+    @media (max-width: 768px) {
+      .hospital-form-container {
+        padding: 1.5rem;
+        margin: 0 1rem;
+      }
+      
+      .button-group {
+        flex-direction: column;
+      }
+      
+      .button-group .btn {
+        width: 100%;
+      }
+    }
 
-    button.btn.btn-primary(type="submit") Actualizar
-    a.btn.btn-secondary.ms-2(href="/pacientes") Cancelar
+  .hospital-header
+    h1.hospital-title
+      i.bi.bi-pencil-square
+      | Editar Paciente
+    p.mb-0 Actualice la información del paciente
+
+  .hospital-form-container
+    .patient-info-badge
+      i.bi.bi-person-circle
+      span ID: #{paciente.id}
+    
+    form(method="POST", action=`/pacientes/editar/${paciente.id}`)
+      .mb-3
+        label.form-label(for="nombre") Nombre
+        input.form-control(type="text", name="nombre", id="nombre", value=paciente.nombre, required)
+
+      .mb-3
+        label.form-label(for="apellido") Apellido
+        input.form-control(type="text", name="apellido", id="apellido", value=paciente.apellido, required)
+
+      .mb-3
+        label.form-label(for="dni") DNI
+        input.form-control(type="text", name="dni", id="dni", value=paciente.dni, required)
+
+      .mb-3
+        label.form-label(for="sexo") Sexo
+        select.form-select(name="sexo", id="sexo", required)
+          option(value="" disabled=!(paciente.sexo)) -- Seleccione --
+          option(value="masculino", selected=paciente.sexo === 'masculino') Masculino
+          option(value="femenino", selected=paciente.sexo === 'femenino') Femenino
+
+      .button-group
+        button.btn.btn-edit(type="submit")
+          i.bi.bi-check-circle
+          | Actualizar
+        a.btn.btn-secondary(href="/pacientes")
+          i.bi.bi-x-circle
+          | Cancelar
+
+  script.
+    // Solo agregamos los íconos si no están cargados
+    if (!document.querySelector('link[href*="bootstrap-icons"]')) {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css';
+      document.head.appendChild(link);
+    }

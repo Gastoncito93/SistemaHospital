@@ -1,35 +1,177 @@
 extends ../layout
 
 block content
-  h1.text-center.mb-4 Sección Pacientes
+  style.
+    :root {
+      --hospital-blue: #0d8abc;
+      --hospital-teal: #00c2cb;
+      --hospital-light: #e8f4f8;
+      --hospital-white: #ffffff;
+      --hospital-gray: #f8f9fa;
+      --hospital-dark: #2c3e50;
+      --hospital-green: #2ecc71;
+      --hospital-red: #e74c3c;
+    }
+    
+    .hospital-header {
+      background: linear-gradient(135deg, var(--hospital-blue), var(--hospital-teal));
+      color: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 6px 15px rgba(13, 138, 188, 0.15);
+      text-align: center;
+    }
+    
+    .hospital-title {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    
+    .hospital-title i {
+      font-size: 1.8rem;
+    }
+    
+    .hospital-form-container {
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      border: 2px solid var(--hospital-teal) !important;
+      max-width: 400px;
+      width: 100%;
+      margin: 0 auto;
+    }
+    
+    .form-label {
+      font-weight: 600;
+      color: var(--hospital-dark);
+      margin-bottom: 0.5rem;
+    }
+    
+    .form-control, .form-select {
+      border: 1px solid #dee2e6;
+      border-radius: 8px;
+      padding: 0.6rem 0.75rem;
+      transition: all 0.3s ease;
+    }
+    
+    .form-control:focus, .form-select:focus {
+      border-color: var(--hospital-teal);
+      box-shadow: 0 0 0 0.25rem rgba(0, 194, 203, 0.25);
+    }
+    
+    .btn-hospital {
+      background: linear-gradient(to right, var(--hospital-blue), var(--hospital-teal));
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 0.6rem 1.5rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 8px rgba(13, 138, 188, 0.2);
+    }
+    
+    .btn-hospital:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(13, 138, 188, 0.25);
+      color: white;
+    }
+    
+    .btn-secondary {
+      background: #6c757d;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 0.6rem 1.5rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-secondary:hover {
+      background: #5a6268;
+      color: white;
+      transform: translateY(-2px);
+    }
+    
+    .button-group {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 2rem;
+    }
+    
+    .invalid-feedback {
+      font-size: 0.85rem;
+      color: var(--hospital-red);
+    }
+    
+    @media (max-width: 768px) {
+      .hospital-form-container {
+        padding: 1.5rem;
+        margin: 0 1rem;
+      }
+      
+      .button-group {
+        flex-direction: column;
+      }
+      
+      .button-group .btn {
+        width: 100%;
+      }
+    }
 
-  .container.d-flex.justify-content-center
-    .p-4.border.rounded-3.shadow-lg(style="border: 2px solid #40e0d0 !important; max-width: 400px; width: 100%; background-color: white;")
-      h2.text-center Nuevo Paciente
+  .hospital-header
+    h1.hospital-title
+      i.bi.bi-person-plus
+      | Nuevo Paciente
+    p.mb-0 Complete los datos del nuevo paciente
 
-      form(method="POST", action="/pacientes/nuevo")
-        .mb-3
-          label.form-label Nombre
-          input.form-control(type="text", name="nombre", required)
-          div.invalid-feedback(id="nombre-error")
+  .hospital-form-container
+    form(method="POST", action="/pacientes/nuevo")
+      .mb-3
+        label.form-label(for="nombre") Nombre
+        input.form-control(type="text", name="nombre", id="nombre", required)
+        div.invalid-feedback(id="nombre-error")
 
-        .mb-3
-          label.form-label Apellido
-          input.form-control(type="text", name="apellido", required)
-          div.invalid-feedback(id="apellido-error")
+      .mb-3
+        label.form-label(for="apellido") Apellido
+        input.form-control(type="text", name="apellido", id="apellido", required)
+        div.invalid-feedback(id="apellido-error")
 
-        .mb-3
-          label.form-label DNI
-          input.form-control(type="text", name="dni", required)
-          div.invalid-feedback(id="dni-error")
+      .mb-3
+        label.form-label(for="dni") DNI
+        input.form-control(type="text", name="dni", id="dni", required)
+        div.invalid-feedback(id="dni-error")
 
-        .mb-3
-          label.form-label Sexo
-          select.form-select(name="sexo", required)
-            option(value="" disabled selected) -- Seleccione --
-            option(value="masculino") Masculino
-            option(value="femenino") Femenino
+      .mb-3
+        label.form-label(for="sexo") Sexo
+        select.form-select(name="sexo", id="sexo", required)
+          option(value="" disabled selected) -- Seleccione --
+          option(value="masculino") Masculino
+          option(value="femenino") Femenino
 
-        .text-center.mt-4
-          button.btn.btn-success(type="submit") Guardar
-          a.btn.btn-secondary.ms-2(href="/pacientes") Cancelar
+      .button-group
+        button.btn.btn-hospital(type="submit")
+          i.bi.bi-save
+          | Guardar
+        a.btn.btn-secondary(href="/pacientes")
+          i.bi.bi-x-circle
+          | Cancelar
+
+  script.
+    // Solo agregamos los íconos si no están cargados
+    if (!document.querySelector('link[href*="bootstrap-icons"]')) {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css';
+      document.head.appendChild(link);
+    }

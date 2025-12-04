@@ -1,78 +1,487 @@
 extends ../layout
 
 block content
-  h2.text-center.mb-4 Editar Evaluación Médica
+  style.
+    :root {
+      --hospital-blue: #0d8abc;
+      --hospital-teal: #00c2cb;
+      --hospital-light: #e8f4f8;
+      --hospital-white: #ffffff;
+      --hospital-gray: #f8f9fa;
+      --hospital-dark: #2c3e50;
+      --hospital-yellow: #f39c12;
+      --hospital-medico: #27ae60;
+      --hospital-red: #e74c3c;
+    }
+    
+    .hospital-header {
+      background: linear-gradient(135deg, var(--hospital-yellow), #f1c40f);
+      color: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 6px 15px rgba(243, 156, 18, 0.15);
+      text-align: center;
+    }
+    
+    .hospital-title {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    
+    .hospital-title i {
+      font-size: 1.8rem;
+    }
+    
+    .hospital-form-container {
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      border: 2px solid var(--hospital-yellow) !important;
+      max-width: 900px;
+      width: 100%;
+      margin: 0 auto;
+    }
+    
+    .patient-banner {
+      background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      text-align: center;
+      border-left: 5px solid var(--hospital-medico);
+    }
+    
+    .patient-avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--hospital-medico), #27ae60);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin: 0 auto 1rem;
+    }
+    
+    .patient-name {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--hospital-dark);
+      margin-bottom: 0.5rem;
+    }
+    
+    .patient-info {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      margin-top: 1rem;
+    }
+    
+    .info-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: white;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      color: var(--hospital-dark);
+      font-size: 0.9rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    
+    .info-badge i {
+      color: var(--hospital-medico);
+    }
+    
+    .evaluation-info {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid #eee;
+    }
+    
+    .form-section {
+      margin-bottom: 1.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid #eaeaea;
+    }
+    
+    .form-section:last-child {
+      border-bottom: none;
+    }
+    
+    .form-section h5 {
+      color: var(--hospital-blue);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .form-section h5 i {
+      font-size: 1.2rem;
+    }
+    
+    .form-label {
+      font-weight: 600;
+      color: var(--hospital-dark);
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    
+    .form-control, .form-select {
+      border: 1px solid #dee2e6;
+      border-radius: 8px;
+      padding: 0.6rem 0.75rem;
+      transition: all 0.3s ease;
+    }
+    
+    .form-control:focus, .form-select:focus {
+      border-color: var(--hospital-yellow);
+      box-shadow: 0 0 0 0.25rem rgba(243, 156, 18, 0.25);
+    }
+    
+    textarea.form-control {
+      resize: vertical;
+      min-height: 80px;
+    }
+    
+    .btn-edit {
+      background: linear-gradient(to right, var(--hospital-yellow), #f1c40f);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 0.6rem 1.5rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 8px rgba(243, 156, 18, 0.2);
+    }
+    
+    .btn-edit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(243, 156, 18, 0.25);
+      color: white;
+    }
+    
+    .btn-secondary {
+      background: #6c757d;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 0.6rem 1.5rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-secondary:hover {
+      background: #5a6268;
+      color: white;
+      transform: translateY(-2px);
+    }
+    
+    .button-group {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 2rem;
+    }
+    
+    .error-message {
+      font-size: 0.85rem;
+      color: var(--hospital-red);
+      margin-top: 0.25rem;
+    }
+    
+    .input-group {
+      position: relative;
+    }
+    
+    .original-date {
+      font-size: 0.9rem;
+      color: #6c757d;
+      margin-top: 0.25rem;
+    }
+    
+    .form-textarea-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-textarea-group label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 0.5rem;
+    }
+    
+    .form-textarea-group label i {
+      color: var(--hospital-medico);
+    }
+    
+    .form-actions {
+      padding-top: 1.5rem;
+      border-top: 2px solid #f0f0f0;
+      margin-top: 1rem;
+    }
+    
+    .form-hint {
+      font-size: 0.85rem;
+      color: #6c757d;
+      margin-top: 0.25rem;
+    }
+    
+    @media (max-width: 768px) {
+      .hospital-form-container {
+        padding: 1.5rem;
+        margin: 0 1rem;
+      }
+      
+      .button-group {
+        flex-direction: column;
+      }
+      
+      .button-group .btn {
+        width: 100%;
+      }
+      
+      .patient-info, .evaluation-info {
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+    }
 
-  // Contenedor angosto
-  .container(style="max-width: 900px; margin: 0 auto;")
+  //- Header principal
+  .hospital-header
+    h1.hospital-title
+      i.bi.bi-clipboard2-check
+      | Editar Evaluación Médica
+    p.mb-0 Actualice la información de la evaluación médica
 
-    // Encabezado informativo
+  .hospital-form-container
+    //- Banner del paciente
     if evaluacion
-      .p-3.rounded.mb-4(style="background-color: #e6f7ff; border-left: 4px solid #0d6efd;")
-        p.mb-1
-          strong Paciente:
-          |  #{evaluacion.paciente_nombre} #{evaluacion.paciente_apellido}
-        p.mb-0
-          strong Habitación:
-          |  #{evaluacion.habitacion_numero} (#{evaluacion.ala} – #{evaluacion.tipo})
-
+      .patient-banner
+        .patient-avatar= `${evaluacion.paciente_nombre.charAt(0)}${evaluacion.paciente_apellido.charAt(0)}`
+        .patient-name #{evaluacion.paciente_apellido}, #{evaluacion.paciente_nombre}
+        .patient-info
+          .info-badge
+            i.bi.bi-hospital
+            span Habitación #{evaluacion.habitacion_numero}
+          .info-badge
+            i.bi.bi-compass
+            span Ala #{evaluacion.ala}
+          .info-badge
+            i.bi.bi-tag
+            span #{evaluacion.tipo}
+        
+        .evaluation-info
+          .info-badge
+            i.bi.bi-clipboard2-pulse
+            span Evaluación ID: #{evaluacion.id}
+          .info-badge
+            i.bi.bi-calendar
+            span Original: #{new Date(evaluacion.fecha_hora).toLocaleDateString('es-AR')}
+    
+    //- Formulario
     form(method="POST", action=`/medico/editar/${evaluacion.id}`)
       input(type="hidden", name="internacion_id", value=evaluacion.internacion_id)
-
-      .card.shadow.p-4(style="border-radius: 12px;")
-
-        // ==========================
-        // FILA: Fecha y Diagnóstico
-        // ==========================
+      
+      //- Sección: Fecha y Diagnóstico
+      .form-section
+        h5
+          i.bi.bi-calendar2-check
+          | Información Básica
         .row
           .col-md-4.mb-3
-            label.form-label Fecha y Hora
+            label.form-label(for="fecha_hora")
+              i.bi.bi-clock
+              | Fecha y Hora
             input.form-control(
               type="datetime-local",
               name="fecha_hora",
+              id="fecha_hora",
               required,
               value=evaluacion.fecha_hora.toISOString().slice(0,16)
             )
             if errors && errors.fecha_hora
-              small.text-danger= errors.fecha_hora
-
+              .error-message= errors.fecha_hora
+            .original-date
+              i.bi.bi-clock-history
+              |  Fecha original: #{new Date(evaluacion.fecha_hora).toLocaleString('es-AR')}
+          
           .col-md-8.mb-3
-            label.form-label Diagnóstico Médico
-            textarea.form-control(name="diagnostico", rows="2")= evaluacion.diagnostico
+            label.form-label(for="diagnostico")
+              i.bi.bi-clipboard2-check
+              | Diagnóstico Médico
+            textarea.form-control(
+              name="diagnostico",
+              id="diagnostico",
+              rows="2",
+              placeholder="Ingrese el diagnóstico principal..."
+            )= evaluacion.diagnostico
             if errors && errors.diagnostico
-              small.text-danger= errors.diagnostico
-
-        // ==========================
-        // FILA: Evolución + Tratamiento
-        // ==========================
+              .error-message= errors.diagnostico
+            .form-hint Diagnóstico principal o provisional del paciente
+      
+      //- Sección: Evolución y Tratamiento
+      .form-section
+        h5
+          i.bi.bi-graph-up
+          | Evolución y Tratamiento
         .row
           .col-md-6.mb-3
-            label.form-label Evolución
-            textarea.form-control(name="evolucion", rows="3")= evaluacion.evolucion
-
+            .form-textarea-group
+              label(for="evolucion")
+                i.bi.bi-arrow-up-right-circle
+                | Evolución del Paciente
+              textarea.form-control(
+                name="evolucion",
+                id="evolucion",
+                rows="3",
+                placeholder="Describa la evolución clínica del paciente..."
+              )= evaluacion.evolucion
+              .form-hint Progreso, cambios en síntomas, respuesta al tratamiento
+          
           .col-md-6.mb-3
-            label.form-label Tratamiento Indicado
-            textarea.form-control(name="tratamiento", rows="3")= evaluacion.tratamiento
-
-        // ==========================
-        // FILA: Medicación + Estudios
-        // ==========================
+            .form-textarea-group
+              label(for="tratamiento")
+                i.bi.bi-prescription2
+                | Tratamiento Indicado
+              textarea.form-control(
+                name="tratamiento",
+                id="tratamiento",
+                rows="3",
+                placeholder="Especifique el tratamiento indicado..."
+              )= evaluacion.tratamiento
+              .form-hint Protocolo terapéutico, intervenciones, indicaciones
+      
+      //- Sección: Medicación y Estudios
+      .form-section
+        h5
+          i.bi.bi-capsule
+          | Prescripciones y Estudios
         .row
           .col-md-6.mb-3
-            label.form-label Medicación
-            textarea.form-control(name="medicacion", rows="2")= evaluacion.medicacion
-
+            .form-textarea-group
+              label(for="medicacion")
+                i.bi.bi-pill
+                | Medicación Prescrita
+              textarea.form-control(
+                name="medicacion",
+                id="medicacion",
+                rows="2",
+                placeholder="Detalle la medicación prescrita..."
+              )= evaluacion.medicacion
+              .form-hint Fármacos, dosis, frecuencia y duración del tratamiento
+          
           .col-md-6.mb-3
-            label.form-label Estudios Solicitados
-            textarea.form-control(name="estudios_solicitados", rows="2")= evaluacion.estudios_solicitados
-
-        // ==========================
-        // NOTAS
-        // ==========================
+            .form-textarea-group
+              label(for="estudios_solicitados")
+                i.bi.bi-clipboard-data
+                | Estudios Solicitados
+              textarea.form-control(
+                name="estudios_solicitados",
+                id="estudios_solicitados",
+                rows="2",
+                placeholder="Liste los estudios solicitados..."
+              )= evaluacion.estudios_solicitados
+              .form-hint Laboratorio, imágenes, interconsultas, otros estudios
+      
+      //- Sección: Notas Adicionales
+      .form-section
+        h5
+          i.bi.bi-journal-text
+          | Observaciones Adicionales
         .mb-3
-          label.form-label Observaciones
-          textarea.form-control(name="notas", rows="3")= evaluacion.notas
+          .form-textarea-group
+            label(for="notas")
+              i.bi.bi-chat-left-text
+              | Notas y Observaciones
+            textarea.form-control(
+              name="notas",
+              id="notas",
+              rows="3",
+              placeholder="Agregue cualquier observación relevante..."
+            )= evaluacion.notas
+            .form-hint Comentarios adicionales, recomendaciones, seguimiento requerido
+      
+      //- Botones de acción
+      .form-actions
+        .button-group
+          button.btn.btn-edit(type="submit")
+            i.bi.bi-check-circle
+            | Actualizar Evaluación
+          a.btn.btn-secondary(href=`/medico/internacion/${evaluacion.internacion_id}`)
+            i.bi.bi-x-circle
+            | Cancelar
 
-        .text-center.mt-4
-          button.btn.btn-success(type="submit") Actualizar
-          a.btn.btn-secondary.ms-2(href=`/medico/internacion/${evaluacion.internacion_id}`) Cancelar
+  script.
+    // Añadir íconos si no están ya incluidos
+    if (!document.querySelector('link[href*="bootstrap-icons"]')) {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css';
+      document.head.appendChild(link);
+    }
+    
+    // Autoajustar altura de textareas
+    document.addEventListener('DOMContentLoaded', function() {
+      const textareas = document.querySelectorAll('textarea');
+      
+      textareas.forEach(textarea => {
+        // Ajustar altura inicial
+        textarea.style.height = 'auto';
+        textarea.style.height = (textarea.scrollHeight) + 'px';
+        
+        // Ajustar altura al escribir
+        textarea.addEventListener('input', function() {
+          this.style.height = 'auto';
+          this.style.height = (this.scrollHeight) + 'px';
+        });
+      });
+      
+      // Formatear fecha/hora para input datetime-local
+      const fechaHoraInput = document.getElementById('fecha_hora');
+      if (fechaHoraInput && !fechaHoraInput.value) {
+        const originalDate = new Date('#{evaluacion.fecha_hora}');
+        const tzOffset = originalDate.getTimezoneOffset() * 60000;
+        const localISOTime = new Date(originalDate - tzOffset).toISOString().slice(0, 16);
+        fechaHoraInput.value = localISOTime;
+      }
+      
+      // Validación de campos requeridos
+      const form = document.querySelector('form');
+      if (form) {
+        form.addEventListener('submit', function(e) {
+          const diagnostico = document.getElementById('diagnostico');
+          const fechaHora = document.getElementById('fecha_hora');
+          
+          let isValid = true;
+          
+          if (fechaHora && !fechaHora.value) {
+            isValid = false;
+            fechaHora.style.borderColor = 'var(--hospital-red)';
+          }
+          
+          if (!isValid) {
+            e.preventDefault();
+            alert('Por favor complete los campos requeridos');
+          }
+        });
+      }
+    });

@@ -1,28 +1,499 @@
 extends ../layout
 
 block content
-  h1 Bienvenido Admin : #{usuario}
-  a.btn.btn-primary.mb-3(href="/pacientes/nuevo") + Nuevo Paciente
+  //- Estilos específicos para esta vista (puedes moverlos a un archivo CSS común)
+  style.
+    :root {
+      --hospital-blue: #0d8abc;
+      --hospital-teal: #00c2cb;
+      --hospital-light: #e8f4f8;
+      --hospital-white: #ffffff;
+      --hospital-gray: #f8f9fa;
+      --hospital-dark: #2c3e50;
+      --hospital-green: #2ecc71;
+      --hospital-red: #e74c3c;
+      --hospital-yellow: #f39c12;
+      --hospital-purple: #9b59b6;
+    }
+    
+    .hospital-header {
+      background: linear-gradient(135deg, var(--hospital-blue), var(--hospital-teal));
+      color: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 6px 15px rgba(13, 138, 188, 0.15);
+    }
+    
+    .hospital-title {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .hospital-title i {
+      font-size: 1.8rem;
+    }
+    
+    .hospital-subtitle {
+      opacity: 0.9;
+      font-size: 0.95rem;
+    }
+    
+    .admin-welcome {
+      background: linear-gradient(135deg, var(--hospital-purple), #6c5ce7);
+      color: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 6px 15px rgba(155, 89, 182, 0.15);
+    }
+    
+    .admin-avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ffffff, #f0f0f0);
+      color: var(--hospital-purple);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      font-weight: 600;
+      margin-right: 15px;
+    }
+    
+    .btn-hospital {
+      background: linear-gradient(to right, var(--hospital-blue), var(--hospital-teal));
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 0.6rem 1.2rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 8px rgba(13, 138, 188, 0.2);
+    }
+    
+    .btn-hospital:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(13, 138, 188, 0.25);
+      color: white;
+    }
+    
+    .btn-admin {
+      background: linear-gradient(to right, var(--hospital-purple), #6c5ce7);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 0.6rem 1.2rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 8px rgba(155, 89, 182, 0.2);
+    }
+    
+    .btn-admin:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(155, 89, 182, 0.25);
+      color: white;
+    }
+    
+    .hospital-table {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      border: none;
+    }
+    
+    .hospital-table thead {
+      background: linear-gradient(to right, #f8f9fa, #e9ecef);
+      color: var(--hospital-dark);
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+      letter-spacing: 0.5px;
+    }
+    
+    .hospital-table th {
+      border-bottom: 2px solid var(--hospital-purple);
+      padding: 1rem;
+    }
+    
+    .hospital-table td {
+      padding: 1rem;
+      vertical-align: middle;
+      border-top: 1px solid #f0f0f0;
+    }
+    
+    .hospital-table tbody tr {
+      transition: all 0.2s ease;
+    }
+    
+    .hospital-table tbody tr:hover {
+      background-color: rgba(155, 89, 182, 0.05);
+      transform: translateX(4px);
+    }
+    
+    .badge-sexo {
+      display: inline-block;
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    
+    .badge-sexo-masculino { 
+      background-color: #d1e7ff; 
+      color: #0d6efd;
+      border-left: 3px solid #0d6efd;
+    }
+    
+    .badge-sexo-femenino { 
+      background-color: #f8d7da; 
+      color: #dc3545;
+      border-left: 3px solid #dc3545;
+    }
+    
+    .badge-sexo-otro { 
+      background-color: #e7f5e8; 
+      color: #198754;
+      border-left: 3px solid #198754;
+    }
+    
+    .dni-badge {
+      display: inline-block;
+      padding: 0.3rem 0.6rem;
+      background-color: #f8f9fa;
+      border-radius: 6px;
+      font-family: monospace;
+      font-weight: 600;
+      color: var(--hospital-dark);
+      border: 1px solid #e9ecef;
+    }
+    
+    .action-buttons {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    
+    .btn-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+    }
+    
+    .btn-icon:hover {
+      transform: scale(1.1);
+    }
+    
+    .btn-edit {
+      background-color: #fff8e6;
+      color: #e67e22;
+    }
+    
+    .btn-delete {
+      background-color: #ffeaea;
+      color: #e74c3c;
+    }
+    
+    .patient-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--hospital-purple), #6c5ce7);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      margin-right: 10px;
+    }
+    
+    .patient-info {
+      display: flex;
+      align-items: center;
+    }
+    
+    .patient-name {
+      font-weight: 600;
+      color: var(--hospital-dark);
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    }
+    
+    .empty-state-icon {
+      font-size: 3.5rem;
+      color: #d1d8e0;
+      margin-bottom: 1rem;
+    }
+    
+    .empty-state-title {
+      color: #7f8c8d;
+      margin-bottom: 0.5rem;
+    }
+    
+    .empty-state-text {
+      color: #95a5a6;
+      max-width: 400px;
+      margin: 0 auto 1.5rem;
+    }
+    
+    .stats-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+      background: white;
+      border-radius: 10px;
+      padding: 1.2rem;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      transition: transform 0.3s ease;
+    }
+    
+    .stat-card:hover {
+      transform: translateY(-5px);
+    }
+    
+    .stat-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+    
+    .stat-icon.pacientes {
+      background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+      color: var(--hospital-blue);
+    }
+    
+    .stat-icon.masculino {
+      background: linear-gradient(135deg, #e8f4ff, #c2d9ff);
+      color: #0d6efd;
+    }
+    
+    .stat-icon.femenino {
+      background: linear-gradient(135deg, #fce4ec, #f8bbd9);
+      color: #dc3545;
+    }
+    
+    .stat-content h3 {
+      margin: 0;
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: var(--hospital-dark);
+    }
+    
+    .stat-content p {
+      margin: 0;
+      color: #6c757d;
+      font-size: 0.9rem;
+    }
+    
+    .table-responsive {
+      border-radius: 12px;
+    }
+    
+    @media (max-width: 768px) {
+      .hospital-table th, 
+      .hospital-table td {
+        padding: 0.75rem 0.5rem;
+      }
+      
+      .action-buttons {
+        flex-direction: column;
+      }
+      
+      .stats-cards {
+        grid-template-columns: 1fr;
+      }
+    }
+
+  //- Contenido principal
+  .admin-welcome
+    .d-flex.justify-content-between.align-items-center.flex-wrap
+      .d-flex.align-items-center
+        .admin-avatar= usuario.charAt(0).toUpperCase()
+        div
+          h1.hospital-title.mb-1
+            i.bi.bi-person-badge
+            | Bienvenido, #{usuario}
+          p.hospital-subtitle.mb-0
+            | Panel de Administración - Gestión de Pacientes
+      a.btn.btn-admin(href="/pacientes/nuevo")
+        i.bi.bi-person-plus
+        | Nuevo Paciente
+
+  //- Tarjetas de estadísticas
+  if pacientes.length > 0
+    .stats-cards
+      .stat-card
+        .stat-icon.pacientes
+          i.bi.bi-people
+        .stat-content
+          h3= pacientes.length
+          p Pacientes Registrados
+      
+      - const masculinos = pacientes.filter(p => p.sexo === 'Masculino').length
+      .stat-card
+        .stat-icon.masculino
+          i.bi.bi-gender-male
+        .stat-content
+          h3= masculinos
+          p Pacientes Masculinos
+      
+      - const femeninos = pacientes.filter(p => p.sexo === 'Femenino').length
+      .stat-card
+        .stat-icon.femenino
+          i.bi.bi-gender-female
+        .stat-content
+          h3= femeninos
+          p Pacientes Femeninos
 
   if pacientes.length > 0
-    h2 Lista de pacientes
-    table.table.table-striped
-      thead
-        tr
-          th Nombre
-          th Apellido
-          th DNI
-          th Sexo
-          th Acciones
-      tbody
-        each paciente in pacientes
+    .hospital-header
+      .d-flex.justify-content-between.align-items-center.flex-wrap
+        div
+          h2.hospital-title.mb-1
+            i.bi.bi-list-ul
+            | Lista de Pacientes
+          p.hospital-subtitle.mb-0
+            | Total: #{pacientes.length} paciente(s) registrado(s)
+        .d-flex.gap-2
+          a.btn.btn-hospital(href="#", onclick="exportToExcel()")
+            i.bi.bi-file-earmark-excel
+            | Exportar
+          a.btn.btn-hospital(href="#", onclick="printTable()")
+            i.bi.bi-printer
+            | Imprimir
+    
+    .table-responsive
+      table.table.table-hover.hospital-table
+        thead
           tr
-            td= paciente.nombre
-            td= paciente.apellido
-            td= paciente.dni
-            td= paciente.sexo
-            td
-              a.btn.btn-sm.btn-warning(href=`/pacientes/editar/${paciente.id}`) Editar
-              a.btn.btn-sm.btn-danger.ms-2(href=`/pacientes/eliminar/${paciente.id}`) Eliminar
+            th(scope="col") Paciente
+            th(scope="col") DNI
+            th(scope="col") Sexo
+            th(scope="col") Acciones
+        tbody
+          each paciente in pacientes
+            tr
+              td
+                .patient-info
+                  .patient-avatar= paciente.nombre.charAt(0).toUpperCase() + paciente.apellido.charAt(0).toUpperCase()
+                  div
+                    .patient-name= paciente.nombre + ' ' + paciente.apellido
+                    small.text-muted ID: #{paciente.id}
+              td
+                .dni-badge= paciente.dni
+              td
+                if paciente.sexo === 'Masculino'
+                  span.badge.badge-sexo.badge-sexo-masculino
+                    i.bi.bi-gender-male
+                    |  #{paciente.sexo}
+                else if paciente.sexo === 'Femenino'
+                  span.badge.badge-sexo.badge-sexo-femenino
+                    i.bi.bi-gender-female
+                    |  #{paciente.sexo}
+                else
+                  span.badge.badge-sexo.badge-sexo-otro= paciente.sexo
+              td
+                .action-buttons
+                  a.btn.btn-icon.btn-edit(
+                    href=`/pacientes/editar/${paciente.id}`,
+                    title="Editar Paciente"
+                  )
+                    i.bi.bi-pencil
+                  a.btn.btn-icon.btn-delete(
+                    href=`/pacientes/eliminar/${paciente.id}`,
+                    title="Eliminar Paciente",
+                    onclick="return confirm('¿Está seguro que desea eliminar a ' + '#{paciente.nombre} #{paciente.apellido}' + '?')"
+                  )
+                    i.bi.bi-trash
+                  a.btn.btn-icon(
+                    style="background-color: #e8f4fc; color: var(--hospital-blue);",
+                    href=`#`,
+                    title="Ver Historial",
+                    onclick=`verHistorial(${paciente.id})`
+                  )
+                    i.bi.bi-file-medical
   else
-    p No hay pacientes cargados.
+    .empty-state
+      .empty-state-icon
+        i.bi.bi-people
+      h3.empty-state-title No hay pacientes cargados
+      p.empty-state-text
+        | No se han encontrado pacientes registrados en el sistema. 
+        | Para agregar un nuevo paciente, haga clic en el botón "Nuevo Paciente".
+      a.btn.btn-admin(href="/pacientes/nuevo")
+        i.bi.bi-person-plus
+        | Agregar primer paciente
+
+  //- Script para funcionalidades adicionales
+  script.
+    // Añadir íconos si no están ya incluidos
+    if (!document.querySelector('link[href*="bootstrap-icons"]')) {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css';
+      document.head.appendChild(link);
+    }
+    
+    // Funciones de utilidad
+    function exportToExcel() {
+      alert('Función de exportación a Excel - Esta funcionalidad se implementaría con una librería como SheetJS');
+      // En una implementación real, aquí iría el código para exportar a Excel
+    }
+    
+    function printTable() {
+      window.print();
+    }
+    
+    function verHistorial(pacienteId) {
+      alert(`Ver historial del paciente ID: ${pacienteId}`);
+      // En una implementación real, redirigiría a la página de historial
+      // window.location.href = `/pacientes/historial/${pacienteId}`;
+    }
+    
+    // Confirmación antes de eliminar (ya está en el onclick)
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('Panel de administración cargado');
+      
+      // Puedes agregar más funcionalidades aquí si es necesario
+      const deleteButtons = document.querySelectorAll('.btn-delete');
+      deleteButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+          if (!confirm('¿Está seguro de que desea eliminar este paciente?')) {
+            e.preventDefault();
+          }
+        });
+      });
+    });

@@ -1,34 +1,462 @@
 extends ../layout
 
 block content
-  h2 Editar Habitación
-  form(method="POST", action=`/habitaciones/editar/${habitacion.id}`)
-    .mb-3
-      label.form-label Número
-      input.form-control(type="number", name="numero", value=habitacion.numero, disabled)
+  style.
+    :root {
+      --hospital-blue: #0d8abc;
+      --hospital-teal: #00c2cb;
+      --hospital-light: #e8f4f8;
+      --hospital-white: #ffffff;
+      --hospital-gray: #f8f9fa;
+      --hospital-dark: #2c3e50;
+      --hospital-yellow: #f39c12;
+      --hospital-green: #2ecc71;
+      --hospital-red: #e74c3c;
+    }
+    
+    .hospital-header {
+      background: linear-gradient(135deg, var(--hospital-yellow), #f1c40f);
+      color: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 6px 15px rgba(243, 156, 18, 0.15);
+      text-align: center;
+    }
+    
+    .hospital-title {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    
+    .hospital-title i {
+      font-size: 1.8rem;
+    }
+    
+    .hospital-form-container {
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      border: 2px solid var(--hospital-yellow) !important;
+      max-width: 500px;
+      width: 100%;
+      margin: 0 auto;
+    }
+    
+    .room-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    
+    .room-icon {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--hospital-blue), var(--hospital-teal));
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      margin: 0 auto 1rem;
+    }
+    
+    .room-number-large {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--hospital-dark);
+      line-height: 1;
+    }
+    
+    .room-id {
+      font-size: 0.9rem;
+      color: #6c757d;
+      margin-top: 0.25rem;
+    }
+    
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      margin-bottom: 2rem;
+      padding: 1rem;
+      background: #f8f9fa;
+      border-radius: 10px;
+    }
+    
+    .info-item {
+      text-align: center;
+    }
+    
+    .info-label {
+      font-size: 0.85rem;
+      color: #6c757d;
+      margin-bottom: 0.25rem;
+    }
+    
+    .info-value {
+      font-weight: 600;
+      color: var(--hospital-dark);
+    }
+    
+    .form-label {
+      font-weight: 600;
+      color: var(--hospital-dark);
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    
+    .form-control, .form-select {
+      border: 1px solid #dee2e6;
+      border-radius: 8px;
+      padding: 0.6rem 0.75rem;
+      transition: all 0.3s ease;
+    }
+    
+    .form-control[disabled], .form-select[disabled] {
+      background-color: #f8f9fa;
+      border-color: #e9ecef;
+      color: #6c757d;
+      cursor: not-allowed;
+    }
+    
+    .form-control:focus, .form-select:focus {
+      border-color: var(--hospital-yellow);
+      box-shadow: 0 0 0 0.25rem rgba(243, 156, 18, 0.25);
+    }
+    
+    .btn-edit {
+      background: linear-gradient(to right, var(--hospital-yellow), #f1c40f);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 0.6rem 1.5rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 8px rgba(243, 156, 18, 0.2);
+    }
+    
+    .btn-edit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(243, 156, 18, 0.25);
+      color: white;
+    }
+    
+    .btn-secondary {
+      background: #6c757d;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 0.6rem 1.5rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-secondary:hover {
+      background: #5a6268;
+      color: white;
+      transform: translateY(-2px);
+    }
+    
+    .button-group {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 2rem;
+    }
+    
+    .form-section {
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-section h5 {
+      color: var(--hospital-blue);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1rem;
+    }
+    
+    .status-select-wrapper {
+      position: relative;
+    }
+    
+    .status-indicator {
+      position: absolute;
+      left: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    
+    .status-libre-indicator { background-color: #2ecc71; }
+    .status-ocupada-indicator { background-color: #e74c3c; }
+    .status-limpieza-indicator { background-color: #f39c12; }
+    
+    .status-select-wrapper .form-select {
+      padding-left: 2rem;
+    }
+    
+    .current-status {
+      font-size: 0.85rem;
+      color: #6c757d;
+      margin-top: 0.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .current-status .status-badge {
+      padding: 0.2rem 0.6rem;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+    
+    .status-libre-badge { background-color: #d4edda; color: #155724; }
+    .status-ocupada-badge { background-color: #f8d7da; color: #721c24; }
+    .status-limpieza-badge { background-color: #fff3cd; color: #856404; }
+    
+    .readonly-field {
+      background: #f8f9fa;
+      padding: 0.75rem;
+      border-radius: 8px;
+      border: 1px solid #e9ecef;
+    }
+    
+    .readonly-field .field-label {
+      font-size: 0.85rem;
+      color: #6c757d;
+      margin-bottom: 0.25rem;
+    }
+    
+    .readonly-field .field-value {
+      font-weight: 600;
+      color: var(--hospital-dark);
+    }
+    
+    @media (max-width: 768px) {
+      .hospital-form-container {
+        padding: 1.5rem;
+        margin: 0 1rem;
+      }
+      
+      .info-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .button-group {
+        flex-direction: column;
+      }
+      
+      .button-group .btn {
+        width: 100%;
+      }
+    }
 
-    .mb-3
-      label.form-label Ala
-      select.form-select(name="ala", disabled)
-        option(value="" disabled selected=!(habitacion.ala)) -- Seleccione un ala --
-        option(value="Norte", selected=habitacion.ala === 'Norte') Norte
-        option(value="Sur", selected=habitacion.ala === 'Sur') Sur
+  //- Header principal
+  .hospital-header
+    h1.hospital-title
+      i.bi.bi-pencil-square
+      | Editar Habitación
+    p.mb-0 Actualice el estado de la habitación
 
-    .mb-3
-      label.form-label Tipo
-      select.form-select(name="tipo", disabled)
-        option(value="" disabled selected=!(habitacion.tipo)) -- Seleccione un tipo --
-        option(value="individual", selected=habitacion.tipo === 'individual') Individual
-        option(value="doble", selected=habitacion.tipo === 'doble') Doble
+  .hospital-form-container
+    //- Encabezado de la habitación
+    .room-header
+      .room-icon
+        i.bi.bi-door-closed
+      .room-number-large= habitacion.numero
+      .room-id ID: #{habitacion.id}
+    
+    //- Información actual (solo lectura)
+    .info-grid
+      .info-item
+        .info-label Ala
+        .info-value= habitacion.ala
+      .info-item
+        .info-label Tipo
+        .info-value= habitacion.tipo
+      .info-item
+        .info-label Estado Actual
+        .info-value
+          if habitacion.estado === 'Libre'
+            span.status-badge.status-libre-badge= habitacion.estado
+          else if habitacion.estado === 'Ocupada'
+            span.status-badge.status-ocupada-badge= habitacion.estado
+          else if habitacion.estado === 'Limpieza'
+            span.status-badge.status-limpieza-badge= habitacion.estado
+          else
+            span= habitacion.estado
+      .info-item
+        .info-label Última Actualización
+        .info-value
+          if habitacion.updated_at
+            | #{new Date(habitacion.updated_at).toLocaleDateString('es-AR')}
+          else
+            | No disponible
+    
+    //- Formulario
+    form(method="POST", action=`/habitaciones/editar/${habitacion.id}`)
+      
+      //- Campos de solo lectura
+      .form-section
+        h5
+          i.bi.bi-info-circle
+          | Información de la Habitación
+        .mb-3
+          .readonly-field
+            .field-label Número de Habitación
+            .field-value= habitacion.numero
+          input(type="hidden", name="numero", value=habitacion.numero)
+        
+        .mb-3
+          .readonly-field
+            .field-label Ala
+            .field-value= habitacion.ala
+          input(type="hidden", name="ala", value=habitacion.ala)
+        
+        .mb-3
+          .readonly-field
+            .field-label Tipo de Habitación
+            .field-value= habitacion.tipo
+          input(type="hidden", name="tipo", value=habitacion.tipo)
+      
+      //- Campo editable: Estado
+      .form-section
+        h5
+          i.bi.bi-sliders
+          | Cambiar Estado
+        .mb-3
+          label.form-label(for="estado_id") Nuevo Estado
+          .status-select-wrapper
+            if habitacion.estado === 'Libre'
+              .status-indicator.status-libre-indicator
+            else if habitacion.estado === 'Ocupada'
+              .status-indicator.status-ocupada-indicator
+            else if habitacion.estado === 'Limpieza'
+              .status-indicator.status-limpieza-indicator
+            select.form-select(id="estado_id", name="estado_id", required)
+              each estado in estados
+                option(
+                  value=estado.id,
+                  selected=(estado.nombre === habitacion.estado)
+                )= estado.nombre
+          
+          .current-status
+            i.bi.bi-info-circle
+            | Estado actual: 
+            if habitacion.estado === 'Libre'
+              span.status-badge.status-libre-badge= habitacion.estado
+            else if habitacion.estado === 'Ocupada'
+              span.status-badge.status-ocupada-badge= habitacion.estado
+            else if habitacion.estado === 'Limpieza'
+              span.status-badge.status-limpieza-badge= habitacion.estado
+            else
+              span= habitacion.estado
+        
+        .form-text
+          small.text-muted
+            i.bi.bi-exclamation-circle
+            |  Solo el estado puede ser modificado. La información de ala y tipo son permanentes.
+      
+      //- Botones de acción
+      .button-group
+        button.btn.btn-edit(type="submit")
+          i.bi.bi-check-circle
+          | Actualizar Estado
+        a.btn.btn-secondary(href="/habitaciones")
+          i.bi.bi-x-circle
+          | Cancelar
 
-    .mb-3
-      label.form-label Estado
-      select.form-select(name="estado_id", required)
-        each estado in estados
-          option(
-            value=estado.id,
-            selected=(estado.nombre === habitacion.estado)
-          )= estado.nombre
-
-    button.btn.btn-primary(type="submit") Actualizar
-    a.btn.btn-secondary.ms-2(href="/habitaciones") Cancelar
+  script.
+    // Añadir íconos si no están ya incluidos
+    if (!document.querySelector('link[href*="bootstrap-icons"]')) {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css';
+      document.head.appendChild(link);
+    }
+    
+    // Actualizar indicador visual según estado seleccionado
+    document.addEventListener('DOMContentLoaded', function() {
+      const estadoSelect = document.getElementById('estado_id');
+      const statusIndicator = document.querySelector('.status-indicator');
+      
+      if (estadoSelect && statusIndicator) {
+        // Función para actualizar el indicador
+        function actualizarIndicador() {
+          const estadoSeleccionado = estadoSelect.options[estadoSelect.selectedIndex].text;
+          
+          // Resetear clases
+          statusIndicator.className = 'status-indicator';
+          
+          // Aplicar clase según estado
+          if (estadoSeleccionado === 'Libre') {
+            statusIndicator.classList.add('status-libre-indicator');
+          } else if (estadoSeleccionado === 'Ocupada') {
+            statusIndicator.classList.add('status-ocupada-indicator');
+          } else if (estadoSeleccionado === 'Limpieza') {
+            statusIndicator.classList.add('status-limpieza-indicator');
+          }
+          
+          // Efecto visual de cambio
+          statusIndicator.style.animation = 'pulse 0.5s';
+          setTimeout(() => {
+            statusIndicator.style.animation = '';
+          }, 500);
+        }
+        
+        // Escuchar cambios
+        estadoSelect.addEventListener('change', actualizarIndicador);
+        
+        // Inicializar indicador
+        actualizarIndicador();
+      }
+      
+      // Confirmación antes de enviar si el estado cambia a "Ocupada"
+      const form = document.querySelector('form');
+      if (form) {
+        form.addEventListener('submit', function(e) {
+          const estadoActual = '#{habitacion.estado}';
+          const estadoNuevo = estadoSelect.options[estadoSelect.selectedIndex].text;
+          
+          if (estadoActual === 'Libre' && estadoNuevo === 'Ocupada') {
+            if (!confirm('¿Está seguro de cambiar el estado a "Ocupada"? Esto afectará la disponibilidad de la habitación.')) {
+              e.preventDefault();
+              return false;
+            }
+          }
+          
+          if (estadoActual === 'Ocupada' && estadoNuevo === 'Libre') {
+            if (!confirm('¿Está seguro de marcar la habitación como "Libre"? Verifique que el paciente haya sido dado de alta.')) {
+              e.preventDefault();
+              return false;
+            }
+          }
+        });
+      }
+    });
+    
+    // Animación de pulso
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes pulse {
+        0% { transform: translateY(-50%) scale(1); }
+        50% { transform: translateY(-50%) scale(1.5); }
+        100% { transform: translateY(-50%) scale(1); }
+      }
+    `;
+    document.head.appendChild(style);

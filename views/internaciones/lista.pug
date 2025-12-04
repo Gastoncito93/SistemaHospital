@@ -1,39 +1,390 @@
 extends ../layout
 
 block content
-  h2 Internaciones Registradas
-  a.btn.btn-primary.mb-3(href="/internaciones/nueva") + Nueva Internación
+  //- Estilos específicos para esta vista
+  style.
+    :root {
+      --hospital-blue: #0d8abc;
+      --hospital-teal: #00c2cb;
+      --hospital-light: #e8f4f8;
+      --hospital-white: #ffffff;
+      --hospital-gray: #f8f9fa;
+      --hospital-dark: #2c3e50;
+      --hospital-green: #2ecc71;
+      --hospital-red: #e74c3c;
+      --hospital-yellow: #f39c12;
+    }
+    
+    .hospital-header {
+      background: linear-gradient(135deg, var(--hospital-blue), var(--hospital-teal));
+      color: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 6px 15px rgba(13, 138, 188, 0.15);
+    }
+    
+    .hospital-title {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .hospital-title i {
+      font-size: 1.8rem;
+    }
+    
+    .hospital-subtitle {
+      opacity: 0.9;
+      font-size: 0.95rem;
+    }
+    
+    .btn-hospital {
+      background: linear-gradient(to right, var(--hospital-blue), var(--hospital-teal));
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 0.6rem 1.2rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 8px rgba(13, 138, 188, 0.2);
+    }
+    
+    .btn-hospital:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(13, 138, 188, 0.25);
+      color: white;
+    }
+    
+    .hospital-table {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      border: none;
+    }
+    
+    .hospital-table thead {
+      background: linear-gradient(to right, #f8f9fa, #e9ecef);
+      color: var(--hospital-dark);
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+      letter-spacing: 0.5px;
+    }
+    
+    .hospital-table th {
+      border-bottom: 2px solid var(--hospital-teal);
+      padding: 1rem;
+    }
+    
+    .hospital-table td {
+      padding: 1rem;
+      vertical-align: middle;
+      border-top: 1px solid #f0f0f0;
+    }
+    
+    .hospital-table tbody tr {
+      transition: all 0.2s ease;
+    }
+    
+    .hospital-table tbody tr:hover {
+      background-color: rgba(13, 138, 188, 0.05);
+      transform: translateX(4px);
+    }
+    
+    .badge-ala {
+      display: inline-block;
+      padding: 0.3rem 0.6rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    
+    .badge-ala-norte { background-color: #d1ecf1; color: #0c5460; }
+    .badge-ala-sur { background-color: #f8d7da; color: #721c24; }
+    .badge-ala-este { background-color: #d4edda; color: #155724; }
+    .badge-ala-oeste { background-color: #fff3cd; color: #856404; }
+    
+    .badge-tipo {
+      display: inline-block;
+      padding: 0.3rem 0.6rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    
+    .badge-tipo-urgencia { background-color: #fde8e8; color: var(--hospital-red); border-left: 3px solid var(--hospital-red); }
+    .badge-tipo-programada { background-color: #e8f7ef; color: var(--hospital-green); border-left: 3px solid var(--hospital-green); }
+    .badge-tipo-observacion { background-color: #fef7e8; color: var(--hospital-yellow); border-left: 3px solid var(--hospital-yellow); }
+    
+    .action-buttons {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    
+    .btn-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+    }
+    
+    .btn-icon:hover {
+      transform: scale(1.1);
+    }
+    
+    .btn-edit {
+      background-color: #fff8e6;
+      color: #e67e22;
+    }
+    
+    .btn-delete {
+      background-color: #ffeaea;
+      color: #e74c3c;
+    }
+    
+    .btn-enfermeria {
+      background-color: #e8f4fc;
+      color: var(--hospital-blue);
+    }
+    
+    .btn-medico {
+      background-color: #e8f7ef;
+      color: #27ae60;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    }
+    
+    .empty-state-icon {
+      font-size: 3.5rem;
+      color: #d1d8e0;
+      margin-bottom: 1rem;
+    }
+    
+    .empty-state-title {
+      color: #7f8c8d;
+      margin-bottom: 0.5rem;
+    }
+    
+    .empty-state-text {
+      color: #95a5a6;
+      max-width: 400px;
+      margin: 0 auto 1.5rem;
+    }
+    
+    .patient-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--hospital-blue), var(--hospital-teal));
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      margin-right: 10px;
+    }
+    
+    .patient-info {
+      display: flex;
+      align-items: center;
+    }
+    
+    .room-number {
+      font-weight: 600;
+      color: var(--hospital-dark);
+      font-size: 1.1rem;
+    }
+    
+    .fecha-ingreso {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: #666;
+      font-size: 0.9rem;
+    }
+    
+    .motivo-truncado {
+      max-width: 200px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .status-indicator {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 8px;
+    }
+    
+    .status-active {
+      background-color: #2ecc71;
+      box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.2);
+    }
+    
+    .status-inactive {
+      background-color: #e74c3c;
+      box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.2);
+    }
+    
+    .table-responsive {
+      border-radius: 12px;
+    }
+    
+    @media (max-width: 768px) {
+      .hospital-table th, 
+      .hospital-table td {
+        padding: 0.75rem 0.5rem;
+      }
+      
+      .action-buttons {
+        flex-direction: column;
+      }
+    }
+
+  //- Contenido principal
+  .hospital-header
+    .d-flex.justify-content-between.align-items-center.flex-wrap
+      div
+        h1.hospital-title
+          i.bi.bi-clipboard-pulse
+          | Internaciones Registradas
+        p.hospital-subtitle.mb-0
+          | Sistema de Gestión de Pacientes Internados - Vista completa del registro de internaciones
+      a.btn.btn-hospital(href="/internaciones/nueva")
+        i.bi.bi-plus-circle
+        | Nueva Internación
 
   if internaciones.length > 0
-    table.table.table-striped
-      thead
-        tr
-          th Paciente
-          th Habitación
-          th Ala
-          th Tipo
-          th Fecha Ingreso
-          th Motivo
-          th Enfermería
-          th Acciones
-      tbody
-        each internacion in internaciones
+    .table-responsive
+      table.table.table-hover.hospital-table
+        thead
           tr
-            td= internacion.paciente_nombre + ' ' + internacion.paciente_apellido
-            td= internacion.habitacion_numero
-            td= internacion.ala
-            td= internacion.tipo
-            td= internacion.fecha_ingreso.toISOString().substring(0, 10)
-            td= internacion.motivo
-
-            // 📌 BOTÓN DE ENFERMERÍA
-            td                    
-              a.btn.btn-info.btn-sm(href=`/enfermeria/internacion/${internacion.id}`) Enfermería
-              a.btn.btn-sm.btn-info.ms-2(href=`/medico/internacion/${internacion.id}`) Médico
-
-            // 📌 Acciones clásicas
-            td
-              a.btn.btn-sm.btn-warning(href=`/internaciones/editar/${internacion.id}`) Editar
-              a.btn.btn-sm.btn-danger.ms-2(href=`/internaciones/eliminar/${internacion.id}`) Eliminar
+            th(scope="col") Paciente
+            th(scope="col") Habitación
+            th(scope="col") Ala
+            th(scope="col") Tipo
+            th(scope="col") Fecha Ingreso
+            th(scope="col") Motivo
+            th(scope="col") Estado
+            th(scope="col") Acciones
+        tbody
+          each internacion in internaciones
+            tr
+              td
+                .patient-info
+                  .patient-avatar= internacion.paciente_nombre.charAt(0) + internacion.paciente_apellido.charAt(0)
+                  div
+                    strong= internacion.paciente_nombre + ' ' + internacion.paciente_apellido
+                    br
+                    small.text-muted ID: #{internacion.id}
+              td
+                .room-number= internacion.habitacion_numero
+              td
+                if internacion.ala === 'Norte'
+                  span.badge.badge-ala.badge-ala-norte= internacion.ala
+                else if internacion.ala === 'Sur'
+                  span.badge.badge-ala.badge-ala-sur= internacion.ala
+                else if internacion.ala === 'Este'
+                  span.badge.badge-ala.badge-ala-este= internacion.ala
+                else if internacion.ala === 'Oeste'
+                  span.badge.badge-ala.badge-ala-oeste= internacion.ala
+                else
+                  span.badge.bg-secondary= internacion.ala
+              td
+                if internacion.tipo === 'Urgencia'
+                  span.badge.badge-tipo.badge-tipo-urgencia= internacion.tipo
+                else if internacion.tipo === 'Programada'
+                  span.badge.badge-tipo.badge-tipo-programada= internacion.tipo
+                else if internacion.tipo === 'Observación'
+                  span.badge.badge-tipo.badge-tipo-observacion= internacion.tipo
+                else
+                  span.badge.bg-light.text-dark= internacion.tipo
+              td
+                .fecha-ingreso
+                  i.bi.bi-calendar-check
+                  = internacion.fecha_ingreso.toISOString().substring(0, 10)
+              td.motivo-truncado(title=internacion.motivo)= internacion.motivo
+              td
+                if internacion.estado === 'Activa'
+                  span.status-indicator.status-active
+                  | Activa
+                else
+                  span.status-indicator.status-inactive
+                  | Alta
+              td
+                .action-buttons
+                  a.btn.btn-icon.btn-enfermeria(
+                    href=`/enfermeria/internacion/${internacion.id}`,
+                    title="Enfermería"
+                  )
+                    i.bi.bi-clipboard-heart
+                  a.btn.btn-icon.btn-medico(
+                    href=`/medico/internacion/${internacion.id}`,
+                    title="Médico"
+                  )
+                    i.bi.bi-stethoscope
+                  a.btn.btn-icon.btn-edit(
+                    href=`/internaciones/editar/${internacion.id}`,
+                    title="Editar"
+                  )
+                    i.bi.bi-pencil
+                  a.btn.btn-icon.btn-delete(
+                    href=`/internaciones/eliminar/${internacion.id}`,
+                    title="Eliminar"
+                  )
+                    i.bi.bi-trash
   else
-    p No hay internaciones registradas.
+    .empty-state
+      .empty-state-icon
+        i.bi.bi-clipboard-x
+      h3.empty-state-title No hay internaciones registradas
+      p.empty-state-text
+        | No se han encontrado registros de internaciones en el sistema. 
+        | Para agregar una nueva internación, haga clic en el botón "Nueva Internación".
+      a.btn.btn-hospital(href="/internaciones/nueva")
+        i.bi.bi-plus-circle
+        | Crear primera internación
+
+  //- Script para íconos de Bootstrap Icons (necesitas incluir esto en tu layout o aquí)
+  script.
+    // Añadir íconos si no están ya incluidos
+    if (!document.querySelector('link[href*="bootstrap-icons"]')) {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css';
+      document.head.appendChild(link);
+    }
+    
+    // Función para formatear fechas mejor
+    document.addEventListener('DOMContentLoaded', function() {
+      const fechaCells = document.querySelectorAll('.fecha-ingreso');
+      fechaCells.forEach(cell => {
+        const dateText = cell.textContent.trim();
+        if (dateText) {
+          const date = new Date(dateText);
+          const options = { day: '2-digit', month: 'short', year: 'numeric' };
+          const formattedDate = date.toLocaleDateString('es-ES', options);
+          cell.innerHTML = `<i class="bi bi-calendar-check"></i> ${formattedDate}`;
+        }
+      });
+    });

@@ -1,69 +1,454 @@
 extends ../layout
 
 block content
-  h1.text-center.mb-4 Sección Habitaciones
+  style.
+    :root {
+      --hospital-blue: #0d8abc;
+      --hospital-teal: #00c2cb;
+      --hospital-light: #e8f4f8;
+      --hospital-white: #ffffff;
+      --hospital-gray: #f8f9fa;
+      --hospital-dark: #2c3e50;
+      --hospital-green: #2ecc71;
+      --hospital-red: #e74c3c;
+      --hospital-yellow: #f39c12;
+    }
+    
+    .hospital-header {
+      background: linear-gradient(135deg, var(--hospital-blue), var(--hospital-teal));
+      color: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 6px 15px rgba(13, 138, 188, 0.15);
+      text-align: center;
+    }
+    
+    .hospital-title {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    
+    .hospital-title i {
+      font-size: 1.8rem;
+    }
+    
+    .hospital-form-container {
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      border: 2px solid var(--hospital-teal) !important;
+      max-width: 500px;
+      width: 100%;
+      margin: 0 auto;
+    }
+    
+    .alert-hospital {
+      border-radius: 10px;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      border: none;
+    }
+    
+    .alert-danger {
+      background: linear-gradient(135deg, #fde8e8, #fadbd8);
+      color: #721c24;
+      border-left: 4px solid #e74c3c;
+    }
+    
+    .alert-info {
+      background: linear-gradient(135deg, #e8f4fc, #d1e8ff);
+      color: #0c5460;
+      border-left: 4px solid var(--hospital-blue);
+    }
+    
+    .form-label {
+      font-weight: 600;
+      color: var(--hospital-dark);
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    
+    .form-control, .form-select {
+      border: 1px solid #dee2e6;
+      border-radius: 8px;
+      padding: 0.6rem 0.75rem;
+      transition: all 0.3s ease;
+    }
+    
+    .form-control:focus, .form-select:focus {
+      border-color: var(--hospital-teal);
+      box-shadow: 0 0 0 0.25rem rgba(0, 194, 203, 0.25);
+    }
+    
+    .input-with-icon {
+      position: relative;
+    }
+    
+    .input-with-icon i {
+      position: absolute;
+      left: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--hospital-blue);
+    }
+    
+    .input-with-icon .form-control {
+      padding-left: 2.5rem;
+    }
+    
+    .btn-hospital {
+      background: linear-gradient(to right, var(--hospital-blue), var(--hospital-teal));
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 0.6rem 1.5rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 8px rgba(13, 138, 188, 0.2);
+    }
+    
+    .btn-hospital:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(13, 138, 188, 0.25);
+      color: white;
+    }
+    
+    .btn-secondary {
+      background: #6c757d;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 0.6rem 1.5rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-secondary:hover {
+      background: #5a6268;
+      color: white;
+      transform: translateY(-2px);
+    }
+    
+    .button-group {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 2rem;
+    }
+    
+    .form-section {
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-section h5 {
+      color: var(--hospital-blue);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1rem;
+    }
+    
+    .form-hint {
+      font-size: 0.85rem;
+      color: #6c757d;
+      margin-top: 0.25rem;
+    }
+    
+    .suggested-number {
+      background: linear-gradient(135deg, #e8f7ef, #d1f2eb);
+      color: #155724;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: 0.5rem;
+    }
+    
+    .option-with-icon {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .option-icon {
+      width: 20px;
+      height: 20px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+    }
+    
+    .ala-norte { background-color: #d1ecf1; color: #0c5460; }
+    .ala-sur { background-color: #f8d7da; color: #721c24; }
+    .ala-este { background-color: #d4edda; color: #155724; }
+    .ala-oeste { background-color: #fff3cd; color: #856404; }
+    
+    .status-libre { background-color: #d4edda; color: #155724; }
+    .status-ocupada { background-color: #f8d7da; color: #721c24; }
+    .status-limpieza { background-color: #fff3cd; color: #856404; }
+    
+    .tipo-comun { background-color: #e8f4fc; color: #0d6efd; }
+    .tipo-privada { background-color: #f0e8fc; color: #6f42c1; }
+    .tipo-suite { background-color: #fff3e6; color: #fd7e14; }
+    .tipo-uti { background-color: #ffeaea; color: #dc3545; }
+    
+    @media (max-width: 768px) {
+      .hospital-form-container {
+        padding: 1.5rem;
+        margin: 0 1rem;
+      }
+      
+      .button-group {
+        flex-direction: column;
+      }
+      
+      .button-group .btn {
+        width: 100%;
+      }
+    }
 
-  .container.d-flex.justify-content-center
-    .p-4.border.rounded-3.shadow-lg(style="border: 2px solid #40e0d0 !important; max-width: 500px; width: 100%; background-color: white;")
-      h2.text-center Nueva Habitación
+  //- Header principal
+  .hospital-header
+    h1.hospital-title
+      i.bi.bi-plus-circle
+      | Nueva Habitación
+    p.mb-0 Registre una nueva habitación en el sistema hospitalario
 
-      // Mensaje de error (duplicado u otro)
-      if error
-        .alert.alert-danger.text-center= error
-
-      // Mensaje de recomendación (si existe sugerencia)
-      if sugerido
-        .alert.alert-info.text-center
-          strong Sugerencia: 
-          | Puedes usar el número 
-          strong= sugerido
-
-      form(method="POST", action="/habitaciones/nueva")
-        
-        // Número
-        .mb-3
-          label.form-label Número
-          input.form-control(
-            type="text"
-            name="numero"
-            required
-            value=(habitacion && habitacion.numero ? habitacion.numero : "")
+  .hospital-form-container
+    //- Mensaje de error
+    if error
+      .alert.alert-hospital.alert-danger
+        .d-flex.align-items-center
+          i.bi.bi-exclamation-triangle.me-2
+          div= error
+    
+    //- Mensaje de sugerencia
+    if sugerido
+      .alert.alert-hospital.alert-info
+        .d-flex.align-items-center.justify-content-between.flex-wrap
+          div
+            i.bi.bi-lightbulb.me-2
+            | Se sugiere utilizar el número: 
+            span.suggested-number
+              i.bi.bi-arrow-right
+              | #{sugerido}
+          button.btn.btn-sm.btn-outline-primary(
+            type="button",
+            onclick="usarNumeroSugerido()"
           )
-
-        // Ala
+            i.bi.bi-check
+            | Usar este número
+    
+    //- Formulario
+    form(method="POST", action="/habitaciones/nueva")
+      
+      //- Sección: Número de Habitación
+      .form-section
+        h5
+          i.bi.bi-123
+          | Identificación
         .mb-3
-          label.form-label Ala
-          select.form-select(name="ala_id", required)
+          label.form-label(for="numero") Número de Habitación
+          .input-with-icon
+            i.bi.bi-hash
+            input.form-control(
+              type="text",
+              id="numero",
+              name="numero",
+              required,
+              placeholder="Ej: 101, 202, 3A",
+              value=(habitacion && habitacion.numero ? habitacion.numero : "")
+            )
+          .form-hint
+            | Utilice números y letras (ej: 101, 2B, 305)
+      
+      //- Sección: Ala
+      .form-section
+        h5
+          i.bi.bi-compass
+          | Ubicación
+        .mb-3
+          label.form-label(for="ala_id") Ala del Hospital
+          select.form-select(id="ala_id", name="ala_id", required)
             option(value="" disabled selected)= "-- Seleccione un ala --"
             each ala in alas
               option(
-                value=ala.id
+                value=ala.id,
                 selected=(habitacion && habitacion.ala_id == ala.id)
-              )= ala.nombre
+              )
+                .option-with-icon
+                  span.option-icon.ala-norte= ala.nombre.charAt(0)
+                  span= ala.nombre
+      
+      //- Sección: Tipo y Estado
+      .row
+        .col-md-6
+          .form-section
+            h5
+              i.bi.bi-tag
+              | Categoría
+            .mb-3
+              label.form-label(for="tipo_id") Tipo de Habitación
+              select.form-select(id="tipo_id", name="tipo_id", required)
+                option(value="" disabled selected)= "-- Seleccione un tipo --"
+                each tipo in tipos
+                  option(
+                    value=tipo.id,
+                    selected=(habitacion && habitacion.tipo_id == tipo.id)
+                  )
+                    .option-with-icon
+                      if tipo.nombre === 'Común'
+                        span.option-icon.tipo-comun C
+                      else if tipo.nombre === 'Privada'
+                        span.option-icon.tipo-privada P
+                      else if tipo.nombre === 'Suite'
+                        span.option-icon.tipo-suite S
+                      else if tipo.nombre === 'UTI'
+                        span.option-icon.tipo-uti U
+                      else
+                        span.option-icon.bg-secondary= tipo.nombre.charAt(0)
+                      span= tipo.nombre
+        
+        .col-md-6
+          .form-section
+            h5
+              i.bi.bi-circle-fill
+              | Estado Actual
+            .mb-3
+              label.form-label(for="estado_id") Estado de la Habitación
+              select.form-select(id="estado_id", name="estado_id", required)
+                option(value="" disabled selected)= "-- Seleccione un estado --"
+                each estado in estados
+                  option(
+                    value=estado.id,
+                    selected=(habitacion && habitacion.estado_id == estado.id)
+                  )
+                    .option-with-icon
+                      if estado.nombre === 'Libre'
+                        span.option-icon.status-libre
+                          i.bi.bi-check
+                      else if estado.nombre === 'Ocupada'
+                        span.option-icon.status-ocupada
+                          i.bi.bi-person
+                      else if estado.nombre === 'Limpieza'
+                        span.option-icon.status-limpieza
+                          i.bi.bi-bucket
+                      else
+                        span.option-icon.bg-secondary= estado.nombre.charAt(0)
+                      span= estado.nombre
+              .form-hint
+                | Estado inicial al momento del registro
+      
+      //- Botones de acción
+      .button-group
+        button.btn.btn-hospital(type="submit")
+          i.bi.bi-save
+          | Guardar Habitación
+        a.btn.btn-secondary(href="/habitaciones")
+          i.bi.bi-x-circle
+          | Cancelar
 
-        // Tipo
-        .mb-3
-          label.form-label Tipo
-          select.form-select(name="tipo_id", required)
-            option(value="" disabled selected)= "-- Seleccione un tipo --"
-            each tipo in tipos
-              option(
-                value=tipo.id
-                selected=(habitacion && habitacion.tipo_id == tipo.id)
-              )= tipo.nombre
-
-        // Estado
-        .mb-3
-          label.form-label Estado
-          select.form-select(name="estado_id", required)
-            option(value="" disabled selected)= "-- Seleccione un estado --"
-            each estado in estados
-              option(
-                value=estado.id
-                selected=(habitacion && habitacion.estado_id == estado.id)
-              )= estado.nombre
-
-        // Botones
-        .text-center.mt-4
-          button.btn.btn-success(type="submit") Guardar
-          a.btn.btn-secondary.ms-2(href="/habitaciones") Cancelar
+  script.
+    // Añadir íconos si no están ya incluidos
+    if (!document.querySelector('link[href*="bootstrap-icons"]')) {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css';
+      document.head.appendChild(link);
+    }
+    
+    // Función para usar el número sugerido
+    function usarNumeroSugerido() {
+      const sugerido = '#{sugerido}';
+      if (sugerido) {
+        document.getElementById('numero').value = sugerido;
+        
+        // Mostrar confirmación visual
+        const input = document.getElementById('numero');
+        input.style.borderColor = 'var(--hospital-green)';
+        input.style.boxShadow = '0 0 0 0.25rem rgba(46, 204, 113, 0.25)';
+        
+        setTimeout(() => {
+          input.style.borderColor = '';
+          input.style.boxShadow = '';
+        }, 2000);
+      }
+    }
+    
+    // Validación del número de habitación
+    document.addEventListener('DOMContentLoaded', function() {
+      const numeroInput = document.getElementById('numero');
+      if (numeroInput) {
+        numeroInput.addEventListener('blur', function() {
+          const value = this.value.trim();
+          if (value && !/^[A-Z0-9]+$/i.test(value)) {
+            this.style.borderColor = 'var(--hospital-red)';
+            this.style.boxShadow = '0 0 0 0.25rem rgba(231, 76, 60, 0.25)';
+          } else {
+            this.style.borderColor = '';
+            this.style.boxShadow = '';
+          }
+        });
+        
+        // Auto-mayúsculas
+        numeroInput.addEventListener('input', function() {
+          this.value = this.value.toUpperCase();
+        });
+      }
+      
+      // Actualizar sugerencia visual según selección
+      const tipoSelect = document.getElementById('tipo_id');
+      const estadoSelect = document.getElementById('estado_id');
+      
+      if (tipoSelect) {
+        tipoSelect.addEventListener('change', function() {
+          const selectedOption = this.options[this.selectedIndex];
+          const optionIcon = selectedOption.querySelector('.option-icon');
+          if (optionIcon) {
+            optionIcon.style.animation = 'pulse 0.5s';
+            setTimeout(() => {
+              optionIcon.style.animation = '';
+            }, 500);
+          }
+        });
+      }
+      
+      if (estadoSelect) {
+        estadoSelect.addEventListener('change', function() {
+          const selectedOption = this.options[this.selectedIndex];
+          const optionIcon = selectedOption.querySelector('.option-icon');
+          if (optionIcon) {
+            optionIcon.style.animation = 'pulse 0.5s';
+            setTimeout(() => {
+              optionIcon.style.animation = '';
+            }, 500);
+          }
+        });
+      }
+    });
+    
+    // Animación de pulso para feedback visual
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.2); }
+        100% { transform: scale(1); }
+      }
+    `;
+    document.head.appendChild(style);
