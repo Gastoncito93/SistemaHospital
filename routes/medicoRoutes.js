@@ -1,23 +1,27 @@
 const express = require('express');
 const router = express.Router();
 const evaluacionMedicaController = require('../controllers/evaluacionMedicaController');
+const { soloMedico } = require('../middlewares/roles');
 
-// LISTAR evaluaciones de una internación
+// redirección raíz
+router.get('/', (req, res) => {
+  return res.redirect('/internaciones');
+});
+
+// listar evaluaciones médicas por internación (todos pueden ver)
 router.get('/internacion/:internacionId', evaluacionMedicaController.listarPorInternacion);
 
-// FORMULARIO nueva evaluación
-router.get('/nueva/:internacionId', evaluacionMedicaController.mostrarFormularioNuevo);
+// nueva evaluación (solo médico y admin)
+router.get('/nueva/:internacionId', soloMedico, evaluacionMedicaController.mostrarFormularioNuevo);
+router.post('/nueva', soloMedico, evaluacionMedicaController.guardar);
 
-// GUARDAR nueva evaluación (sin parámetros en la URL)
-router.post('/nueva', evaluacionMedicaController.guardar);
+// editar evaluación (solo médico y admin)
+router.get('/editar/:id', soloMedico, evaluacionMedicaController.mostrarFormularioEditar);
+router.post('/editar/:id', soloMedico, evaluacionMedicaController.actualizar);
 
-// FORMULARIO editar evaluación
-router.get('/editar/:id', evaluacionMedicaController.mostrarFormularioEditar);
-
-// GUARDAR edición
-router.post('/editar/:id', evaluacionMedicaController.actualizar);
-
-// ELIMINAR evaluación
-router.get('/eliminar/:id', evaluacionMedicaController.eliminar);
+// eliminar DESHABILITADO
+router.get('/eliminar/:id', (req, res) => {
+  return res.status(403).send('Acción no permitida');
+});
 
 module.exports = router;

@@ -1,31 +1,27 @@
 const express = require('express');
 const router = express.Router();
 const enfermeriaController = require('../controllers/enfermeriaController');
+const { soloEnfermero } = require('../middlewares/roles');
 
-// 👇 ESTA ES LA RUTA QUE ROMPE AHORA MISMO
-// router.get('/', enfermeriaController.listarTodo);
-
-// ✅ En vez de eso, redirigimos a /internaciones (como hablamos)
+// redirección raíz
 router.get('/', (req, res) => {
   return res.redirect('/internaciones');
 });
 
-// 📌 Lista todas las evaluaciones de una internación
+// listar evaluaciones por internación (todos pueden ver)
 router.get('/internacion/:internacionId', enfermeriaController.listarPorInternacion);
 
-// 📌 Mostrar formulario NUEVA evaluación
-router.get('/nueva/:internacionId', enfermeriaController.mostrarFormularioNuevo);
+// nueva evaluación (solo enfermería y admin)
+router.get('/nueva/:internacionId', soloEnfermero, enfermeriaController.mostrarFormularioNuevo);
+router.post('/nueva', soloEnfermero, enfermeriaController.guardar);
 
-// 📌 Guardar nueva evaluación
-router.post('/nueva', enfermeriaController.guardar);
+// editar evaluación (solo enfermería y admin)
+router.get('/editar/:id', soloEnfermero, enfermeriaController.mostrarFormularioEditar);
+router.post('/editar/:id', soloEnfermero, enfermeriaController.actualizar);
 
-// 📌 Mostrar formulario EDITAR evaluación
-router.get('/editar/:id', enfermeriaController.mostrarFormularioEditar);
-
-// 📌 Actualizar evaluación
-router.post('/editar/:id', enfermeriaController.actualizar);
-
-// 📌 Eliminar evaluación
-router.get('/eliminar/:id', enfermeriaController.eliminar);
+// eliminar DESHABILITADO (nadie elimina)
+router.get('/eliminar/:id', (req, res) => {
+  return res.status(403).send('Acción no permitida');
+});
 
 module.exports = router;

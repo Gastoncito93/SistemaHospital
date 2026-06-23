@@ -29,6 +29,7 @@ app.set('view engine', 'pug');
 // Variable local para plantillas
 app.use((req, res, next) => {
   res.locals.usuario = req.session.usuario || null;
+  res.locals.rol = req.session.rol || null;
   next();
 });
 

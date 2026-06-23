@@ -341,11 +341,14 @@ block content
   .admin-welcome
     .d-flex.justify-content-between.align-items-center.flex-wrap
       .d-flex.align-items-center
-        .admin-avatar= usuario.charAt(0).toUpperCase()
+        if usuario
+          .admin-avatar= usuario.charAt(0).toUpperCase()
+        else
+          .admin-avatar ?
         div
           h1.hospital-title.mb-1
             i.bi.bi-person-badge
-            | Bienvenido, #{usuario}
+            | Bienvenido, #{usuario} (#{rol})
           p.hospital-subtitle.mb-0
             | Panel de Administración - Gestión de Pacientes
       a.btn.btn-admin(href="/pacientes/nuevo")

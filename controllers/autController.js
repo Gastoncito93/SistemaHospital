@@ -30,6 +30,7 @@ exports.postLogin = async (req, res) => {
     // guardamos el usuario en sesión
     req.session.userId   = user.id;
     req.session.usuario  = user.nombre;
+    req.session.rol      = user.rol;
     // redirigimos a /pacientes (ten en cuenta que en app.js montas pacienteRoutes en '/pacientes')
     return res.redirect('/pacientes');
   } catch (err) {
