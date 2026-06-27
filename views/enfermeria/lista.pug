@@ -288,9 +288,10 @@ block content
       h4.mb-0
         i.bi.bi-list-check
         | Registros de Evaluación
-      a.btn.btn-nurse(href=`/enfermeria/nueva/${internacion.id}`)
-        i.bi.bi-plus-circle
-        | Nueva Evaluación
+      if rol === 'enfermero' || rol === 'admin'
+        a.btn.btn-nurse(href=`/enfermeria/nueva/${internacion.id}`)
+          i.bi.bi-plus-circle
+          | Nueva Evaluación
 
     //- Tabla de evaluaciones
     if evaluaciones.length > 0
@@ -345,17 +346,18 @@ block content
                 
                 td
                   .action-buttons
-                    a.btn.btn-icon.btn-edit(
-                      href=`/enfermeria/editar/${ev.id}`,
-                      title="Editar evaluación"
-                    )
-                      i.bi.bi-pencil
-                    a.btn.btn-icon.btn-delete(
-                      href=`/enfermeria/eliminar/${ev.id}`,
-                      title="Eliminar evaluación",
-                      onclick=`return confirm('¿Está seguro de eliminar esta evaluación del ${fechaStr} a las ${horaStr}?')`
-                    )
-                      i.bi.bi-trash
+                    if rol === 'enfermero' || rol === 'admin'
+                      a.btn.btn-icon.btn-edit(
+                        href=`/enfermeria/editar/${ev.id}`,
+                        title="Editar evaluación"
+                      )
+                        i.bi.bi-pencil
+                      a.btn.btn-icon.btn-delete(
+                        href=`/enfermeria/eliminar/${ev.id}`,
+                        title="Eliminar evaluación",
+                        onclick=`return confirm('¿Está seguro de eliminar esta evaluación del ${fechaStr} a las ${horaStr}?')`
+                      )
+                        i.bi.bi-trash
                     button.btn.btn-icon(
                       style="background-color: #e8f4fc; color: var(--hospital-nurse);",
                       title="Ver detalles completos",
@@ -371,9 +373,10 @@ block content
         h3.empty-state-title No hay evaluaciones registradas
         p.empty-state-text
           | No se han registrado evaluaciones de enfermería para esta internación.
-        a.btn.btn-nurse(href=`/enfermeria/nueva/${internacion.id}`)
-          i.bi.bi-plus-circle
-          | Crear primera evaluación
+        if rol === 'enfermero' || rol === 'admin'
+          a.btn.btn-nurse(href=`/enfermeria/nueva/${internacion.id}`)
+            i.bi.bi-plus-circle
+            | Crear primera evaluación
   
   //- Error si no hay internación
   else

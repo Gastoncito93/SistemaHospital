@@ -92,5 +92,58 @@ guardar: async (req, res) => {
             console.error(error);
             res.status(500).send('Error al eliminar el paciente');
         }
+    },
+
+    // Ver Historia Clínica Única del Paciente
+    verHistorial: async (req, res) => {
+        try {
+            const id = parseInt(req.params.id, 10);
+            const db = require('../config/db');
+
+            // 1. Obtener datos del paciente
+            const [pacientes] = await db.query('SELECT * FROM pacientes WHERE id = ?', [id]);
+            const paciente = pacientes[0];
+            if (!paciente) {
+                return res.status(404).send('Paciente no encontrado');
+            }
+
+            // 2. Obtener todas las internaciones del paciente
+            const [internaciones] = await db.query(`
+                SELECT i.*, h.numero AS habitacion_numero, a.nombre AS ala_nombre
+                FROM internaciones i
+                LEFT JOIN habitaciones h ON i.habitacion_id = h.id
+                LEFT JOIN alas a ON h.ala_id = a.id
+                WHERE i.paciente_id = ?
+                ORDER BY i.fecha_ingreso DESC
+            `, [id]);
+
+            // 3. Por cada internación, cargar sus evaluaciones médicas y de enfermería
+            for (let i = 0; i < internaciones.length; i++) {
+                const intId = internaciones[i].id;
+                
+                const [medicas] = await db.query(
+                    'SELECT * FROM evaluaciones_medicas WHERE internacion_id = ? ORDER BY fecha_hora DESC',
+                    [intId]
+                );
+                
+                const [enfermeria] = await db.query(
+                    'SELECT * FROM evaluaciones_enfermeria WHERE internacion_id = ? ORDER BY fecha_hora DESC',
+                    [intId]
+                );
+
+                internaciones[i].evaluacionesMedicas = medicas;
+                internaciones[i].evaluacionesEnfermeria = enfermeria;
+            }
+
+            // 4. Renderizar vista del historial
+            res.render('pacientes/historial', {
+                paciente,
+                internaciones
+            });
+
+        } catch (error) {
+            console.error(error);
+            res.status(500).send('Error al cargar la historia clínica');
+        }
     }
 };

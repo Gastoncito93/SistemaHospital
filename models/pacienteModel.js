@@ -26,7 +26,7 @@ const Paciente = {
         FROM pacientes p
         WHERE NOT EXISTS (
             SELECT 1 FROM internaciones i
-            WHERE i.paciente_id = p.id
+            WHERE i.paciente_id = p.id AND i.estado_internacion = 'activa'
         )
     `);
     return rows;

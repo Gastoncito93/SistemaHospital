@@ -18,6 +18,7 @@ const Internacion = {
     JOIN alas a ON h.ala_id = a.id
     JOIN tipos t ON h.tipo_id = t.id
     JOIN estados e ON h.estado_id = e.id
+    WHERE i.estado_internacion = 'activa'
   `);
   return rows;
 },
@@ -72,7 +73,7 @@ const Internacion = {
       JOIN alas a ON h.ala_id = a.id
       JOIN tipos t ON h.tipo_id = t.id
       JOIN estados e ON h.estado_id = e.id
-      LEFT JOIN internaciones i ON i.habitacion_id = h.id
+      LEFT JOIN internaciones i ON i.habitacion_id = h.id AND i.estado_internacion = 'activa'
       LEFT JOIN pacientes p ON p.id = i.paciente_id
       GROUP BY h.id
       HAVING (

@@ -320,6 +320,7 @@ block content
     
     .table-responsive {
       border-radius: 12px;
+      min-height: 455px; /* Altura mínima para prevenir saltos de maquetación con 5 filas */
     }
     
     @media (max-width: 768px) {
@@ -365,7 +366,7 @@ block content
           h3= pacientes.length
           p Pacientes Registrados
       
-      - const masculinos = pacientes.filter(p => p.sexo === 'Masculino').length
+      - const masculinos = pacientes.filter(p => p.sexo === 'masculino').length
       .stat-card
         .stat-icon.masculino
           i.bi.bi-gender-male
@@ -373,7 +374,7 @@ block content
           h3= masculinos
           p Pacientes Masculinos
       
-      - const femeninos = pacientes.filter(p => p.sexo === 'Femenino').length
+      - const femeninos = pacientes.filter(p => p.sexo === 'femenino').length
       .stat-card
         .stat-icon.femenino
           i.bi.bi-gender-female
@@ -398,6 +399,13 @@ block content
             i.bi.bi-printer
             | Imprimir
     
+    //- Buscador de Pacientes
+    .mb-3
+      .input-group.shadow-sm
+        span.input-group-text.bg-white.border-end-0
+          i.bi.bi-search.text-muted
+        input#buscarPaciente.form-control.border-start-0(type="text", placeholder="Buscar por nombre, apellido o DNI...")
+
     .table-responsive
       table.table.table-hover.hospital-table
         thead
@@ -418,11 +426,11 @@ block content
               td
                 .dni-badge= paciente.dni
               td
-                if paciente.sexo === 'Masculino'
+                if paciente.sexo === 'masculino'
                   span.badge.badge-sexo.badge-sexo-masculino
                     i.bi.bi-gender-male
                     |  #{paciente.sexo}
-                else if paciente.sexo === 'Femenino'
+                else if paciente.sexo === 'femenino'
                   span.badge.badge-sexo.badge-sexo-femenino
                     i.bi.bi-gender-female
                     |  #{paciente.sexo}
@@ -435,19 +443,25 @@ block content
                     title="Editar Paciente"
                   )
                     i.bi.bi-pencil
-                  a.btn.btn-icon.btn-delete(
-                    href=`/pacientes/eliminar/${paciente.id}`,
-                    title="Eliminar Paciente",
-                    onclick="return confirm('¿Está seguro que desea eliminar a ' + '#{paciente.nombre} #{paciente.apellido}' + '?')"
-                  )
-                    i.bi.bi-trash
+                  if rol === 'admin'
+                    a.btn.btn-icon.btn-delete(
+                      href=`/pacientes/eliminar/${paciente.id}`,
+                      title="Eliminar Paciente",
+                      onclick="return confirm('¿Está seguro que desea eliminar a ' + '#{paciente.nombre} #{paciente.apellido}' + '?')"
+                    )
+                      i.bi.bi-trash
                   a.btn.btn-icon(
                     style="background-color: #e8f4fc; color: var(--hospital-blue);",
-                    href=`#`,
-                    title="Ver Historial",
-                    onclick=`verHistorial(${paciente.id})`
+                    href=`/pacientes/historial/${paciente.id}`,
+                    title="Ver Historial"
                   )
                     i.bi.bi-file-medical
+    
+    //- Controles de Paginación
+    #paginationContainer.d-flex.justify-content-between.align-items-center.flex-wrap.mt-3.px-2.gap-2
+      small#paginationInfo.text-muted.fw-semibold Mostrando pacientes
+      nav
+        ul.pagination.pagination-sm.mb-0(id="paginationControl")
   else
     .empty-state
       .empty-state-icon
@@ -470,33 +484,140 @@ block content
       document.head.appendChild(link);
     }
     
-    // Funciones de utilidad
+    // Función de exportación a CSV (compatible con Excel)
     function exportToExcel() {
-      alert('Función de exportación a Excel - Esta funcionalidad se implementaría con una librería como SheetJS');
-      // En una implementación real, aquí iría el código para exportar a Excel
+      const table = document.querySelector('.hospital-table');
+      if (!table) return;
+      
+      let csv = [];
+      const rows = table.querySelectorAll('tr');
+      
+      for (let i = 0; i < rows.length; i++) {
+        // Si la fila está oculta por el filtro, no la exportamos
+        if (rows[i].style.display === 'none') continue;
+        
+        const row = [];
+        const cols = rows[i].querySelectorAll('td, th');
+        
+        // Recorremos todas las columnas excepto la última (Acciones)
+        for (let j = 0; j < cols.length - 1; j++) {
+          let text = cols[j].innerText.trim().replace(/(\r\n|\n|\r)/gm, " ").replace(/"/g, '""');
+          row.push('"' + text + '"');
+        }
+        csv.push(row.join(','));
+      }
+      
+      const csvContent = "data:text/csv;charset=utf-8,\uFEFF" + csv.join("\n");
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "lista_pacientes.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
     
     function printTable() {
       window.print();
     }
     
-    function verHistorial(pacienteId) {
-      alert(`Ver historial del paciente ID: ${pacienteId}`);
-      // En una implementación real, redirigiría a la página de historial
-      // window.location.href = `/pacientes/historial/${pacienteId}`;
-    }
-    
-    // Confirmación antes de eliminar (ya está en el onclick)
+    // Lógica de Búsqueda y Paginación en tiempo real (Lado del Cliente)
     document.addEventListener('DOMContentLoaded', function() {
-      console.log('Panel de administración cargado');
+      const buscarInput = document.getElementById('buscarPaciente');
+      const tableBody = document.querySelector('.hospital-table tbody');
+      if (!tableBody) return;
       
-      // Puedes agregar más funcionalidades aquí si es necesario
-      const deleteButtons = document.querySelectorAll('.btn-delete');
-      deleteButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
-          if (!confirm('¿Está seguro de que desea eliminar este paciente?')) {
-            e.preventDefault();
+      const originalRows = Array.from(tableBody.querySelectorAll('tr'));
+      const rowsPerPage = 5;
+      let currentPage = 1;
+      let filteredRows = [...originalRows];
+      
+      function renderTable() {
+        const totalRows = filteredRows.length;
+        const totalPages = Math.max(1, Math.ceil(totalRows / rowsPerPage));
+        
+        if (currentPage > totalPages) currentPage = totalPages;
+        if (currentPage < 1) currentPage = 1;
+        
+        const start = (currentPage - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+        
+        // Ocultar todas
+        originalRows.forEach(row => {
+          row.style.display = 'none';
+        });
+        
+        // Mostrar las de la página actual
+        filteredRows.slice(start, end).forEach(row => {
+          row.style.display = '';
+        });
+        
+        // Info de Paginación
+        const paginationInfo = document.getElementById('paginationInfo');
+        if (totalRows === 0) {
+          paginationInfo.textContent = 'No se encontraron pacientes';
+        } else {
+          paginationInfo.textContent = `Mostrando ${start + 1} a ${Math.min(end, totalRows)} de ${totalRows} paciente(s)`;
+        }
+        
+        // Crear botones de paginación
+        const paginationControl = document.getElementById('paginationControl');
+        paginationControl.innerHTML = '';
+        
+        // Botón Anterior
+        const liPrev = document.createElement('li');
+        liPrev.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
+        liPrev.innerHTML = `<a class="page-link" href="#">Anterior</a>`;
+        liPrev.addEventListener('click', function(e) {
+          e.preventDefault();
+          if (currentPage > 1) {
+            currentPage--;
+            renderTable();
           }
         });
+        paginationControl.appendChild(liPrev);
+        
+        // Páginas individuales
+        for (let i = 1; i <= totalPages; i++) {
+          const liPage = document.createElement('li');
+          liPage.className = `page-item ${currentPage === i ? 'active' : ''}`;
+          liPage.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+          liPage.addEventListener('click', function(e) {
+            e.preventDefault();
+            currentPage = i;
+            renderTable();
+          });
+          paginationControl.appendChild(liPage);
+        }
+        
+        // Botón Siguiente
+        const liNext = document.createElement('li');
+        liNext.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
+        liNext.innerHTML = `<a class="page-link" href="#">Siguiente</a>`;
+        liNext.addEventListener('click', function(e) {
+          e.preventDefault();
+          if (currentPage < totalPages) {
+            currentPage++;
+            renderTable();
+          }
+        });
+        paginationControl.appendChild(liNext);
+      }
+      
+      // Escuchar el buscador
+      buscarInput.addEventListener('input', function() {
+        const query = this.value.toLowerCase().trim();
+        
+        filteredRows = originalRows.filter(row => {
+          const nameCol = row.querySelector('.patient-name').textContent.toLowerCase();
+          const dniCol = row.querySelector('.dni-badge').textContent.toLowerCase();
+          return nameCol.includes(query) || dniCol.includes(query);
+        });
+        
+        currentPage = 1;
+        renderTable();
       });
+      
+      // Renderizar por primera vez
+      renderTable();
     });

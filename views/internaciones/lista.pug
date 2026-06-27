@@ -282,7 +282,7 @@ block content
             th(scope="col") Paciente
             th(scope="col") Habitación
             th(scope="col") Ala
-            th(scope="col") Tipo
+            th(scope="col") Ingreso
             th(scope="col") Fecha Ingreso
             th(scope="col") Motivo
             th(scope="col") Estado
@@ -311,21 +311,21 @@ block content
                 else
                   span.badge.bg-secondary= internacion.ala
               td
-                if internacion.tipo === 'Urgencia'
-                  span.badge.badge-tipo.badge-tipo-urgencia= internacion.tipo
-                else if internacion.tipo === 'Programada'
-                  span.badge.badge-tipo.badge-tipo-programada= internacion.tipo
-                else if internacion.tipo === 'Observación'
-                  span.badge.badge-tipo.badge-tipo-observacion= internacion.tipo
+                if internacion.tipo_ingreso === 'Guardia' || internacion.tipo_ingreso === 'Ambulancia' || internacion.tipo_ingreso === 'Urgencia'
+                  span.badge.badge-tipo.badge-tipo-urgencia= internacion.tipo_ingreso
+                else if internacion.tipo_ingreso === 'Cirugía programada' || internacion.tipo_ingreso === 'Cita programada' || internacion.tipo_ingreso === 'Programada'
+                  span.badge.badge-tipo.badge-tipo-programada= internacion.tipo_ingreso
+                else if internacion.tipo_ingreso === 'Derivación médica' || internacion.tipo_ingreso === 'Observación'
+                  span.badge.badge-tipo.badge-tipo-observacion= internacion.tipo_ingreso
                 else
-                  span.badge.bg-light.text-dark= internacion.tipo
+                  span.badge.bg-light.text-dark= internacion.tipo_ingreso || 'N/A'
               td
                 .fecha-ingreso
                   i.bi.bi-calendar-check
                   = internacion.fecha_ingreso.toISOString().substring(0, 10)
               td.motivo-truncado(title=internacion.motivo)= internacion.motivo
               td
-                if internacion.estado === 'Activa'
+                if internacion.estado_internacion === 'activa'
                   span.status-indicator.status-active
                   | Activa
                 else
@@ -342,17 +342,25 @@ block content
                     href=`/medico/internacion/${internacion.id}`,
                     title="Médico"
                   )
-                    i.bi.bi-stethoscope
+                    i.bi.bi-activity
                   a.btn.btn-icon.btn-edit(
                     href=`/internaciones/editar/${internacion.id}`,
                     title="Editar"
                   )
                     i.bi.bi-pencil
-                  a.btn.btn-icon.btn-delete(
-                    href=`/internaciones/eliminar/${internacion.id}`,
-                    title="Eliminar"
-                  )
-                    i.bi.bi-trash
+                  if internacion.estado_internacion === 'activa' && (rol === 'medico' || rol === 'admin')
+                    a.btn.btn-icon(
+                      style="background-color: #ffeaea; color: #e74c3c;",
+                      href=`/internaciones/alta/${internacion.id}`,
+                      title="Dar de Alta"
+                    )
+                      i.bi.bi-box-arrow-right
+                  if rol === 'admin'
+                    a.btn.btn-icon.btn-delete(
+                      href=`/internaciones/eliminar/${internacion.id}`,
+                      title="Eliminar"
+                    )
+                      i.bi.bi-trash
   else
     .empty-state
       .empty-state-icon

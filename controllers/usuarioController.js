@@ -25,7 +25,7 @@ module.exports = {
 
       // ❌ Bloquear auto-edición
       if (parseInt(id) === req.session.userId) {
-        return res.status(403).send('No podés cambiar tu propio rol');
+        return res.redirect('/usuarios?error=No podés cambiar tu propio rol');
       }
 
       await Usuario.actualizarRol(id, rol);

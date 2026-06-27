@@ -1,0 +1,106 @@
+extends ../layout
+
+block content
+  style.
+    :root {
+      --hospital-blue: #0d8abc;
+      --hospital-teal: #00c2cb;
+      --hospital-light: #e8f4f8;
+      --hospital-white: #ffffff;
+      --hospital-gray: #f8f9fa;
+      --hospital-dark: #2c3e50;
+      --hospital-red: #e74c3c;
+    }
+    
+    .hospital-header {
+      background: linear-gradient(135deg, var(--hospital-red), #ff7675);
+      color: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 6px 15px rgba(231, 76, 60, 0.15);
+      text-align: center;
+    }
+    
+    .hospital-form-container {
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      border: 2px solid var(--hospital-red) !important;
+      max-width: 600px;
+      width: 100%;
+      margin: 0 auto;
+    }
+    
+    .form-label {
+      font-weight: 600;
+      color: var(--hospital-dark);
+      margin-bottom: 0.5rem;
+    }
+    
+    .btn-hospital {
+      background: linear-gradient(to right, var(--hospital-red), #ff7675);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 0.6rem 1.5rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 8px rgba(231, 76, 60, 0.2);
+    }
+    
+    .btn-hospital:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(231, 76, 60, 0.25);
+      color: white;
+    }
+
+    .patient-summary {
+      background-color: var(--hospital-light);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      border-left: 4px solid var(--hospital-red);
+    }
+
+  .hospital-header
+    h1.hospital-title.mb-1
+      i.bi.bi-box-arrow-right.me-2
+      | Registrar Alta Médica
+    p.mb-0 Complete el informe de egreso para dar de alta al paciente
+
+  .hospital-form-container
+    .patient-summary
+      h5.fw-bold.mb-1 Paciente: #{internacion.paciente_nombre} #{internacion.paciente_apellido}
+      p.mb-1.text-muted DNI: #{internacion.paciente_dni}
+      p.mb-0.text-muted Habitación: N° #{internacion.habitacion_numero} (Ingreso: #{new Date(internacion.fecha_ingreso).toLocaleDateString('es-ES')})
+
+    form(method="POST", action=`/internaciones/alta/${internacion.id}`)
+      .mb-3
+        label.form-label(for="fecha_alta") Fecha y Hora de Alta
+        input.form-control(type="datetime-local", name="fecha_alta", id="fecha_alta", required)
+      
+      .mb-3
+        label.form-label(for="motivo_alta") Resumen Clínico / Motivo de Alta
+        textarea.form-control(name="motivo_alta", id="motivo_alta", rows="5", required, placeholder="Escriba las indicaciones de alta, diagnóstico de egreso y observaciones...")
+        .form-hint Indique pautas de alarma y tratamiento a seguir en domicilio
+
+      .d-flex.gap-2.justify-content-center.mt-4
+        button.btn.btn-hospital(type="submit")
+          i.bi.bi-check-circle
+          | Confirmar Alta Médica
+        a.btn.btn-secondary(href="/internaciones") Cancelar
+
+  script.
+    document.addEventListener('DOMContentLoaded', function() {
+      // Set current local datetime as default
+      const now = new Date();
+      now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+      const nowStr = now.toISOString().slice(0, 16);
+      document.getElementById('fecha_alta').value = nowStr;
+    });

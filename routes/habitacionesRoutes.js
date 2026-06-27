@@ -1,20 +1,24 @@
 const express = require('express');
 const router = express.Router();
 const habitacionController = require('../controllers/habitacionController');
+const { requerirLogin, soloAdmin } = require('../middlewares/roles');
+
+// Aplicar middleware de autenticación a todas las rutas
+router.use(requerirLogin);
 
 // Ruta base: /habitaciones
 // Listar todos
 router.get('/', habitacionController.listar);
 
-// Crear nuevo paciente
+// Crear nueva habitación
 router.get('/nueva', habitacionController.mostrarFormularioNuevo);
 router.post('/nueva', habitacionController.guardar);
 
-// Editar paciente
+// Editar habitación
 router.get('/editar/:id', habitacionController.mostrarFormularioEditar);
 router.post('/editar/:id', habitacionController.actualizar);
 
-// Eliminar paciente
-router.get('/eliminar/:id', habitacionController.eliminar);
+// Eliminar habitación
+router.get('/eliminar/:id', soloAdmin, habitacionController.eliminar);
 
 module.exports = router;

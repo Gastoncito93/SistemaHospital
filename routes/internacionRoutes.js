@@ -1,6 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const internacionController = require('../controllers/internacionController');
+const { requerirLogin, soloAdmin, soloMedico } = require('../middlewares/roles');
+
+// Aplicar middleware de autenticación a todas las rutas
+router.use(requerirLogin);
 
 // Listar todas las internaciones
 router.get('/', internacionController.listar);
@@ -19,8 +23,12 @@ router.get('/habitaciones-disponibles/:pacienteId', internacionController.obtene
 router.get('/editar/:id', internacionController.mostrarFormularioEditar);
 router.post('/editar/:id', internacionController.actualizar);
 
-// Eliminar paciente
-router.get('/eliminar/:id', internacionController.eliminar);
+// Eliminar internación
+router.get('/eliminar/:id', soloAdmin, internacionController.eliminar);
+
+// Alta médica (solo médicos y admins)
+router.get('/alta/:id', soloMedico, internacionController.mostrarAltaForm);
+router.post('/alta/:id', soloMedico, internacionController.procesarAlta);
 
 
 module.exports = router;

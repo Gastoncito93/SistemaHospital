@@ -307,9 +307,10 @@ block content
       h4.mb-0
         i.bi.bi-journal-medical
         | Historial Médico
-      a.btn.btn-medico(href=`/medico/nueva/${internacion.id}`)
-        i.bi.bi-plus-circle
-        | Nueva Evaluación
+      if rol === 'medico' || rol === 'admin'
+        a.btn.btn-medico(href=`/medico/nueva/${internacion.id}`)
+          i.bi.bi-plus-circle
+          | Nueva Evaluación
 
     //- Tabla de evaluaciones
     if evaluaciones.length > 0
@@ -349,17 +350,18 @@ block content
                       onclick=`mostrarEvaluacionCompleta(${JSON.stringify(ev).replace(/'/g, "\\'")})`
                     )
                       i.bi.bi-eye
-                    a.btn.btn-icon.btn-edit(
-                      href=`/medico/editar/${ev.id}`,
-                      title="Editar evaluación"
-                    )
-                      i.bi.bi-pencil
-                    a.btn.btn-icon.btn-delete(
-                      href=`/medico/eliminar/${ev.id}`,
-                      title="Eliminar evaluación",
-                      onclick=`return confirm('¿Está seguro de eliminar la evaluación médica del ${fechaStr}?')`
-                    )
-                      i.bi.bi-trash
+                    if rol === 'medico' || rol === 'admin'
+                      a.btn.btn-icon.btn-edit(
+                        href=`/medico/editar/${ev.id}`,
+                        title="Editar evaluación"
+                      )
+                        i.bi.bi-pencil
+                      a.btn.btn-icon.btn-delete(
+                        href=`/medico/eliminar/${ev.id}`,
+                        title="Eliminar evaluación",
+                        onclick=`return confirm('¿Está seguro de eliminar la evaluación médica del ${fechaStr}?')`
+                      )
+                        i.bi.bi-trash
     
     //- Estado vacío
     else
@@ -370,9 +372,10 @@ block content
         p.empty-state-text
           | No se han registrado evaluaciones médicas para esta internación.
           | La historia clínica del paciente se encuentra vacía.
-        a.btn.btn-medico(href=`/medico/nueva/${internacion.id}`)
-          i.bi.bi-plus-circle
-          | Crear primera evaluación médica
+        if rol === 'medico' || rol === 'admin'
+          a.btn.btn-medico(href=`/medico/nueva/${internacion.id}`)
+            i.bi.bi-plus-circle
+            | Crear primera evaluación médica
   
   //- Error si no hay internación
   else

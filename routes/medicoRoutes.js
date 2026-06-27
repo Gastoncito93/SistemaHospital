@@ -21,7 +21,7 @@ router.post('/editar/:id', soloMedico, evaluacionMedicaController.actualizar);
 
 // eliminar DESHABILITADO
 router.get('/eliminar/:id', (req, res) => {
-  return res.status(403).send('Acción no permitida');
+  return res.redirect('/internaciones?error=Acción no permitida: la eliminación de evaluaciones médicas está deshabilitada');
 });
 
 module.exports = router;

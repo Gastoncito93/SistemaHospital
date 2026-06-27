@@ -444,12 +444,13 @@ block content
                     title="Editar habitación"
                   )
                     i.bi.bi-pencil
-                  a.btn.btn-icon.btn-delete(
-                    href=`/habitaciones/eliminar/${habitacion.id}`,
-                    title="Eliminar habitación",
-                    onclick=`return confirm('¿Está seguro de eliminar la habitación ${habitacion.numero}?')`
-                  )
-                    i.bi.bi-trash
+                  if rol === 'admin'
+                    a.btn.btn-icon.btn-delete(
+                      href=`/habitaciones/eliminar/${habitacion.id}`,
+                      title="Eliminar habitación",
+                      onclick=`return confirm('¿Está seguro de eliminar la habitación ${habitacion.numero}?')`
+                    )
+                      i.bi.bi-trash
   
   //- Estado vacío
   else

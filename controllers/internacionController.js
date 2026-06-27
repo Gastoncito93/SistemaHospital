@@ -149,5 +149,66 @@ module.exports = {
       console.error(error);
       res.status(500).send('Error al eliminar la internación');
     }
+  },
+
+  // Mostrar formulario de Alta Médica
+  mostrarAltaForm: async (req, res) => {
+    try {
+      const id = parseInt(req.params.id, 10);
+      const internacion = await Internacion.obtenerPorId(id);
+
+      if (!internacion) {
+        return res.status(404).send('Internación no encontrada');
+      }
+
+      res.render('internaciones/alta', { internacion });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Error al cargar formulario de alta');
+    }
+  },
+
+  // Procesar el Alta Médica
+  procesarAlta: async (req, res) => {
+    try {
+      const id = parseInt(req.params.id, 10);
+      const { fecha_alta, motivo_alta } = req.body;
+
+      const internacion = await Internacion.obtenerPorId(id);
+      if (!internacion) {
+        return res.status(404).send('Internación no encontrada');
+      }
+
+      // 1. Dar el alta en la base de datos
+      await Internacion.darAlta(id, { fecha_alta, motivo_alta });
+
+      // 2. Actualizar el estado de la habitación
+      const habitacionId = internacion.habitacion_id;
+      const db = require('../config/db');
+      
+      // Contar cuántas internaciones activas quedan en esa habitación
+      const [rows] = await db.query(
+        "SELECT COUNT(*) AS activas FROM internaciones WHERE habitacion_id = ? AND estado_internacion = 'activa'",
+        [habitacionId]
+      );
+      const activas = rows[0].activas;
+
+      let nombreEstado = 'Libre';
+      if (activas === 1) {
+        nombreEstado = 'Semi-Ocupada';
+      } else if (activas >= 2) {
+        nombreEstado = 'Ocupada';
+      }
+
+      const estado = await Estado.obtenerPorNombre(nombreEstado);
+      if (estado) {
+        await Habitacion.actualizarEstado(habitacionId, estado.id);
+      }
+
+      res.redirect('/internaciones');
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Error al procesar el alta médica');
+    }
   }
 };

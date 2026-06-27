@@ -9,6 +9,7 @@ const internacionRoutes = require('./routes/internacionRoutes');
 const habitacionesRoutes = require('./routes/habitacionesRoutes');
 const enfermeriaRoutes = require('./routes/enfermeriaRoutes');
 const medicoRoutes = require('./routes/medicoRoutes');
+const usuarioRoutes = require('./routes/usuarioRoutes');
 const autRoutes = require('./routes/aut');
 
 const app = express();
@@ -30,6 +31,7 @@ app.set('view engine', 'pug');
 app.use((req, res, next) => {
   res.locals.usuario = req.session.usuario || null;
   res.locals.rol = req.session.rol || null;
+  res.locals.userId = req.session.userId || null;
   next();
 });
 
@@ -40,6 +42,7 @@ app.use('/internaciones', internacionRoutes);
 app.use('/habitaciones', habitacionesRoutes);
 app.use('/enfermeria', enfermeriaRoutes);
 app.use('/medico', medicoRoutes);
+app.use('/usuarios', usuarioRoutes);
 
 // Redirigir raíz a /login
 app.get('/', (req, res) => res.redirect('/login'));
