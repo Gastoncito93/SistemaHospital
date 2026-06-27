@@ -198,14 +198,37 @@ block content
     
     form(method="POST", action=`/internaciones/editar/${internacion.id}`)
       
-      // Sección: Paciente (solo lectura)
+      // Sección: Paciente
       .form-section
         h5
           i.bi.bi-person-vcard
           | Paciente
-        .patient-display
-          .patient-name= `${internacion.paciente_nombre} ${internacion.paciente_apellido}`
-          .patient-id ID Paciente: #{internacion.paciente_id}
+        if internacion.paciente_nombre === 'Paciente NN'
+          .alert.alert-warning.mb-3(style="border-left: 4px solid var(--hospital-yellow);")
+            h6.fw-bold
+              i.bi.bi-exclamation-triangle-fill.me-2
+              | Paciente NN (Emergencia)
+            p.small.mb-2 Este es un registro provisional de emergencia. Ingrese los datos reales a continuación para identificarlo o fusionarlo con un paciente existente.
+            .row.g-3.mt-1
+              .col-md-6
+                label.form-label.small.fw-bold(for="identificar_nombre") Nombre Real
+                input.form-control#identificar_nombre(type="text", name="identificar_nombre", placeholder="Nombre")
+              .col-md-6
+                label.form-label.small.fw-bold(for="identificar_apellido") Apellido Real
+                input.form-control#identificar_apellido(type="text", name="identificar_apellido", placeholder="Apellido")
+              .col-md-6
+                label.form-label.small.fw-bold(for="identificar_dni") DNI Real
+                input.form-control#identificar_dni(type="text", name="identificar_dni", placeholder="Solo números")
+              .col-md-6
+                label.form-label.small.fw-bold(for="identificar_sexo") Sexo
+                select.form-select#identificar_sexo(name="identificar_sexo")
+                  option(value="") -- Seleccione --
+                  option(value="masculino", selected=internacion.paciente_sexo === 'masculino') Masculino
+                  option(value="femenino", selected=internacion.paciente_sexo === 'femenino') Femenino
+        else
+          .patient-display
+            .patient-name= `${internacion.paciente_nombre} ${internacion.paciente_apellido}`
+            .patient-id ID Paciente: #{internacion.paciente_id}
         input.form-control(
           type="text"
           name="paciente_id"

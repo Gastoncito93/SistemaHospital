@@ -74,10 +74,54 @@ guardar: async (req, res) => {
         return res.status(400).send('El DNI debe ser un número entero');
       }
 
-      await Paciente.actualizar(req.params.id, req.body);
-      res.redirect('/pacientes');
+      const pacienteId = parseInt(req.params.id, 10);
+
+      // Verificamos si ya existe otro paciente con el DNI ingresado
+      const pacienteExistente = await Paciente.buscarPorDNI(dni);
+
+      if (pacienteExistente && pacienteExistente.id !== pacienteId) {
+        // --- ESCENARIO DE FUSIÓN (MERGE) ---
+        // Si ya existe un paciente con ese DNI, transferimos las internaciones
+        // y eliminamos el paciente temporal.
+        const db = require('../config/db');
+
+        // 1. Obtener datos del paciente temporal actual (para guardar la descripción visual)
+        const pacienteEmergencia = await Paciente.obtenerPorId(pacienteId);
+
+        // 2. Obtener todas las internaciones del paciente de emergencia
+        const [internaciones] = await db.query(
+          'SELECT * FROM internaciones WHERE paciente_id = ?',
+          [pacienteId]
+        );
+
+        // 3. Transferir las internaciones al paciente existente, agregando la nota de emergencia
+        for (const internacion of internaciones) {
+          const notaEmergencia = `\n[Ingreso de emergencia original: Registrado como ${pacienteEmergencia.nombre} (${pacienteEmergencia.apellido})]`;
+          const nuevasObservaciones = (internacion.observaciones || '') + notaEmergencia;
+          const nuevoMotivo = internacion.motivo.includes('Emergencia')
+            ? internacion.motivo
+            : `Emergencia: ${internacion.motivo}`;
+
+          await db.query(
+            `UPDATE internaciones 
+             SET paciente_id = ?, observaciones = ?, motivo = ?
+             WHERE id = ?`,
+            [pacienteExistente.id, nuevasObservaciones, nuevoMotivo, internacion.id]
+          );
+        }
+
+        // 4. Eliminar el paciente de emergencia temporal
+        await Paciente.eliminar(pacienteId);
+
+        return res.redirect('/pacientes?success=El paciente de emergencia ha sido identificado y fusionado con el paciente existente con éxito.');
+      } else {
+        // --- ESCENARIO NORMAL ---
+        // Si no existe conflicto de DNI o es el mismo paciente, actualizamos normalmente
+        await Paciente.actualizar(pacienteId, req.body);
+        return res.redirect('/pacientes?success=Datos del paciente actualizados correctamente.');
+      }
     } catch (error) {
-      console.error(error);
+      console.error('Error al actualizar paciente:', error);
       res.status(500).send('Error al actualizar el paciente');
     }
   },
@@ -114,7 +158,7 @@ guardar: async (req, res) => {
                 LEFT JOIN habitaciones h ON i.habitacion_id = h.id
                 LEFT JOIN alas a ON h.ala_id = a.id
                 WHERE i.paciente_id = ?
-                ORDER BY i.fecha_ingreso DESC
+                ORDER BY i.id DESC
             `, [id]);
 
             // 3. Por cada internación, cargar sus evaluaciones médicas y de enfermería

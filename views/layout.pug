@@ -7,27 +7,108 @@ html
     link(rel="stylesheet", href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css")
     link(rel="stylesheet", href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css")
     link(rel="stylesheet", href="/style.css")
+    style.
+      :root {
+        --hospital-blue: #0d8abc;
+        --hospital-teal: #00c2cb;
+        --hospital-light: #e8f4f8;
+        --hospital-white: #ffffff;
+        --hospital-gray: #f8f9fa;
+        --hospital-dark: #2c3e50;
+      }
+      .navbar-hospital {
+        background: linear-gradient(135deg, var(--hospital-dark), #1a252f) !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        border-bottom: 3px solid var(--hospital-teal);
+        padding: 0.8rem 1rem;
+      }
+      .navbar-hospital .navbar-brand {
+        font-weight: 700;
+        letter-spacing: 1px;
+        color: var(--hospital-white) !important;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .navbar-hospital .navbar-brand i {
+        color: var(--hospital-teal);
+        font-size: 1.4rem;
+      }
+      .navbar-hospital .nav-link {
+        color: rgba(255, 255, 255, 0.8) !important;
+        font-weight: 500;
+        padding: 0.5rem 1rem !important;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .navbar-hospital .nav-link:hover {
+        color: var(--hospital-white) !important;
+        background-color: rgba(0, 194, 203, 0.15);
+        transform: translateY(-1px);
+      }
+      .navbar-hospital .nav-link.active {
+        color: var(--hospital-white) !important;
+        background-color: var(--hospital-blue) !important;
+        box-shadow: 0 2px 6px rgba(13, 138, 188, 0.3);
+      }
+      .btn-volver-universal {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-weight: 500;
+        color: var(--hospital-blue);
+        border: 1px solid var(--hospital-blue);
+        background-color: transparent;
+        padding: 0.4rem 1.2rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        text-decoration: none;
+      }
+      .btn-volver-universal:hover {
+        background-color: var(--hospital-blue);
+        color: white;
+        transform: translateX(-3px);
+        box-shadow: 0 4px 8px rgba(13, 138, 188, 0.15);
+      }
   body
     // Navbar
-    nav.navbar.navbar-expand-lg.navbar-dark.bg-dark
+    nav.navbar.navbar-expand-lg.navbar-hospital
       .container-fluid
-        a.navbar-brand(href="/") HIS Internación
+        a.navbar-brand(href="/") 
+          i.bi.bi-heart-pulse-fill
+          | HIS Internación
         button.navbar-toggler(type="button", data-bs-toggle="collapse", data-bs-target="#navbarNav")
           span.navbar-toggler-icon
         #navbarNav.collapse.navbar-collapse
           ul.navbar-nav
-            li.nav-item
-              a.nav-link(href="/pacientes") Pacientes
-            li.nav-item
-              a.nav-link(href="/internaciones") Internaciones
-            li.nav-item
-              a.nav-link(href="/habitaciones") Habitaciones
             if rol === 'admin'
               li.nav-item
-                a.nav-link(href="/usuarios") Usuarios
+                a.nav-link(href="/usuarios") 
+                  i.bi.bi-people-fill
+                  | Usuarios
+            li.nav-item
+              a.nav-link(href="/pacientes") 
+                i.bi.bi-person-badge-fill
+                | Pacientes
+            li.nav-item
+              a.nav-link(href="/internaciones") 
+                i.bi.bi-clipboard2-pulse-fill
+                | Internaciones
+            li.nav-item
+              a.nav-link(href="/habitaciones") 
+                i.bi.bi-hospital-fill
+                | Habitaciones
           
     // Contenido principal
     .container.mt-4
+      if rol && pathname !== '/pacientes' && pathname !== '/internaciones' && pathname !== '/habitaciones' && pathname !== '/usuarios' && pathname !== '/'
+        .mb-3
+          a.btn-volver-universal(href="#", onclick="window.history.back(); return false;")
+            i.bi.bi-arrow-left
+            | Volver
       block content
 
     // Modal de Alerta de Permisos
@@ -44,21 +125,124 @@ html
           .modal-footer
             button.btn.btn-secondary(type="button", data-bs-dismiss="modal") Entendido
 
+    if rol === 'admin'
+      // Botón flotante de Emergencia
+      button.btn.btn-danger.btn-lg.rounded-circle.shadow-lg#btnEmergenciaFlotante(
+        type="button",
+        data-bs-toggle="modal",
+        data-bs-target="#emergenciaModal",
+        style="position: fixed; bottom: 25px; right: 25px; z-index: 1050; width: 65px; height: 65px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(220, 53, 69, 0.4) !important;"
+      )
+        i.bi.bi-lightning-charge-fill(style="font-size: 1.8rem; color: white;")
+
+      // Modal de Ingreso de Emergencia Rápido
+      #emergenciaModal.modal.fade(tabindex="-1", aria-labelledby="emergenciaModalLabel", aria-hidden="true")
+        .modal-dialog.modal-dialog-centered
+          .modal-content(style="border: 2px solid #dc3545;")
+            .modal-header.bg-danger.text-white
+              h5#emergenciaModalLabel.modal-title
+                i.bi.bi-lightning-charge-fill.me-2
+                | Ingreso Rápido de Emergencia
+              button.btn-close.btn-close-white(type="button", data-bs-dismiss="modal", aria-label="Close")
+            form(method="POST", action="/internaciones/emergencia-rapida")
+              .modal-body
+                .mb-3
+                  label.form-label.fw-bold(for="emergenciaSexo") Sexo del Paciente
+                  select.form-select#emergenciaSexo(name="sexo", required)
+                    option(value="" disabled selected) -- Seleccione sexo --
+                    option(value="masculino") Masculino
+                    option(value="femenino") Femenino
+                .mb-3
+                  label.form-label.fw-bold(for="emergenciaDescripcion") Seña Particular / Descripción Visual
+                  input.form-control#emergenciaDescripcion(
+                    type="text",
+                    name="descripcion",
+                    required,
+                    placeholder="Ej: Hombre, buzo azul, aprox 30 años"
+                  )
+                  small.text-muted Esto identificará provisionalmente al paciente en el sistema.
+                .mb-3
+                  label.form-label.fw-bold(for="emergenciaHabitacion") Habitación / Cama Disponible
+                  select.form-select#emergenciaHabitacion(name="habitacion_id", required)
+                    option(value="" disabled selected) -- Seleccione sexo primero --
+              .modal-footer
+                button.btn.btn-secondary(type="button", data-bs-dismiss="modal") Cancelar
+                button.btn.btn-danger(type="submit") 
+                  i.bi.bi-plus-circle-fill.me-2
+                  | Internar de Emergencia
+
     // Bootstrap JS para el navbar responsive
     script(src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js")
 
-    // Script para capturar y mostrar errores en Pop-up
+    // Script para capturar y mostrar errores/éxitos en Pop-up y manejo de habitaciones de emergencia
     script.
       document.addEventListener('DOMContentLoaded', function() {
+        // Activar el link de la barra de navegación correspondiente a la ruta actual
+        const currentPath = window.location.pathname;
+        const navLinks = document.querySelectorAll('.navbar-hospital .nav-link');
+        navLinks.forEach(link => {
+          const href = link.getAttribute('href');
+          if (currentPath === href || (href !== '/' && currentPath.startsWith(href))) {
+            link.classList.add('active');
+          }
+        });
+
+        // Manejo de mensajes de error/éxito
         const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.has('error')) {
-          const mensaje = urlParams.get('error');
+        if (urlParams.has('error') || urlParams.has('success')) {
+          const isError = urlParams.has('error');
+          const mensaje = isError ? urlParams.get('error') : urlParams.get('success');
+          
+          const modalHeader = document.querySelector('#permisosModal .modal-header');
+          const modalTitle = document.getElementById('permisosModalLabel');
+          
+          if (isError) {
+            modalHeader.className = 'modal-header bg-danger text-white';
+            modalTitle.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-2"></i>Acceso Restringido / Alerta';
+          } else {
+            modalHeader.className = 'modal-header bg-success text-white';
+            modalTitle.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i>Operación Exitosa';
+          }
+          
           document.getElementById('permisosModalMessage').textContent = mensaje;
           const myModal = new bootstrap.Modal(document.getElementById('permisosModal'));
           myModal.show();
           
-          // Limpiar el parámetro de la URL sin recargar la página
+          // Limpiar los parámetros de la URL sin recargar la página
           const newUrl = window.location.pathname;
           window.history.replaceState({}, document.title, newUrl);
+        }
+
+        // Carga dinámica de habitaciones en el modal de emergencia
+        const sexoSelect = document.getElementById('emergenciaSexo');
+        const habitacionSelect = document.getElementById('emergenciaHabitacion');
+        
+        if (sexoSelect && habitacionSelect) {
+          sexoSelect.addEventListener('change', async function() {
+            const sexo = this.value;
+            if (!sexo) return;
+            
+            habitacionSelect.innerHTML = '<option value="" disabled selected>Cargando habitaciones...</option>';
+            
+            try {
+              const res = await fetch(`/internaciones/habitaciones-disponibles-por-sexo/${sexo}`);
+              const data = await res.json();
+              
+              habitacionSelect.innerHTML = '<option value="" disabled selected>-- Seleccione una habitación --</option>';
+              if (data.length === 0) {
+                habitacionSelect.innerHTML = '<option value="" disabled>No hay habitaciones disponibles para este sexo</option>';
+              } else {
+                data.forEach(h => {
+                  const opt = document.createElement('option');
+                  opt.value = h.id;
+                  opt.textContent = `Habitación N° ${h.numero} (${h.ala} - ${h.tipo})`;
+                  habitacionSelect.appendChild(opt);
+                });
+              }
+            } catch (error) {
+              console.error('Error al cargar habitaciones de emergencia:', error);
+              habitacionSelect.innerHTML = '<option value="" disabled>Error al cargar habitaciones</option>';
+            }
+          });
         }
       });

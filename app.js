@@ -32,6 +32,7 @@ app.use((req, res, next) => {
   res.locals.usuario = req.session.usuario || null;
   res.locals.rol = req.session.rol || null;
   res.locals.userId = req.session.userId || null;
+  res.locals.pathname = req.path;
   next();
 });
 

@@ -18,6 +18,12 @@ router.post('/nueva', internacionController.registrar);
 // Obtener habitaciones disponibles segun sexo del paciente
 router.get('/habitaciones-disponibles/:pacienteId', internacionController.obtenerHabitacionesDisponibles);
 
+// Obtener habitaciones disponibles directamente por el sexo (sin ID de paciente)
+router.get('/habitaciones-disponibles-por-sexo/:sexo', internacionController.obtenerHabitacionesDisponiblesPorSexo);
+
+// Procesar ingreso rápido de emergencia (flotante)
+router.post('/emergencia-rapida', internacionController.registrarEmergenciaRapida);
+
 // Mostrar formulario de edición
 //Actualizar internacion
 router.get('/editar/:id', internacionController.mostrarFormularioEditar);
