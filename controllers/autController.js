@@ -2,21 +2,40 @@
 const Usuario = require('../models/usuarioModel');
 
 exports.getRegister = (req, res) => {
+  if (req.session && req.session.userId) {
+    return res.redirect('/pacientes');
+  }
   res.render('registro', { error: null });
 };
 
 exports.postRegister = async (req, res) => {
   try {
     const { nombre, apellido, dni, email, pass } = req.body;
-    await Usuario.create({ nombre, apellido, dni, email, pass });
-    return res.redirect('/login');
+    
+    // Validación básica de campos vacíos
+    if (!nombre || !apellido || !dni || !email || !pass) {
+      return res.render('registro', { error: 'Todos los campos son obligatorios.' });
+    }
+
+    // Verificar si el correo ya está registrado
+    const usuarioExistente = await Usuario.findByEmail(email);
+    if (usuarioExistente) {
+      return res.render('registro', { error: 'El correo electrónico ya está registrado.' });
+    }
+
+    // Crear el usuario con rol por defecto 'pendiente'
+    await Usuario.create({ nombre, apellido, dni, email, pass, rol: 'pendiente' });
+    return res.redirect('/login?success=Registro exitoso. Su cuenta está pendiente de aprobación por un administrador.');
   } catch (err) {
-    // muestra el mensaje concreto en la vista
-    return res.render('registro', { error: err.message });
+    console.error('Error en postRegister:', err);
+    return res.render('registro', { error: 'Ocurrió un error al procesar el registro. Intente nuevamente.' });
   }
 };
 
 exports.getLogin = (req, res) => {
+  if (req.session && req.session.userId) {
+    return res.redirect('/pacientes');
+  }
   res.render('login', { error: null });
 };
 
@@ -41,4 +60,14 @@ exports.postLogin = async (req, res) => {
 
 exports.logout = (req, res) => {
   req.session.destroy(() => res.redirect('/login'));
+};
+
+exports.getPendiente = (req, res) => {
+  if (!req.session || !req.session.userId) {
+    return res.redirect('/login');
+  }
+  if (req.session.rol !== 'pendiente') {
+    return res.redirect('/pacientes');
+  }
+  res.render('pendiente');
 };

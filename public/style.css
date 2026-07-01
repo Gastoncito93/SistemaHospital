@@ -1,0 +1,200 @@
+/* public/style.css */
+
+/* Fonts & Core Settings */
+:root {
+  --hospital-blue: #0d8abc;
+  --hospital-teal: #00c2cb;
+  --hospital-light: #e8f4f8;
+  --hospital-white: #ffffff;
+  --hospital-gray: #f8f9fa;
+  --hospital-dark: #2c3e50;
+  --hospital-green: #2ecc71;
+  --hospital-red: #e74c3c;
+  --hospital-yellow: #f39c12;
+  --hospital-purple: #9b59b6;
+  --hospital-gradient: linear-gradient(135deg, #0d8abc 0%, #00c2cb 100%);
+  --hospital-dark-gradient: linear-gradient(135deg, #2c3e50 0%, #1a252f 100%);
+}
+
+body {
+  font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background-color: #f4f7f9;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Authentication Page Styles */
+.auth-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1.5rem;
+  background: radial-gradient(circle at 10% 20%, rgba(13, 138, 188, 0.08) 0%, transparent 45%),
+              radial-gradient(circle at 90% 80%, rgba(0, 194, 203, 0.08) 0%, transparent 45%);
+}
+
+.auth-card {
+  background: var(--hospital-white);
+  border: none;
+  border-radius: 24px;
+  box-shadow: 0 20px 40px rgba(44, 62, 80, 0.06);
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+  width: 100%;
+  max-width: 480px;
+}
+
+.auth-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 30px 60px rgba(44, 62, 80, 0.12);
+}
+
+.auth-header {
+  background: var(--hospital-gradient);
+  padding: 3rem 2rem 2.5rem;
+  text-align: center;
+  color: var(--hospital-white);
+  position: relative;
+}
+
+.auth-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 16px;
+  background: var(--hospital-white);
+  clip-path: ellipse(60% 100% at 50% 100%);
+}
+
+.auth-icon {
+  width: 72px;
+  height: 72px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.2rem;
+  font-size: 2.2rem;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  animation: pulse-hospital 3s infinite;
+}
+
+@keyframes pulse-hospital {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 12px rgba(255, 255, 255, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+  }
+}
+
+.auth-title {
+  font-weight: 800;
+  font-size: 1.9rem;
+  letter-spacing: -0.5px;
+  margin-bottom: 0.3rem;
+}
+
+.auth-subtitle {
+  font-size: 0.95rem;
+  opacity: 0.9;
+  font-weight: 400;
+}
+
+.auth-body {
+  padding: 2.5rem 2.5rem;
+}
+
+.form-group-custom {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.form-group-custom i {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #a0aec0;
+  font-size: 1.1rem;
+  transition: color 0.3s ease;
+}
+
+.form-control-custom {
+  padding: 0.85rem 1rem 0.85rem 2.7rem;
+  border-radius: 12px;
+  border: 1.5px solid #e2e8f0;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--hospital-dark);
+  transition: all 0.3s ease;
+}
+
+.form-control-custom:focus {
+  border-color: var(--hospital-blue);
+  box-shadow: 0 0 0 4px rgba(13, 138, 188, 0.12);
+  outline: none;
+}
+
+.form-control-custom:focus + i {
+  color: var(--hospital-blue);
+}
+
+.auth-btn {
+  background: var(--hospital-gradient);
+  border: none;
+  border-radius: 12px;
+  padding: 0.9rem;
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--hospital-white);
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 20px rgba(13, 138, 188, 0.2);
+  width: 100%;
+}
+
+.auth-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(13, 138, 188, 0.3);
+  color: var(--hospital-white);
+}
+
+.auth-footer {
+  text-align: center;
+  margin-top: 1.8rem;
+  font-size: 0.95rem;
+  color: #718096;
+}
+
+.auth-link {
+  color: var(--hospital-blue);
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.auth-link:hover {
+  color: var(--hospital-teal);
+  text-decoration: underline;
+}
+
+/* Custom error message */
+.alert-custom {
+  border-radius: 12px;
+  padding: 0.85rem 1.2rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 1.5rem;
+}

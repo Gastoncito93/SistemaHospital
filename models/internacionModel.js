@@ -77,10 +77,10 @@ const Internacion = {
       LEFT JOIN pacientes p ON p.id = i.paciente_id
       GROUP BY h.id
       HAVING (
-        e.nombre = 'libre' AND COUNT(i.id) = 0
+        LOWER(e.nombre) = 'libre' AND COUNT(i.id) = 0
       ) OR (
-        t.nombre = 'doble'
-        AND e.nombre <> 'limpieza'
+        LOWER(t.nombre) = 'doble'
+        AND LOWER(e.nombre) <> 'limpieza'
         AND COUNT(i.id) = 1
         AND SUM(CASE WHEN p.sexo != ? THEN 1 ELSE 0 END) = 0
       )

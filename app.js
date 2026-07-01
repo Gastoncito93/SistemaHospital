@@ -36,6 +36,10 @@ app.use((req, res, next) => {
   next();
 });
 
+// Middleware para verificar usuarios pendientes
+const { verificarRolPendiente } = require('./middlewares/roles');
+app.use(verificarRolPendiente);
+
 // Rutas
 app.use('/', autRoutes);
 app.use('/pacientes', pacienteRoutes);

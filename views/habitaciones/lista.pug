@@ -210,6 +210,7 @@ block content
     .status-libre { background-color: #2ecc71; }
     .status-ocupada { background-color: #e74c3c; }
     .status-limpieza { background-color: #f39c12; }
+    .status-semi-ocupada { background-color: #00c2cb; }
     
     .status-badge {
       display: inline-flex;
@@ -224,6 +225,8 @@ block content
     .status-libre-badge { background-color: #d4edda; color: #155724; }
     .status-ocupada-badge { background-color: #f8d7da; color: #721c24; }
     .status-limpieza-badge { background-color: #fff3cd; color: #856404; }
+    .status-semi-ocupada-badge { background-color: #e8f4f8; color: #0d8abc; }
+    .stat-icon.semi-ocupada { background: linear-gradient(135deg, #e8f4f8, #c4edf0); color: var(--hospital-teal); }
     
     .action-buttons {
       display: flex;
@@ -333,9 +336,10 @@ block content
   if habitaciones.length > 0
     - 
       const total = habitaciones.length;
-      const libres = habitaciones.filter(h => h.estado === 'libre').length;
-      const ocupadas = habitaciones.filter(h => h.estado === 'ocupada').length;
-      const limpieza = habitaciones.filter(h => h.estado === 'limpieza').length;
+      const libres = habitaciones.filter(h => h.estado.toLowerCase() === 'libre').length;
+      const ocupadas = habitaciones.filter(h => h.estado.toLowerCase() === 'ocupada').length;
+      const semiOcupadas = habitaciones.filter(h => h.estado.toLowerCase() === 'semi-ocupada').length;
+      const limpieza = habitaciones.filter(h => h.estado.toLowerCase() === 'limpieza').length;
     
     .stats-cards
       .stat-card
@@ -343,21 +347,28 @@ block content
           i.bi.bi-hospital
         .stat-content
           h3= total
-          p Total Habitaciones
+          p Total
       
       .stat-card
         .stat-icon.libre
           i.bi.bi-check-circle
         .stat-content
           h3= libres
-          p Habitaciones Libres
+          p Libres
       
       .stat-card
         .stat-icon.ocupada
           i.bi.bi-person-fill
         .stat-content
           h3= ocupadas
-          p Habitaciones Ocupadas
+          p Ocupadas
+      
+      .stat-card
+        .stat-icon.semi-ocupada
+          i.bi.bi-people
+        .stat-content
+          h3= semiOcupadas
+          p Semi-Ocupadas
       
       .stat-card
         .stat-icon.limpieza
@@ -416,15 +427,19 @@ block content
                   span.badge.bg-light.text-dark= habitacion.tipo
               
               td
-                if habitacion.estado === 'libre'
+                if habitacion.estado.toLowerCase() === 'libre'
                   span.status-badge.status-libre-badge
                     span.status-indicator.status-libre
                     | Libre
-                else if habitacion.estado === 'ocupada'
+                else if habitacion.estado.toLowerCase() === 'ocupada'
                   span.status-badge.status-ocupada-badge
                     span.status-indicator.status-ocupada
                     | Ocupada
-                else if habitacion.estado === 'limpieza'
+                else if habitacion.estado.toLowerCase() === 'semi-ocupada'
+                  span.status-badge.status-semi-ocupada-badge
+                    span.status-indicator.status-semi-ocupada
+                    | Semi-Ocupada
+                else if habitacion.estado.toLowerCase() === 'limpieza'
                   span.status-badge.status-limpieza-badge
                     span.status-indicator.status-limpieza
                     | En Limpieza
@@ -486,6 +501,9 @@ block content
               option(value="ocupada") 
                 i.bi.bi-person-fill
                 |  Habitaciones Ocupadas
+              option(value="semi-ocupada") 
+                i.bi.bi-people-fill
+                |  Habitaciones Semi-Ocupadas
               option(value="limpieza") 
                 i.bi.bi-bucket
                 |  Habitaciones en Limpieza
@@ -523,7 +541,7 @@ block content
       let contador = 0;
       
       filas.forEach(fila => {
-        const estado = fila.getAttribute('data-estado');
+        const estado = (fila.getAttribute('data-estado') || '').toLowerCase();
         if (!filtro || estado === filtro) {
           fila.style.display = '';
           contador++;
@@ -542,6 +560,7 @@ block content
         switch(filtro) {
           case 'libre': estadoTexto = 'libres'; break;
           case 'ocupada': estadoTexto = 'ocupadas'; break;
+          case 'semi-ocupada': estadoTexto = 'semi-ocupadas'; break;
           case 'limpieza': estadoTexto = 'en limpieza'; break;
         }
         
@@ -558,7 +577,7 @@ block content
       let estadoIcono = '';
       let estadoColor = '';
       
-      switch(habitacion.estado) {
+      switch(habitacion.estado.toLowerCase()) {
         case 'libre':
           estadoIcono = '<i class="bi bi-check-circle text-success"></i>';
           estadoColor = 'text-success';
@@ -567,10 +586,48 @@ block content
           estadoIcono = '<i class="bi bi-person-fill text-danger"></i>';
           estadoColor = 'text-danger';
           break;
+        case 'semi-ocupada':
+          estadoIcono = '<i class="bi bi-people-fill text-info"></i>';
+          estadoColor = 'text-info';
+          break;
         case 'limpieza':
           estadoIcono = '<i class="bi bi-bucket text-warning"></i>';
           estadoColor = 'text-warning';
           break;
+      }
+      
+      let pacientesHtml = '';
+      if (habitacion.pacientes) {
+        pacientesHtml = `
+          <div class="row">
+            <div class="col-12 mb-3">
+              <h6 class="text-secondary"><i class="bi bi-people-fill"></i> Pacientes Internados</h6>
+              <div class="p-3 border rounded bg-light" style="font-size: 0.95rem;">
+                <strong>${habitacion.pacientes}</strong>
+              </div>
+            </div>
+          </div>
+        `;
+      } else if (habitacion.estado.toLowerCase() === 'ocupada' || habitacion.estado.toLowerCase() === 'semi-ocupada') {
+        pacientesHtml = `
+          <div class="row">
+            <div class="col-12 mb-3">
+              <h6 class="text-secondary"><i class="bi bi-people-fill"></i> Pacientes Internados</h6>
+              <div class="p-3 border rounded text-danger bg-light d-flex align-items-center gap-2" style="font-size: 0.95rem;">
+                <i class="bi bi-exclamation-triangle-fill"></i> No hay registros de pacientes activos asignados a esta habitación.
+              </div>
+            </div>
+          </div>
+        `;
+      } else {
+        pacientesHtml = `
+          <div class="row">
+            <div class="col-12 mb-3">
+              <h6 class="text-secondary"><i class="bi bi-people-fill"></i> Pacientes Internados</h6>
+              <p class="mb-0 text-muted"><em>Habitación vacía</em></p>
+            </div>
+          </div>
+        `;
       }
       
       const contenido = `
@@ -599,6 +656,10 @@ block content
             <p class="mb-0 ${estadoColor}"><strong>${habitacion.estado.charAt(0).toUpperCase() + habitacion.estado.slice(1)}</strong></p>
           </div>
         </div>
+        
+        <hr>
+        
+        ${pacientesHtml}
         
         <hr>
         

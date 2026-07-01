@@ -243,7 +243,7 @@ CREATE TABLE `usuario` (
   `email` varchar(255) NOT NULL,
   `pass` varchar(255) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `rol` enum('admin','medico','enfermero') NOT NULL DEFAULT 'enfermero'
+  `rol` enum('admin','medico','enfermero','pendiente') NOT NULL DEFAULT 'pendiente'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -251,9 +251,10 @@ CREATE TABLE `usuario` (
 --
 
 INSERT INTO `usuario` (`id`, `nombre`, `apellido`, `dni`, `email`, `pass`, `created_at`, `rol`) VALUES
-(2, 'Gaston', 'Sosa', '541965165', 'gastonoscarsosa@gmail.com', 'a3s2d1q6w5e4', '2025-07-30 18:40:09', 'admin'),
-(3, 'German', 'Perez', '15651384', 'germanperez@gmail.com', 'a3s2d1q6w5e4a3s2d1', '2025-11-14 21:46:33', 'enfermero'),
-(4, 'yaciel', 'muñoz', '4695161', 'yacielzombers@gmail.com', 'a3s2d1q6w5e4', '2025-12-04 20:20:42', 'enfermero');
+(2, 'Gaston', 'Sosa', '541965165', 'gastonoscarsosa@gmail.com', 'pbkdf2$11317e224f4c5cca86c74631b0ec4399$68b7267578cfea14890f81b7d637572840f17d9de0b7f52572d44f3a606df01011501a577dd330eb04c903fcc4e86af696fc19dbd05071ceebb348bb4b0fa6ff', '2025-07-30 18:40:09', 'admin'),
+(3, 'German', 'Perez', '15651384', 'germanperez@gmail.com', 'pbkdf2$0f938c211ccf1c0c9fe62f58f87e4293$3b18adcceb7e847a1033ccca50e246ad3f198864bdefc7f7b0ef7a6794cc0b2d3338d8d3d03d19cfaf706b24ac1d2195fcdec51ca3d5c025becf4406966de21b', '2025-11-14 21:46:33', 'enfermero'),
+(4, 'Yaciel', 'Muñoz', '4695161', 'yacielzombers@gmail.com', 'pbkdf2$d913d22f6d7133bfba74a13d0388bf34$9b8726c9a846d038c2fb7541aaef641a53ff2ff790d4709cb5c597833735361cd6e9be6972b4505a53ec711597106e39946fc64123e11288dac729ebbfad3e52', '2025-12-04 20:20:42', 'medico'),
+(5, 'Pablo', 'Garcia', '9876543', 'pablogarcia@gmail.com', 'pbkdf2$7a08f0847d1b6c562918a027163c0ae7$f94b3d48ce2aadb06002c73721eea88da05a0ba01018024842b5696133dbe2b758a742c3e9396f7daf994c615bd325bef514eca3c8cf0fc8bb358c2b47f28eaa', '2026-07-01 02:40:00', 'pendiente');
 
 --
 -- Índices para tablas volcadas

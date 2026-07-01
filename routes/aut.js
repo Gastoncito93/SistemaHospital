@@ -14,4 +14,7 @@ router.post('/login',    aut.postLogin);
 // Logout
 router.get('/logout',    aut.logout);
 
+// Pendiente de aprobación
+router.get('/pendiente', aut.getPendiente);
+
 module.exports = router;

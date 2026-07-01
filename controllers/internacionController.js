@@ -92,9 +92,9 @@ module.exports = {
 
     let nombreEstado;
     if (habitacion.tipo === 'individual') {
-      nombreEstado = 'ocupada';
+      nombreEstado = 'Ocupada';
     } else {
-      nombreEstado = ocupacion >= 2 ? 'ocupada' : 'semi ocupado';
+      nombreEstado = ocupacion >= 2 ? 'Ocupada' : 'Semi-Ocupada';
     }
 
     const estado = await Estado.obtenerPorNombre(nombreEstado);
@@ -149,6 +149,15 @@ module.exports = {
         if (pacienteExistente && pacienteExistente.id !== pacienteIdTemp) {
           // --- ESCENARIO DE FUSIÓN (MERGE) ---
           const db = require('../config/db');
+
+          // Validar si el paciente de destino ya tiene una internación activa
+          const [yaInternado] = await db.query(
+            "SELECT 1 FROM internaciones WHERE paciente_id = ? AND estado_internacion = 'activa'",
+            [pacienteExistente.id]
+          );
+          if (yaInternado.length > 0) {
+            return res.redirect(`/internaciones?error=El paciente con el DNI ingresado ya se encuentra internado. No es posible realizar la fusión.`);
+          }
 
           // Obtener los datos del paciente de emergencia actual (antes de borrarlo)
           const pacienteEmergencia = await Paciente.obtenerPorId(pacienteIdTemp);
@@ -212,8 +221,38 @@ module.exports = {
   // Eliminar internacion
   eliminar: async (req, res) => {
     try {
-      await Internacion.eliminar(req.params.id);
-      res.redirect('/internaciones/');
+      const id = parseInt(req.params.id, 10);
+      const internacion = await Internacion.obtenerPorId(id);
+      if (!internacion) {
+        return res.redirect('/internaciones?error=Internación no encontrada');
+      }
+      
+      const habitacionId = internacion.habitacion_id;
+      
+      // Eliminar internación
+      await Internacion.eliminar(id);
+      
+      // Recalcular y actualizar el estado de la habitación
+      const db = require('../config/db');
+      const [rows] = await db.query(
+        "SELECT COUNT(*) AS activas FROM internaciones WHERE habitacion_id = ? AND estado_internacion = 'activa'",
+        [habitacionId]
+      );
+      const activas = rows[0].activas;
+
+      let nombreEstado = 'Libre';
+      if (activas === 1) {
+        nombreEstado = 'Semi-Ocupada';
+      } else if (activas >= 2) {
+        nombreEstado = 'Ocupada';
+      }
+
+      const estado = await Estado.obtenerPorNombre(nombreEstado);
+      if (estado) {
+        await Habitacion.actualizarEstado(habitacionId, estado.id);
+      }
+      
+      res.redirect('/internaciones/?success=Internación eliminada y estado de habitación actualizado correctamente.');
     } catch (error) {
       console.error(error);
       res.status(500).send('Error al eliminar la internación');
@@ -297,7 +336,15 @@ module.exports = {
       const { sexo, descripcion, habitacion_id } = req.body;
 
       if (!sexo || !descripcion || !habitacion_id) {
-        return res.status(400).send('Todos los campos son obligatorios para el ingreso de emergencia');
+        return res.redirect('/internaciones?error=Todos los campos son obligatorios para el ingreso de emergencia. Debe haber camas disponibles.');
+      }
+
+      // Validar si la habitación seleccionada realmente está libre y es compatible con el sexo
+      const habitacionesDisponibles = await Internacion.obtenerHabitacionesDisponiblesPorSexo(sexo);
+      const habitacionValida = habitacionesDisponibles.some(h => h.id === parseInt(habitacion_id, 10));
+
+      if (!habitacionValida) {
+        return res.redirect('/internaciones?error=La habitación seleccionada ya no está disponible o no hay camas libres para este sexo.');
       }
 
       // 1. Crear el paciente temporal
@@ -328,9 +375,9 @@ module.exports = {
 
       let nombreEstado;
       if (habitacion.tipo === 'individual') {
-        nombreEstado = 'ocupada';
+        nombreEstado = 'Ocupada';
       } else {
-        nombreEstado = ocupacion >= 2 ? 'ocupada' : 'semi ocupado';
+        nombreEstado = ocupacion >= 2 ? 'Ocupada' : 'Semi-Ocupada';
       }
 
       const estado = await Estado.obtenerPorNombre(nombreEstado);
@@ -343,7 +390,7 @@ module.exports = {
 
     } catch (error) {
       console.error('Error al registrar ingreso de emergencia rápido:', error);
-      res.status(500).send('Error al registrar el ingreso de emergencia');
+      res.redirect('/internaciones?error=Error al registrar el ingreso de emergencia.');
     }
   }
 };

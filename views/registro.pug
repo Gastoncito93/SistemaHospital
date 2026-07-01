@@ -1,29 +1,47 @@
 extends layout
 
 block content
-  .container.mt-5
-    .row.justify-content-center
-      .col-md-6
-        h1.text-center.mb-4 Registro
+  .auth-wrapper
+    .auth-card
+      .auth-header
+        .auth-icon
+          i.bi.bi-person-plus-fill
+        h2.auth-title Crear Cuenta
+        p.auth-subtitle Registro de Personal del Hospital
+      
+      .auth-body
         if error
-          .alert.alert-danger= error
+          .alert.alert-danger.alert-custom(role="alert")
+            i.bi.bi-exclamation-triangle-fill
+            span= error
+            
         form(action="/registro" method="POST")
-          .mb-3
-            label.form-label(for="nombre") Nombre
-            input.form-control(type="text" name="nombre" id="nombre" required)
-          .mb-3
-            label.form-label(for="apellido") Apellido
-            input.form-control(type="text" name="apellido" id="apellido" required)
-          .mb-3
-            label.form-label(for="dni") DNI
-            input.form-control(type="text" name="dni" id="dni" required)
-          .mb-3
-            label.form-label(for="email") Email
-            input.form-control(type="email" name="email" id="email" required)
-          .mb-3
-            label.form-label(for="pass") Contraseña
-            input.form-control(type="password" name="pass" id="pass" required)
-          button.btn.btn-primary.w-100(type="submit") Registrarse
-        p.text-center.mt-3
+          .row
+            .col-md-6
+              .form-group-custom
+                input.form-control.form-control-custom(type="text" name="nombre" id="nombre" placeholder="Nombre" required)
+                i.bi.bi-person-fill
+            .col-md-6
+              .form-group-custom
+                input.form-control.form-control-custom(type="text" name="apellido" id="apellido" placeholder="Apellido" required)
+                i.bi.bi-person-badge
+                
+          .form-group-custom
+            input.form-control.form-control-custom(type="text" name="dni" id="dni" placeholder="DNI" required)
+            i.bi.bi-card-text
+            
+          .form-group-custom
+            input.form-control.form-control-custom(type="email" name="email" id="email" placeholder="Correo Electrónico" required)
+            i.bi.bi-envelope-fill
+            
+          .form-group-custom.mb-4
+            input.form-control.form-control-custom(type="password" name="pass" id="pass" placeholder="Contraseña" required)
+            i.bi.bi-key-fill
+            
+          button.btn.auth-btn(type="submit") 
+            i.bi.bi-person-check-fill.me-2
+            | Completar Registro
+            
+        .auth-footer
           | ¿Ya tienes cuenta? 
-          a(href="/login") Inicia sesión
+          a.auth-link(href="/login") Inicia sesión aquí

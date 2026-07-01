@@ -7,6 +7,16 @@ module.exports = {
     next();
   },
 
+  verificarRolPendiente: (req, res, next) => {
+    if (req.session && req.session.rol === 'pendiente') {
+      const rutasPermitidas = ['/pendiente', '/logout', '/login'];
+      if (!rutasPermitidas.includes(req.path)) {
+        return res.redirect('/pendiente');
+      }
+    }
+    next();
+  },
+
   requireRol: (rolesPermitidos = []) => {
     return (req, res, next) => {
 

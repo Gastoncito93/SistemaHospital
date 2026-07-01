@@ -1,0 +1,32 @@
+extends layout
+
+block content
+  .container.mt-5.text-center
+    .row.justify-content-center
+      .col-md-8
+        .card.border-0.shadow-lg.p-5(style="border-radius: 24px; background: white;")
+          .card-body
+            .mb-4
+              i.bi.bi-person-clock.text-warning(style="font-size: 5rem; animation: pulse 2.2s infinite; display: inline-block;")
+            h2.fw-bold.mb-3 Acceso Pendiente de Aprobación
+            p.text-muted.fs-5.mb-4
+              | Hola, #[strong= usuario]. Tu registro en el sistema #[strong HIS Internación] se completó correctamente, 
+              | pero tu cuenta aún está en estado #[span.badge.bg-warning.text-dark(style="font-size: 0.95rem; font-weight: 600; padding: 0.4em 0.8em; border-radius: 8px;") pendiente].
+            
+            .alert.alert-info.d-flex.align-items-center.gap-3.text-start.mb-4.p-3(style="border-radius: 16px; border: none; background-color: #eaf6fa;")
+              i.bi.bi-info-circle-fill.fs-3.text-info
+              div(style="font-size: 0.95rem; font-weight: 500; color: #2c3e50;")
+                | Un administrador del hospital debe asignarte un rol (Médico, Enfermero o Administrador) antes de que puedas acceder y visualizar los datos del sistema.
+            
+            p.text-muted.small(style="font-size: 0.85rem;") Por favor, ponte en contacto con el administrador del hospital para la activación de tu cuenta.
+            
+            a.btn.btn-outline-danger.mt-3.px-4.py-2.fw-semibold(href="/logout" style="border-radius: 12px; transition: all 0.3s ease;")
+              i.bi.bi-box-arrow-right.me-2
+              | Cerrar Sesión
+
+  style.
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 0.9; }
+      50% { transform: scale(1.06); opacity: 1; filter: drop-shadow(0 0 15px rgba(243, 156, 18, 0.4)); }
+      100% { transform: scale(1); opacity: 0.9; }
+    }

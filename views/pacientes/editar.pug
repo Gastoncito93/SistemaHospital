@@ -150,7 +150,7 @@ block content
       i.bi.bi-person-circle
       span ID: #{paciente.id}
     
-    form(method="POST", action=`/pacientes/editar/${paciente.id}`)
+    form(method="POST", action=`/pacientes/editar/${paciente.id}${page ? '?page=' + page : ''}`)
       .mb-3
         label.form-label(for="nombre") Nombre
         input.form-control(type="text", name="nombre", id="nombre", value=paciente.nombre, required)
@@ -174,7 +174,7 @@ block content
         button.btn.btn-edit(type="submit")
           i.bi.bi-check-circle
           | Actualizar
-        a.btn.btn-secondary(href="/pacientes")
+        a.btn.btn-secondary(href=`/pacientes${page ? '?page=' + page : ''}`)
           i.bi.bi-x-circle
           | Cancelar
 

@@ -416,7 +416,7 @@ block content
             th(scope="col") Acciones
         tbody
           each paciente in pacientes
-            tr
+            tr(data-id=paciente.id)
               td
                 .patient-info
                   .patient-avatar= paciente.nombre.charAt(0).toUpperCase() + paciente.apellido.charAt(0).toUpperCase()
@@ -444,10 +444,10 @@ block content
                   )
                     i.bi.bi-pencil
                   if rol === 'admin'
-                    a.btn.btn-icon.btn-delete(
-                      href=`/pacientes/eliminar/${paciente.id}`,
+                    button.btn.btn-icon.btn-delete(
+                      type="button",
                       title="Eliminar Paciente",
-                      onclick="return confirm('¿Está seguro que desea eliminar a ' + '#{paciente.nombre} #{paciente.apellido}' + '?')"
+                      onclick=`prepararEliminacion('${paciente.id}', '${paciente.nombre} ${paciente.apellido}')`
                     )
                       i.bi.bi-trash3-fill
                   a.btn.btn-icon(
@@ -472,7 +472,28 @@ block content
         | Para agregar un nuevo paciente, haga clic en el botón "Nuevo Paciente".
       a.btn.btn-admin(href="/pacientes/nuevo")
         i.bi.bi-person-plus
-        | Agregar primer paciente
+  //- Modal de Confirmación de Eliminación
+  #confirmarEliminarModal.modal.fade(tabindex="-1", aria-hidden="true")
+    .modal-dialog.modal-dialog-centered
+      .modal-content(style="border: 2px solid var(--hospital-red); border-radius: 16px;")
+        .modal-header.bg-danger.text-white(style="border-radius: 14px 14px 0 0; border-bottom: none;")
+          h5.modal-title.fw-bold
+            i.bi.bi-exclamation-triangle-fill.me-2
+            | Confirmar Eliminación
+          button.btn-close.btn-close-white(type="button", data-bs-dismiss="modal", aria-label="Close")
+        .modal-body.text-center.py-4
+          .mb-3
+            i.bi.bi-trash3-fill.text-danger(style="font-size: 4rem;")
+          h4.fw-bold.mb-2 ¿Estás seguro?
+          p.text-muted.mb-0
+            | Se eliminará permanentemente al paciente 
+            strong#eliminarPacienteNombre (Nombre)
+            |  y todo su historial clínico. Esta acción no se puede deshacer.
+        .modal-footer.border-0.justify-content-center.gap-2.pb-4
+          button.btn.btn-secondary.px-4(type="button", data-bs-dismiss="modal", style="border-radius: 8px;") Cancelar
+          button#btnConfirmarEliminacion.btn.btn-danger.px-4(type="button", style="border-radius: 8px;") 
+            i.bi.bi-trash3-fill.me-1
+            | Eliminar Paciente
 
   //- Script para funcionalidades adicionales
   script.
@@ -521,6 +542,15 @@ block content
       window.print();
     }
     
+    function prepararEliminacion(id, nombreCompleto) {
+      document.getElementById('eliminarPacienteNombre').textContent = nombreCompleto;
+      const btnConfirmar = document.getElementById('btnConfirmarEliminacion');
+      btnConfirmar.setAttribute('data-id', id);
+      
+      const modal = new bootstrap.Modal(document.getElementById('confirmarEliminarModal'));
+      modal.show();
+    }
+    
     // Lógica de Búsqueda y Paginación en tiempo real (Lado del Cliente)
     document.addEventListener('DOMContentLoaded', function() {
       const buscarInput = document.getElementById('buscarPaciente');
@@ -529,8 +559,91 @@ block content
       
       const originalRows = Array.from(tableBody.querySelectorAll('tr'));
       const rowsPerPage = 5;
-      let currentPage = 1;
+      
+      // Leer página actual desde la URL
+      const urlParams = new URLSearchParams(window.location.search);
+      let currentPage = parseInt(urlParams.get('page')) || 1;
+      
       let filteredRows = [...originalRows];
+      
+      const btnConfirmar = document.getElementById('btnConfirmarEliminacion');
+      if (btnConfirmar) {
+        btnConfirmar.addEventListener('click', async function() {
+          const id = this.getAttribute('data-id');
+          if (!id) return;
+          
+          try {
+            const response = await fetch(`/pacientes/eliminar/${id}`, {
+              method: 'GET',
+              headers: {
+                'Accept': 'application/json'
+              }
+            });
+            
+            const result = await response.json();
+            if (result.success) {
+              const modalEl = document.getElementById('confirmarEliminarModal');
+              const modal = bootstrap.Modal.getInstance(modalEl);
+              if (modal) modal.hide();
+              
+              const rowToRemove = tableBody.querySelector(`tr[data-id="${id}"]`);
+              if (rowToRemove) {
+                rowToRemove.style.transition = 'all 0.4s ease';
+                rowToRemove.style.opacity = '0';
+                rowToRemove.style.transform = 'scale(0.9)';
+                setTimeout(() => {
+                  rowToRemove.remove();
+                  
+                  const indexInOriginal = originalRows.findIndex(r => r.getAttribute('data-id') === id);
+                  if (indexInOriginal !== -1) {
+                    originalRows.splice(indexInOriginal, 1);
+                  }
+                  
+                  const indexInFiltered = filteredRows.findIndex(r => r.getAttribute('data-id') === id);
+                  if (indexInFiltered !== -1) {
+                    filteredRows.splice(indexInFiltered, 1);
+                  }
+                  
+                  renderTable();
+                  
+                  // Mostrar permisosModal de éxito
+                  const modalHeader = document.querySelector('#permisosModal .modal-header');
+                  const modalTitle = document.getElementById('permisosModalLabel');
+                  const modalMessage = document.getElementById('permisosModalMessage');
+                  if (modalHeader && modalTitle && modalMessage) {
+                    modalHeader.className = 'modal-header bg-success text-white';
+                    modalTitle.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i>Operación Exitosa';
+                    modalMessage.textContent = 'Paciente eliminado correctamente.';
+                    const myModal = new bootstrap.Modal(document.getElementById('permisosModal'));
+                    myModal.show();
+                  }
+                }, 400);
+              }
+            } else {
+              alert('Error al eliminar: ' + result.message);
+            }
+          } catch (error) {
+            console.error(error);
+            alert('Error de red al intentar eliminar al paciente.');
+          }
+        });
+      }
+      
+      function updateUrlPage() {
+        const url = new URL(window.location.href);
+        url.searchParams.set('page', currentPage);
+        window.history.replaceState({}, '', url.toString());
+      }
+      
+      function updateActionLinks() {
+        document.querySelectorAll('.hospital-table tbody a').forEach(link => {
+          const href = link.getAttribute('href');
+          if (href) {
+            const cleanHref = href.split('?')[0];
+            link.setAttribute('href', `${cleanHref}?page=${currentPage}`);
+          }
+        });
+      }
       
       function renderTable() {
         const totalRows = filteredRows.length;
@@ -572,6 +685,7 @@ block content
           e.preventDefault();
           if (currentPage > 1) {
             currentPage--;
+            updateUrlPage();
             renderTable();
           }
         });
@@ -585,6 +699,7 @@ block content
           liPage.addEventListener('click', function(e) {
             e.preventDefault();
             currentPage = i;
+            updateUrlPage();
             renderTable();
           });
           paginationControl.appendChild(liPage);
@@ -598,10 +713,14 @@ block content
           e.preventDefault();
           if (currentPage < totalPages) {
             currentPage++;
+            updateUrlPage();
             renderTable();
           }
         });
         paginationControl.appendChild(liNext);
+        
+        // Actualizar los enlaces de las acciones para que lleven la página actual
+        updateActionLinks();
       }
       
       // Escuchar el buscador
@@ -615,6 +734,7 @@ block content
         });
         
         currentPage = 1;
+        updateUrlPage();
         renderTable();
       });
       

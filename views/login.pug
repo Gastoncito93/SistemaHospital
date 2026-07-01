@@ -1,20 +1,33 @@
 extends layout
 
 block content
-  .container.mt-5
-    .row.justify-content-center
-      .col-md-6
-        h1.text-center.mb-4 Iniciar Sesión
+  .auth-wrapper
+    .auth-card
+      .auth-header
+        .auth-icon
+          i.bi.bi-shield-lock-fill
+        h2.auth-title Iniciar Sesión
+        p.auth-subtitle Acceso al Portal de Gestión Hospitalaria
+      
+      .auth-body
         if error
-          .alert.alert-danger= error
+          .alert.alert-danger.alert-custom(role="alert")
+            i.bi.bi-exclamation-triangle-fill
+            span= error
+            
         form(action="/login" method="POST")
-          .mb-3
-            label.form-label(for="email") Email
-            input.form-control(type="email" name="email" id="email" required)
-          .mb-3
-            label.form-label(for="pass") Contraseña
-            input.form-control(type="password" name="pass" id="pass" required)
-          button.btn.btn-primary.w-100(type="submit") Entrar
-        p.text-center.mt-3
+          .form-group-custom
+            input.form-control.form-control-custom(type="email" name="email" id="email" placeholder="Correo Electrónico" required)
+            i.bi.bi-envelope-fill
+            
+          .form-group-custom.mb-4
+            input.form-control.form-control-custom(type="password" name="pass" id="pass" placeholder="Contraseña" required)
+            i.bi.bi-key-fill
+            
+          button.btn.auth-btn(type="submit") 
+            i.bi.bi-box-arrow-in-right.me-2
+            | Entrar al Sistema
+            
+        .auth-footer
           | ¿No tienes cuenta? 
-          a(href="/registro") Regístrate
+          a.auth-link(href="/registro") Regístrate aquí

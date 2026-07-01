@@ -39,6 +39,7 @@ guardar: async (req, res) => {
     mostrarFormularioEditar: async (req, res) => {
         try {
             const id = parseInt(req.params.id, 10);
+            const page = req.query.page || '';
             console.log('ID recibido:', req.params.id);
 
             if (isNaN(id)) {
@@ -52,7 +53,7 @@ guardar: async (req, res) => {
                 return res.status(404).send('Paciente no encontrado');
             }
 
-            res.render('pacientes/editar', { paciente });
+            res.render('pacientes/editar', { paciente, page });
         } catch (error) {
             console.error(error);
             console.error('ERROR DETECTADO:', error);
@@ -85,6 +86,15 @@ guardar: async (req, res) => {
         // y eliminamos el paciente temporal.
         const db = require('../config/db');
 
+        // Validar si el paciente de destino ya tiene una internación activa
+        const [yaInternado] = await db.query(
+          "SELECT 1 FROM internaciones WHERE paciente_id = ? AND estado_internacion = 'activa'",
+          [pacienteExistente.id]
+        );
+        if (yaInternado.length > 0) {
+          return res.redirect('/pacientes?error=El paciente con el DNI ingresado ya se encuentra internado. No es posible realizar la fusión.');
+        }
+
         // 1. Obtener datos del paciente temporal actual (para guardar la descripción visual)
         const pacienteEmergencia = await Paciente.obtenerPorId(pacienteId);
 
@@ -113,12 +123,14 @@ guardar: async (req, res) => {
         // 4. Eliminar el paciente de emergencia temporal
         await Paciente.eliminar(pacienteId);
 
-        return res.redirect('/pacientes?success=El paciente de emergencia ha sido identificado y fusionado con el paciente existente con éxito.');
+        const page = req.query.page || '';
+        return res.redirect(`/pacientes?success=El paciente de emergencia ha sido identificado y fusionado con el paciente existente con éxito.${page ? '&page=' + page : ''}`);
       } else {
         // --- ESCENARIO NORMAL ---
         // Si no existe conflicto de DNI o es el mismo paciente, actualizamos normalmente
         await Paciente.actualizar(pacienteId, req.body);
-        return res.redirect('/pacientes?success=Datos del paciente actualizados correctamente.');
+        const page = req.query.page || '';
+        return res.redirect(`/pacientes?success=Datos del paciente actualizados correctamente.${page ? '&page=' + page : ''}`);
       }
     } catch (error) {
       console.error('Error al actualizar paciente:', error);
@@ -131,9 +143,16 @@ guardar: async (req, res) => {
     eliminar: async (req, res) => {
         try {
             await Paciente.eliminar(req.params.id);
-            res.redirect('/pacientes');
+            if (req.xhr || (req.headers.accept && req.headers.accept.indexOf('json') > -1)) {
+                return res.json({ success: true, message: 'Paciente eliminado correctamente' });
+            }
+            const page = req.query.page || '';
+            res.redirect(`/pacientes?success=Paciente eliminado correctamente.${page ? '&page=' + page : ''}`);
         } catch (error) {
             console.error(error);
+            if (req.xhr || (req.headers.accept && req.headers.accept.indexOf('json') > -1)) {
+                return res.status(500).json({ success: false, message: 'Error al eliminar el paciente' });
+            }
             res.status(500).send('Error al eliminar el paciente');
         }
     },

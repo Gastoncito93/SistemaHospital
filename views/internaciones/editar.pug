@@ -220,11 +220,14 @@ block content
                 label.form-label.small.fw-bold(for="identificar_dni") DNI Real
                 input.form-control#identificar_dni(type="text", name="identificar_dni", placeholder="Solo números")
               .col-md-6
-                label.form-label.small.fw-bold(for="identificar_sexo") Sexo
-                select.form-select#identificar_sexo(name="identificar_sexo")
-                  option(value="") -- Seleccione --
-                  option(value="masculino", selected=internacion.paciente_sexo === 'masculino') Masculino
-                  option(value="femenino", selected=internacion.paciente_sexo === 'femenino') Femenino
+                label.form-label.small.fw-bold Sexo (Asignado en Emergencia)
+                .p-2.bg-white.border.rounded.text-capitalize.fw-semibold
+                  if internacion.paciente_sexo === 'masculino'
+                    i.bi.bi-gender-male.text-primary.me-1
+                  else if internacion.paciente_sexo === 'femenino'
+                    i.bi.bi-gender-female.text-danger.me-1
+                  | #{internacion.paciente_sexo}
+                input(type="hidden", name="identificar_sexo", value=internacion.paciente_sexo)
         else
           .patient-display
             .patient-name= `${internacion.paciente_nombre} ${internacion.paciente_apellido}`
