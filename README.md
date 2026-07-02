@@ -88,7 +88,7 @@ La aplicación estará disponible en [http://localhost:3000](http://localhost:30
 
 ## 📝 Informe de Problemas Encontrados y Soluciones Desarrolladas
 
-Durante la realización del integrador se detectaron varios problemas críticos que fueron solucionados para asegurar la robustez y calidad del software:
+Durante la realización del integrador se detectaron varios problemas críticos y áreas de mejora que fueron solucionados para asegurar la robustez, seguridad y usabilidad del software:
 
 1. **Inconsistencia de Contraseñas del Dump**:
    * *Problema*: Los usuarios del backup inicial tenían contraseñas en texto plano, mientras que el controlador utilizaba cifrado, impidiendo el acceso inicial.
@@ -105,3 +105,27 @@ Durante la realización del integrador se detectaron varios problemas críticos 
 5. **Fusión Inconsistente de Paciente de Emergencia (DNI Duplicado)**:
    * *Problema*: Si un paciente de emergencia ingresaba como NN y luego se descubría su identidad, al asignarle su DNI el sistema intentaba fusionarlo con su registro real histórico. Sin embargo, si ese paciente real ya estaba internado en el hospital, fusionarlo generaría el error lógico de tener a un mismo paciente en dos camas diferentes a la vez.
    * *Solución*: Se agregaron validaciones tanto en el controlador de pacientes como en el de internaciones para bloquear fusiones si el registro de destino ya cuenta con una internación activa.
+6. **Actualización Completa de Páginas en Errores de Validación (AJAX)**:
+   * *Problema*: Al ingresar datos incorrectos en los formularios de nueva/editar evaluación médica, enfermería y registro de usuarios, la página se recargaba por completo, perdiendo datos y dañando la experiencia de usuario.
+   * *Solución*: Se adaptaron los controladores para responder con JSON (`{ success: false, errores }`) y se implementó lógica con Fetch API en el cliente para pintar bordes de color rojo, añadir textos de ayuda bajo los campos con error de forma dinámica, y hacer scroll automático al primer fallo sin recargar la pantalla.
+7. **Rangos de Alerta en Signos Vitales (Semaforización)**:
+   * *Problema*: En el listado de evaluaciones de enfermería, todos los valores numéricos se mostraban con el mismo estilo, dificultando que el profesional identificara rápidamente signos críticos o de alarma.
+   * *Solución*: Se implementó una lógica de semaforización en la plantilla PUG para pintar los valores en verde (normal), amarillo (precaución/límite) o rojo (alerta/crítico) siguiendo estándares médicos para SpO2, Frecuencia Cardíaca, Temperatura, Frecuencia Respiratoria, Dolor y Presión Arterial.
+8. **Doble Internación Activa Simultánea**:
+   * *Problema*: El sistema permitía internar múltiples veces a un mismo paciente en diferentes habitaciones de forma simultánea.
+   * *Solución*: Se añadió una validación en el controlador de internaciones que realiza una consulta SQL antes de guardar para verificar si el paciente ya tiene una internación con fecha de alta pendiente o nula, bloqueando la operación en caso afirmativo.
+9. **Bloqueo del Selector de Pacientes y Carga Masiva**:
+   * *Problema*: Al abrir el formulario de nueva internación, el navegador cargaba la lista completa de todos los pacientes del hospital, lo cual afectaba el rendimiento.
+   * *Solución*: Se bloqueó el selector de pacientes y se añadió una caja de búsqueda. Ahora, el selector solo se activa y busca pacientes de forma dinámica tras escribir al menos **2 caracteres** en la caja.
+10. **Error de "Fecha Futura" por Husos Horarios (Timezone Offset)**:
+    * *Problema*: Al editar una evaluación, el navegador cargaba la hora en formato UTC a través de `.toISOString()`, lo cual adelantaba la hora 3 horas respecto a la hora local argentina, disparando la validación del backend "La fecha no puede ser futura".
+    * *Solución*: Se corrigió restando el `getTimezoneOffset` en minutos convertido a milisegundos antes de invocar el formateador ISO, inicializando de forma precisa los inputs de tipo `datetime-local` en la hora local del cliente.
+11. **Falta de Auditoría y Privacidad (Control Cruzado de Evaluaciones)**:
+    * *Problema*: El sistema no registraba qué profesional guardaba una evaluación y permitía que cualquier enfermero o médico modificara o eliminara las evoluciones escritas por sus colegas.
+    * *Solución*: Se agregó la columna `usuario_id` en las tablas de evaluaciones. Al guardar, se almacena el ID del usuario en sesión y se muestra con un tag en la lista (ej. `👤 Juan Perez`). Adicionalmente, se configuró una restricción de permisos: si el usuario no es el creador de la evaluación (y no es `admin`), los botones se ocultan en el frontend y cualquier acceso manual por URL se bloquea en el backend devolviendo un código **HTTP 403 Forbidden**.
+12. **Registros que Reaparecen con el Botón "Atrás" (bfcache)**:
+    * *Problema*: Al eliminar una evaluación e ir para atrás con el botón de retroceso del navegador, el registro eliminado volvía a aparecer en pantalla temporalmente debido a la memoria caché.
+    * *Solución*: Se inyectaron cabeceras `Cache-Control` globales para evitar el cacheo y se añadió un detector del evento `pageshow` en JavaScript que recarga forzosamente la vista actual si se detecta navegación proveniente de la caché del historial.
+13. **Fuerza de Contraseña y Bloqueo de Login por Intentos Fallidos**:
+    * *Problema*: El registro de usuarios aceptaba contraseñas débiles y el inicio de sesión era vulnerable a ataques repetidos.
+    * *Solución*: Se añadieron validaciones de complejidad en el registro (mínimo una mayúscula, una minúscula, un número y un símbolo especial). Asimismo, se agregaron columnas de seguridad en la tabla `usuario` para bloquear cuentas de rol `medico` o `enfermero` por un lapso de **30 minutos** si ingresan credenciales incorrectas en **3 intentos seguidos**.

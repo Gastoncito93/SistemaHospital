@@ -88,4 +88,31 @@ Usuario.actualizarRol = async (id, rol) => {
   );
 };
 
+// 🔹 Métodos de seguridad para login (bloqueo por intentos fallidos)
+Usuario.verificarPassword = (password, storedPassword) => {
+  return verifyPassword(password, storedPassword);
+};
+
+Usuario.incrementarIntentos = async (id) => {
+  await db.execute(
+    `UPDATE usuario SET intentos_fallidos = intentos_fallidos + 1 WHERE id = ?`,
+    [id]
+  );
+};
+
+Usuario.bloquearUsuario = async (id, minutos) => {
+  const fechaBloqueo = new Date(Date.now() + minutos * 60000);
+  await db.execute(
+    `UPDATE usuario SET bloqueado_hasta = ? WHERE id = ?`,
+    [fechaBloqueo, id]
+  );
+};
+
+Usuario.resetearIntentos = async (id) => {
+  await db.execute(
+    `UPDATE usuario SET intentos_fallidos = 0, bloqueado_hasta = NULL WHERE id = ?`,
+    [id]
+  );
+};
+
 module.exports = Usuario;
