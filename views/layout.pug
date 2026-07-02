@@ -132,7 +132,7 @@ html
     .container.mt-4
       if rol && pathname !== '/pacientes' && pathname !== '/internaciones' && pathname !== '/habitaciones' && pathname !== '/usuarios' && pathname !== '/'
         .mb-3
-          a.btn-volver-universal(href="#", onclick="window.history.back(); return false;")
+          a.btn-volver-universal(href="#", onclick="volverAtras(); return false;")
             i.bi.bi-arrow-left
             | Volver
       block content
@@ -281,4 +281,43 @@ html
             }
           });
         }
+
+        // Función inteligente para el botón Volver
+        window.volverAtras = function() {
+          const path = window.location.pathname;
+          
+          if (path.includes('/enfermeria/internacion/') || path.includes('/medico/internacion/')) {
+            window.location.href = '/internaciones';
+            return;
+          }
+          
+          if (path.includes('/enfermeria/nueva/') || path.includes('/enfermeria/editar/')) {
+            const internacionIdInput = document.querySelector('input[name="internacion_id"]');
+            if (internacionIdInput && internacionIdInput.value) {
+              window.location.href = '/enfermeria/internacion/' + internacionIdInput.value;
+              return;
+            }
+          }
+          
+          if (path.includes('/medico/nueva/') || path.includes('/medico/editar/')) {
+            const internacionIdInput = document.querySelector('input[name="internacion_id"]');
+            if (internacionIdInput && internacionIdInput.value) {
+              window.location.href = '/medico/internacion/' + internacionIdInput.value;
+              return;
+            }
+          }
+          
+          if (document.referrer && document.referrer.includes(window.location.hostname)) {
+            window.location.href = document.referrer;
+          } else {
+            window.history.back();
+          }
+        };
+
+        // Forzar recarga al retroceder si la página proviene del cache (bfcache)
+        window.addEventListener('pageshow', function(event) {
+          if (event.persisted) {
+            window.location.reload();
+          }
+        });
       });

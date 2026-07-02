@@ -318,6 +318,55 @@ block content
         grid-template-columns: repeat(2, 1fr);
       }
     }
+    
+    /* Estilos personalizados para el paginador premium */
+    #paginationContainer {
+      margin-top: 2rem !important;
+      margin-bottom: 4rem !important;
+      padding: 1rem 1.5rem !important;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+      border: 1px solid #f0f0f0;
+    }
+    
+    .pagination {
+      gap: 5px;
+    }
+    
+    .pagination .page-item .page-link {
+      color: var(--hospital-blue) !important;
+      border: 1px solid #e9ecef;
+      border-radius: 8px !important;
+      padding: 0.5rem 0.9rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      background-color: white;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    }
+    
+    .pagination .page-item:not(.disabled) .page-link:hover {
+      background: linear-gradient(135deg, var(--hospital-blue), var(--hospital-teal));
+      color: white !important;
+      border-color: transparent;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(13, 138, 188, 0.2);
+    }
+    
+    .pagination .page-item.active .page-link {
+      background: linear-gradient(135deg, var(--hospital-blue), var(--hospital-teal)) !important;
+      color: white !important;
+      border-color: transparent !important;
+      font-weight: 600;
+      box-shadow: 0 4px 8px rgba(13, 138, 188, 0.25);
+    }
+    
+    .pagination .page-item.disabled .page-link {
+      color: #ccc !important;
+      background-color: #f8f9fa !important;
+      border-color: #e9ecef !important;
+      cursor: not-allowed;
+    }
 
   //- Header principal
   .hospital-header
@@ -382,19 +431,25 @@ block content
       h4.mb-0
         i.bi.bi-list-ul
         | Listado de Habitaciones
-      button.btn.btn-filter(type="button", data-bs-toggle="modal", data-bs-target="#modalFiltro")
+
+    .mb-3.d-flex.gap-2.align-items-center
+      .input-group.shadow-sm
+        span.input-group-text.bg-white.border-end-0
+          i.bi.bi-search.text-muted
+        input#buscarHabitacion.form-control.border-start-0(type="text", placeholder="Buscar por número, ala, tipo o estado...")
+      button.btn.btn-filter.d-flex.align-items-center.gap-2(type="button", data-bs-toggle="modal", data-bs-target="#modalFiltro" style="height: 43px; white-space: nowrap;")
         i.bi.bi-funnel
         | Filtrar por Estado
     
     .table-responsive
-      table.table.table-hover.hospital-table#tablaHabitaciones
+      table.table.table-hover.hospital-table#tablaHabitaciones(style="table-layout: fixed; width: 100%;")
         thead
           tr
-            th N° Habitación
-            th Ala
-            th Tipo
-            th Estado
-            th Acciones
+            th(style="width: 20%;") N° Habitación
+            th(style="width: 20%;") Ala
+            th(style="width: 20%;") Tipo
+            th(style="width: 20%;") Estado
+            th(style="width: 20%;") Acciones
         tbody
           each habitacion in habitaciones
             tr(data-estado=habitacion.estado)
@@ -466,6 +521,12 @@ block content
                       onclick=`return confirm('¿Está seguro de eliminar la habitación ${habitacion.numero}?')`
                     )
                       i.bi.bi-trash
+  
+    //- Controles de Paginación
+    #paginationContainer.d-flex.justify-content-between.align-items-center.flex-wrap.mt-3.px-2.gap-2
+      small#paginationInfo.text-muted.fw-semibold Mostrando habitaciones
+      nav
+        ul.pagination.pagination-sm.mb-0(id="paginationControl")
   
   //- Estado vacío
   else
@@ -686,7 +747,7 @@ block content
       }
     }
     
-    // Inicializar tooltips si Bootstrap está disponible
+    // Inicializar tooltips si Bootstrap está disponible y paginado/búsqueda
     document.addEventListener('DOMContentLoaded', function() {
       console.log('Vista de habitaciones cargada');
       
@@ -697,4 +758,119 @@ block content
           return new bootstrap.Tooltip(tooltipTriggerEl);
         });
       }
+
+      const buscarInput = document.getElementById('buscarHabitacion');
+      const tableBody = document.querySelector('#tablaHabitaciones tbody');
+      if (!tableBody) return;
+      
+      const originalRows = Array.from(tableBody.querySelectorAll('tr'));
+      const rowsPerPage = 5;
+      let currentPage = 1;
+      let filteredRows = [...originalRows];
+      
+      function renderTable() {
+        const totalRows = filteredRows.length;
+        const totalPages = Math.max(1, Math.ceil(totalRows / rowsPerPage));
+        
+        if (currentPage > totalPages) currentPage = totalPages;
+        if (currentPage < 1) currentPage = 1;
+        
+        const start = (currentPage - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+        
+        originalRows.forEach(row => {
+          row.style.display = 'none';
+        });
+        
+        filteredRows.slice(start, end).forEach(row => {
+          row.style.display = '';
+        });
+        
+        const paginationInfo = document.getElementById('paginationInfo');
+        if (totalRows === 0) {
+          paginationInfo.textContent = 'No se encontraron habitaciones';
+        } else {
+          paginationInfo.textContent = `Mostrando ${start + 1} a ${Math.min(end, totalRows)} de ${totalRows} habitación(es)`;
+        }
+        
+        const paginationControl = document.getElementById('paginationControl');
+        paginationControl.innerHTML = '';
+        
+        const liPrev = document.createElement('li');
+        liPrev.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
+        liPrev.innerHTML = `<a class="page-link" href="#">Anterior</a>`;
+        liPrev.addEventListener('click', function(e) {
+          e.preventDefault();
+          if (currentPage > 1) {
+            currentPage--;
+            renderTable();
+          }
+        });
+        paginationControl.appendChild(liPrev);
+        
+        for (let i = 1; i <= totalPages; i++) {
+          const liPage = document.createElement('li');
+          liPage.className = `page-item ${currentPage === i ? 'active' : ''}`;
+          liPage.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+          liPage.addEventListener('click', function(e) {
+            e.preventDefault();
+            currentPage = i;
+            renderTable();
+          });
+          paginationControl.appendChild(liPage);
+        }
+        
+        const liNext = document.createElement('li');
+        liNext.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
+        liNext.innerHTML = `<a class="page-link" href="#">Siguiente</a>`;
+        liNext.addEventListener('click', function(e) {
+          e.preventDefault();
+          if (currentPage < totalPages) {
+            currentPage++;
+            renderTable();
+          }
+        });
+        paginationControl.appendChild(liNext);
+      }
+      
+      buscarInput.addEventListener('input', function() {
+        const query = this.value.toLowerCase().trim();
+        
+        filteredRows = originalRows.filter(row => {
+          const numCol = row.querySelector('.room-number').textContent.toLowerCase();
+          const alaCol = row.cells[1].textContent.toLowerCase();
+          const tipoCol = row.cells[2].textContent.toLowerCase();
+          const estadoCol = row.cells[3].textContent.toLowerCase();
+          return numCol.includes(query) || alaCol.includes(query) || tipoCol.includes(query) || estadoCol.includes(query);
+        });
+        
+        currentPage = 1;
+        renderTable();
+      });
+
+      // Sobrescribir aplicarFiltro para que sea cooperativo con la búsqueda y paginado
+      window.aplicarFiltro = function() {
+        const filtro = document.getElementById('filtroEstado').value;
+        const query = buscarInput.value.toLowerCase().trim();
+        
+        filteredRows = originalRows.filter(row => {
+          const numCol = row.querySelector('.room-number').textContent.toLowerCase();
+          const alaCol = row.cells[1].textContent.toLowerCase();
+          const tipoCol = row.cells[2].textContent.toLowerCase();
+          const estadoCol = (row.getAttribute('data-estado') || '').toLowerCase();
+          
+          const matchQuery = numCol.includes(query) || alaCol.includes(query) || tipoCol.includes(query) || estadoCol.includes(query);
+          const matchFiltro = !filtro || estadoCol === filtro;
+          
+          return matchQuery && matchFiltro;
+        });
+        
+        currentPage = 1;
+        renderTable();
+        
+        const modal = bootstrap.Modal.getInstance(document.getElementById('modalFiltro'));
+        if (modal) modal.hide();
+      };
+      
+      renderTable();
     });

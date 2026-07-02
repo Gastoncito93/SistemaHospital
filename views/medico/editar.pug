@@ -311,12 +311,15 @@ block content
             label.form-label(for="fecha_hora")
               i.bi.bi-clock
               | Fecha y Hora
+            - const originalDate = new Date(evaluacion.fecha_hora);
+            - const tzOffset = originalDate.getTimezoneOffset() * 60000;
+            - const localVal = new Date(originalDate - tzOffset).toISOString().slice(0, 16);
             input.form-control(
               type="datetime-local",
               name="fecha_hora",
               id="fecha_hora",
               required,
-              value=evaluacion.fecha_hora.toISOString().slice(0,16)
+              value=(errors ? (datos ? datos.fecha_hora : '') : localVal)
             )
             if errors && errors.fecha_hora
               .error-message= errors.fecha_hora
@@ -464,23 +467,64 @@ block content
         fechaHoraInput.value = localISOTime;
       }
       
-      // Validación de campos requeridos
+      // Envío de formulario vía AJAX con validaciones dinámicas
       const form = document.querySelector('form');
       if (form) {
-        form.addEventListener('submit', function(e) {
-          const diagnostico = document.getElementById('diagnostico');
-          const fechaHora = document.getElementById('fecha_hora');
+        form.addEventListener('submit', async function(e) {
+          e.preventDefault();
           
-          let isValid = true;
+          document.querySelectorAll('.error-message').forEach(el => el.remove());
+          document.querySelectorAll('.form-control').forEach(el => el.style.borderColor = '');
           
-          if (fechaHora && !fechaHora.value) {
-            isValid = false;
-            fechaHora.style.borderColor = 'var(--hospital-red)';
-          }
-          
-          if (!isValid) {
-            e.preventDefault();
-            alert('Por favor complete los campos requeridos');
+          try {
+            const formData = new URLSearchParams(new FormData(form));
+            const response = await fetch(form.action, {
+              method: 'POST',
+              headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/x-www-form-urlencoded'
+              },
+              body: formData
+            });
+            
+            const result = await response.json();
+            
+            if (response.ok && result.success) {
+              window.location.href = result.redirectUrl;
+            } else if (result.errores) {
+              for (const [key, msg] of Object.entries(result.errores)) {
+                const inputEl = document.getElementById(key) || document.getElementsByName(key)[0];
+                if (inputEl) {
+                  const errEl = document.createElement('div');
+                  errEl.className = 'error-message text-danger';
+                  errEl.style.fontSize = '0.85rem';
+                  errEl.style.marginTop = '0.25rem';
+                  errEl.textContent = msg;
+                  
+                  inputEl.after(errEl);
+                  inputEl.style.borderColor = 'var(--hospital-red)';
+                  
+                  inputEl.addEventListener('input', function onInputReset() {
+                    this.style.borderColor = '';
+                    const next = this.nextElementSibling;
+                    if (next && next.classList.contains('error-message')) {
+                      next.remove();
+                    }
+                    this.removeEventListener('input', onInputReset);
+                  });
+                }
+              }
+              
+              const firstError = document.querySelector('.error-message');
+              if (firstError) {
+                firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              }
+            } else {
+              alert(result.message || 'Error al guardar la evaluación');
+            }
+          } catch (error) {
+            console.error('Error:', error);
+            alert('Error de red al intentar guardar la evaluación');
           }
         });
       }

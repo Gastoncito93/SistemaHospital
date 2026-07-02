@@ -74,6 +74,23 @@ module.exports = {
       observaciones
     } = req.body;
 
+    const db = require('../config/db');
+    // Verificar si el paciente ya tiene una internación activa
+    const [activeInternaciones] = await db.query(
+      "SELECT id FROM internaciones WHERE paciente_id = ? AND estado_internacion = 'activa'",
+      [paciente_id]
+    );
+
+    if (activeInternaciones.length > 0) {
+      const pacientes = await Paciente.obtenerNoInternados();
+      const habitaciones = await Habitacion.obtenerDisponibles();
+      return res.render('internaciones/nueva', {
+        pacientes,
+        habitaciones,
+        error: 'El paciente ya cuenta con una internación activa. No es posible crear otra.'
+      });
+    }
+
     // Guardamos la internación con los nuevos datos
     await Internacion.insertar({
       paciente_id,

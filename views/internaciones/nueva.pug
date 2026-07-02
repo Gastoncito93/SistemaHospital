@@ -158,6 +158,11 @@ block content
     p.mb-0 Complete los datos para registrar una nueva internación
 
   .hospital-form-container
+    if error
+      .alert.alert-danger.mb-4.d-flex.align-items-center.gap-2
+        i.bi.bi-exclamation-triangle-fill
+        span= error
+
     form(method="POST", action="/internaciones/nueva")
       
       // Sección: Datos del Paciente
@@ -166,11 +171,15 @@ block content
           i.bi.bi-person-vcard
           | Datos del Paciente
         .mb-3
-          label.form-label(for="pacienteSelect") Paciente
+          label.form-label Buscar Paciente (Escriba al menos 2 letras)
+          .input-group.mb-2
+            span.input-group-text
+              i.bi.bi-search
+            input.form-control(type="text", id="pacienteSearch", placeholder="Buscar por nombre, apellido o DNI...")
+        .mb-3
+          label.form-label(for="pacienteSelect") Seleccione Paciente
           select.form-select(name="paciente_id", required, id="pacienteSelect")
-            option(value="" disabled selected) -- Seleccione un paciente --
-            each paciente in pacientes
-              option(value=paciente.id)= paciente.nombre + ' ' + paciente.apellido
+            option(value="" disabled selected) -- Escriba arriba para buscar un paciente --
       
       // Sección: Datos de la Habitación
       .form-section
@@ -246,29 +255,96 @@ block content
       link.href = 'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css';
       document.head.appendChild(link);
     }
+
+    // Serializar lista de pacientes desde el servidor
+    const pacientesList = !{JSON.stringify(pacientes || [])};
     
-    // Configurar fecha actual por defecto
     document.addEventListener('DOMContentLoaded', function() {
+      // Configurar fecha actual por defecto
       const today = new Date().toISOString().split('T')[0];
       const fechaInput = document.getElementById('fecha_ingreso');
       if (fechaInput && !fechaInput.value) {
         fechaInput.value = today;
       }
-    });
-    
-    // Script original para habitaciones dinámicas
-    const pacienteSelect = document.getElementById('pacienteSelect');
-    const habitacionSelect = document.getElementById('habitacionSelect');
-    pacienteSelect.addEventListener('change', async function() {
-      const id = this.value;
-      if (!id) return;
-      const res = await fetch(`/internaciones/habitaciones-disponibles/${id}`);
-      const data = await res.json();
-      habitacionSelect.innerHTML = '<option value="" disabled selected>-- Seleccione una habitación --</option>';
-      data.forEach(h => {
-        const opt = document.createElement('option');
-        opt.value = h.id;
-        opt.textContent = 'N° ' + h.numero;
-        habitacionSelect.appendChild(opt);
-      });
+
+      // Elementos
+      const searchInput = document.getElementById('pacienteSearch');
+      const selectEl = document.getElementById('pacienteSelect');
+      const habitacionSelect = document.getElementById('habitacionSelect');
+      
+      if (searchInput && selectEl) {
+        searchInput.addEventListener('input', function() {
+          const query = this.value.trim().toLowerCase();
+          
+          // Limpiar desplegables
+          selectEl.innerHTML = '';
+          if (habitacionSelect) {
+            habitacionSelect.innerHTML = '<option value="" disabled selected>-- Seleccione una habitación --</option>';
+          }
+          
+          // Requiere al menos 2 letras
+          if (query.length < 2) {
+            const defaultOpt = document.createElement('option');
+            defaultOpt.value = '';
+            defaultOpt.disabled = true;
+            defaultOpt.selected = true;
+            defaultOpt.textContent = '-- Escriba al menos 2 letras arriba --';
+            selectEl.appendChild(defaultOpt);
+            return;
+          }
+          
+          // Filtrar la lista local
+          const filtered = pacientesList.filter(p => {
+            const fullName = `${p.nombre} ${p.apellido}`.toLowerCase();
+            const dni = p.dni ? p.dni.toString() : '';
+            return fullName.includes(query) || dni.includes(query);
+          });
+          
+          if (filtered.length === 0) {
+            const emptyOpt = document.createElement('option');
+            emptyOpt.value = '';
+            emptyOpt.disabled = true;
+            emptyOpt.selected = true;
+            emptyOpt.textContent = 'No se encontraron pacientes';
+            selectEl.appendChild(emptyOpt);
+          } else {
+            const promptOpt = document.createElement('option');
+            promptOpt.value = '';
+            promptOpt.disabled = true;
+            promptOpt.selected = true;
+            promptOpt.textContent = `-- Seleccione un paciente (${filtered.length} encontrados) --`;
+            selectEl.appendChild(promptOpt);
+            
+            filtered.forEach(p => {
+              const opt = document.createElement('option');
+              opt.value = p.id;
+              opt.textContent = `${p.nombre} ${p.apellido} (DNI: ${p.dni})`;
+              selectEl.appendChild(opt);
+            });
+          }
+        });
+      }
+      
+      // Script para habitaciones dinámicas al cambiar de paciente
+      if (selectEl && habitacionSelect) {
+        selectEl.addEventListener('change', async function() {
+          const id = this.value;
+          if (!id) return;
+          
+          try {
+            const res = await fetch(`/internaciones/habitaciones-disponibles/${id}`);
+            const data = await res.json();
+            
+            habitacionSelect.innerHTML = '<option value="" disabled selected>-- Seleccione una habitación --</option>';
+            data.forEach(h => {
+              const opt = document.createElement('option');
+              opt.value = h.id;
+              opt.textContent = 'N° ' + h.numero;
+              habitacionSelect.appendChild(opt);
+            });
+          } catch (e) {
+            console.error('Error al cargar habitaciones disponibles:', e);
+          }
+        });
+      }
     });

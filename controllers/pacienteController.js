@@ -24,6 +24,33 @@ module.exports = {
 guardar: async (req, res) => {
   console.log('📥 GUARDAR BODY:', req.body);
   try {
+    const { nombre, apellido, dni, sexo } = req.body;
+
+    // 1. Campos obligatorios
+    if (!nombre?.trim() || !apellido?.trim() || !dni?.trim() || !sexo?.trim()) {
+      return res.render('pacientes/nuevo', {
+        paciente: req.body,
+        error: 'Todos los campos (Nombre, Apellido, DNI, Sexo) son obligatorios.'
+      });
+    }
+
+    // 2. DNI debe contener solo números
+    if (!/^\d+$/.test(dni.trim())) {
+      return res.render('pacientes/nuevo', {
+        paciente: req.body,
+        error: 'El DNI debe contener únicamente números.'
+      });
+    }
+
+    // 3. Validar si ya existe otro paciente con el mismo DNI
+    const pacienteExistente = await Paciente.buscarPorDNI(dni.trim());
+    if (pacienteExistente) {
+      return res.render('pacientes/nuevo', {
+        paciente: req.body,
+        error: `El paciente con el DNI ${dni.trim()} ya se encuentra registrado con el nombre de "${pacienteExistente.nombre} ${pacienteExistente.apellido}".`
+      });
+    }
+
     await Paciente.insertar(req.body);
     return res.redirect('/pacientes');
   } catch (error) {

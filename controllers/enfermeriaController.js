@@ -108,6 +108,9 @@ module.exports = {
     const errores = validarEvaluacion(req.body);
 
     if (Object.keys(errores).length > 0) {
+      if (req.xhr || (req.headers.accept && req.headers.accept.indexOf('json') > -1)) {
+        return res.status(400).json({ success: false, errores });
+      }
       const internacion = await Internacion.obtenerPorId(req.body.internacion_id);
 
       return res.render("enfermeria/nueva", {
@@ -117,11 +120,18 @@ module.exports = {
       });
     }
 
+    req.body.usuario_id = req.session.userId || null;
     await Enfermeria.insertar(req.body);
+    if (req.xhr || (req.headers.accept && req.headers.accept.indexOf('json') > -1)) {
+      return res.json({ success: true, redirectUrl: `/enfermeria/internacion/${req.body.internacion_id}` });
+    }
     res.redirect(`/enfermeria/internacion/${req.body.internacion_id}`);
 
   } catch (error) {
     console.error(error);
+    if (req.xhr || (req.headers.accept && req.headers.accept.indexOf('json') > -1)) {
+      return res.status(500).json({ success: false, message: "Error al guardar evaluación de enfermería" });
+    }
     res.status(500).send("Error al guardar evaluación de enfermería");
   }
 },
@@ -129,7 +139,6 @@ module.exports = {
 
 
 
-  // 📌 Formulario editar evaluación
   mostrarFormularioEditar: async (req, res) => {
     try {
       const id = req.params.id;
@@ -137,6 +146,11 @@ module.exports = {
 
       if (!evaluacion) {
         return res.status(404).send("Evaluación no encontrada");
+      }
+
+      // Restricción: solo el creador o un admin pueden editar
+      if (req.session.rol !== 'admin' && evaluacion.usuario_id !== req.session.userId) {
+        return res.status(403).send("No tiene permisos para editar esta evaluación");
       }
 
       res.render('enfermeria/editar', { evaluacion });
@@ -147,12 +161,28 @@ module.exports = {
     }
   },
 
-  // 📌 Guardar edición
   actualizar: async (req, res) => {
   try {
+    const id = req.params.id;
+    const evaluacionExistente = await Enfermeria.obtenerPorId(id);
+    if (!evaluacionExistente) {
+      return res.status(404).send("Evaluación no encontrada");
+    }
+
+    // Restricción: solo el creador o un admin pueden actualizar
+    if (req.session.rol !== 'admin' && evaluacionExistente.usuario_id !== req.session.userId) {
+      if (req.xhr || (req.headers.accept && req.headers.accept.indexOf('json') > -1)) {
+        return res.status(403).json({ success: false, message: "No tiene permisos para editar esta evaluación" });
+      }
+      return res.status(403).send("No tiene permisos para editar esta evaluación");
+    }
+
     const errores = validarEvaluacion(req.body);
 
     if (Object.keys(errores).length > 0) {
+      if (req.xhr || (req.headers.accept && req.headers.accept.indexOf('json') > -1)) {
+        return res.status(400).json({ success: false, errores });
+      }
       const evaluacion = await Enfermeria.obtenerPorId(req.params.id);
 
       return res.render("enfermeria/editar", {
@@ -163,10 +193,16 @@ module.exports = {
     }
 
     await Enfermeria.actualizar(req.params.id, req.body);
+    if (req.xhr || (req.headers.accept && req.headers.accept.indexOf('json') > -1)) {
+      return res.json({ success: true, redirectUrl: `/enfermeria/internacion/${req.body.internacion_id}` });
+    }
     res.redirect(`/enfermeria/internacion/${req.body.internacion_id}`);
 
   } catch (error) {
     console.error(error);
+    if (req.xhr || (req.headers.accept && req.headers.accept.indexOf('json') > -1)) {
+      return res.status(500).json({ success: false, message: "Error al actualizar evaluación" });
+    }
     res.status(500).send("Error al actualizar evaluación");
   }
 },
@@ -174,7 +210,6 @@ module.exports = {
 
 
   
-    // 📌 Eliminar evaluación
     eliminar: async (req, res) => {
   try {
     const id = req.params.id;
@@ -183,7 +218,12 @@ module.exports = {
     const evaluacion = await Enfermeria.obtenerPorId(id);
 
     if (!evaluacion) {
-      return res.status(404).send("Evaluación no encontrada");
+      return res.redirect('/internaciones');
+    }
+
+    // Restricción: solo el creador o un admin pueden eliminar
+    if (req.session.rol !== 'admin' && evaluacion.usuario_id !== req.session.userId) {
+      return res.status(403).send("No tiene permisos para eliminar esta evaluación");
     }
 
     const internacionId = evaluacion.internacion_id;

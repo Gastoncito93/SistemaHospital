@@ -27,12 +27,18 @@ app.use(session({
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
-// Variable local para plantillas
+// Variable local para plantillas y deshabilitar caché de navegación
 app.use((req, res, next) => {
   res.locals.usuario = req.session.usuario || null;
   res.locals.rol = req.session.rol || null;
   res.locals.userId = req.session.userId || null;
   res.locals.pathname = req.path;
+  
+  // Deshabilitar caché del navegador para prevenir que registros eliminados vuelvan a aparecer al retroceder
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+  
   next();
 });
 

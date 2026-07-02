@@ -269,6 +269,86 @@ block content
         flex-direction: column;
       }
     }
+    
+    /* Estilos personalizados para el paginador premium */
+    #paginationContainer {
+      margin-top: 2rem !important;
+      margin-bottom: 4rem !important;
+      padding: 1rem 1.5rem !important;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+      border: 1px solid #f0f0f0;
+    }
+    
+    .pagination {
+      gap: 5px;
+    }
+    
+    .pagination .page-item .page-link {
+      color: var(--hospital-medico) !important;
+      border: 1px solid #e9ecef;
+      border-radius: 8px !important;
+      padding: 0.5rem 0.9rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      background-color: white;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    }
+    
+    .pagination .page-item:not(.disabled) .page-link:hover {
+      background: linear-gradient(135deg, var(--hospital-medico), #2ecc71);
+      color: white !important;
+      border-color: transparent;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(39, 174, 96, 0.2);
+    }
+    
+    .pagination .page-item.active .page-link {
+      background: linear-gradient(135deg, var(--hospital-medico), #2ecc71) !important;
+      color: white !important;
+      border-color: transparent !important;
+      font-weight: 600;
+      box-shadow: 0 4px 8px rgba(39, 174, 96, 0.25);
+    }
+    
+    .pagination .page-item.disabled .page-link {
+      color: #ccc !important;
+      background-color: #f8f9fa !important;
+      border-color: #e9ecef !important;
+      cursor: not-allowed;
+    }
+    
+    .modal-medico-header {
+      background: linear-gradient(135deg, var(--hospital-medico), #2ecc71) !important;
+      color: white !important;
+    }
+    
+    .modal-medico-header .btn-close {
+      filter: invert(1) grayscale(100%) brightness(200%);
+    }
+    
+    .clinical-box {
+      border-left: 4px solid var(--hospital-medico);
+      background-color: #f4faf6;
+      padding: 1.25rem;
+      border-radius: 8px;
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.02);
+      margin-bottom: 1rem;
+    }
+    
+    .clinical-box h6 {
+      color: var(--hospital-dark);
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .clinical-box h6 i {
+      color: var(--hospital-medico);
+    }
 
   //- Header principal
   .hospital-header
@@ -312,18 +392,24 @@ block content
           i.bi.bi-plus-circle
           | Nueva Evaluación
 
+    .mb-3
+      .input-group.shadow-sm
+        span.input-group-text.bg-white.border-end-0
+          i.bi.bi-search.text-muted
+        input#buscarEvaluacionMedico.form-control.border-start-0(type="text", placeholder="Buscar por fecha, diagnóstico, evolución o tratamiento...")
+
     //- Tabla de evaluaciones
     if evaluaciones.length > 0
       .table-responsive
-        table.table.table-hover.hospital-table
+        table.table.table-hover.hospital-table(style="table-layout: fixed; width: 100%;")
           thead
             tr
-              th Fecha y Hora
-              th Diagnóstico
-              th Evolución
-              th Tratamiento
-              th Medicación
-              th Acciones
+              th(style="width: 15%;") Fecha y Hora
+              th(style="width: 20%;") Diagnóstico
+              th(style="width: 20%;") Evolución
+              th(style="width: 15%;") Tratamiento
+              th(style="width: 15%;") Medicación
+              th(style="width: 15%;") Acciones
           tbody
             each ev in evaluaciones
               - const fecha = new Date(ev.fecha_hora);
@@ -334,6 +420,10 @@ block content
                 td
                   .evaluation-date= fechaStr
                   .evaluation-time= horaStr
+                  if ev.usuario_nombre
+                    span.badge.bg-light.text-dark.mt-1(title="Médico que registró", style="font-size: 0.75rem; border: 1px solid #ddd; padding: 2px 6px;")
+                      i.bi.bi-person-fill.text-success.me-1
+                      = ev.usuario_nombre + ' ' + (ev.usuario_apellido || '')
                 
                 td.text-truncate-cell(title=ev.diagnostico)= ev.diagnostico || '--'
                 
@@ -350,7 +440,7 @@ block content
                       onclick=`mostrarEvaluacionCompleta(${JSON.stringify(ev).replace(/'/g, "\\'")})`
                     )
                       i.bi.bi-eye
-                    if rol === 'medico' || rol === 'admin'
+                    if rol === 'admin' || (rol === 'medico' && ev.usuario_id === userId)
                       a.btn.btn-icon.btn-edit(
                         href=`/medico/editar/${ev.id}`,
                         title="Editar evaluación"
@@ -362,6 +452,12 @@ block content
                         onclick=`return confirm('¿Está seguro de eliminar la evaluación médica del ${fechaStr}?')`
                       )
                         i.bi.bi-trash
+    
+      //- Controles de Paginación
+      #paginationContainer.d-flex.justify-content-between.align-items-center.flex-wrap.mt-3.px-2.gap-2
+        small#paginationInfo.text-muted.fw-semibold Mostrando evaluaciones
+        nav
+          ul.pagination.pagination-sm.mb-0(id="paginationControl")
     
     //- Estado vacío
     else
@@ -393,7 +489,7 @@ block content
   .modal.fade(id="evaluacionModal", tabindex="-1")
     .modal-dialog.modal-lg
       .modal-content
-        .modal-header.bg-light
+        .modal-header.modal-medico-header
           h5.modal-title
             i.bi.bi-clipboard2-pulse
             | Evaluación Médica Completa
@@ -426,66 +522,60 @@ block content
       
       const contenido = `
         <div class="row mb-3">
-          <div class="col-md-6">
-            <h6><i class="bi bi-calendar"></i> Fecha y Hora</h6>
-            <p class="mb-1"><strong>${fechaStr}</strong></p>
-            <p class="text-muted">${horaStr}</p>
+          <div class="col-md-6 mb-2">
+            <div class="p-3 border rounded bg-light">
+              <h6 class="text-muted mb-2" style="font-size: 0.85rem; font-weight: 600;"><i class="bi bi-calendar-event text-success"></i> FECHA Y HORA</h6>
+              <p class="mb-1"><strong>${fechaStr}</strong></p>
+              <p class="text-muted small mb-0">${horaStr}</p>
+            </div>
           </div>
-          <div class="col-md-6">
-            <h6><i class="bi bi-person-badge"></i> Evaluador</h6>
-            <p class="mb-0"><strong>Médico a cargo</strong></p>
-            <small class="text-muted">Registro ID: ${evaluacion.id}</small>
-          </div>
-        </div>
-        
-        <hr>
-        
-        <div class="row mb-3">
-          <div class="col-12">
-            <h6><i class="bi bi-clipboard2-check"></i> Diagnóstico</h6>
-            <div class="p-3 bg-light rounded">
-              <p style="white-space: pre-line;">${evaluacion.diagnostico || 'No especificado'}</p>
+          <div class="col-md-6 mb-2">
+            <div class="p-3 border rounded bg-light">
+              <h6 class="text-muted mb-2" style="font-size: 0.85rem; font-weight: 600;"><i class="bi bi-person-badge text-success"></i> EVALUADOR</h6>
+              <p class="mb-1"><strong>${evaluacion.usuario_nombre ? (evaluacion.usuario_nombre + ' ' + (evaluacion.usuario_apellido || '')) : 'Médico a cargo'}</strong></p>
+              <p class="text-muted small mb-0">Registro ID: ${evaluacion.id}</p>
             </div>
           </div>
         </div>
         
-        <div class="row mb-3">
-          <div class="col-md-6">
-            <h6><i class="bi bi-graph-up"></i> Evolución</h6>
-            <div class="p-3 bg-light rounded">
-              <p style="white-space: pre-line;">${evaluacion.evolucion || 'No registrada'}</p>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <h6><i class="bi bi-prescription2"></i> Tratamiento</h6>
-            <div class="p-3 bg-light rounded">
-              <p style="white-space: pre-line;">${evaluacion.tratamiento || 'No especificado'}</p>
-            </div>
-          </div>
+        <div class="clinical-box">
+          <h6><i class="bi bi-clipboard2-check"></i> Diagnóstico Médico</h6>
+          <p class="mb-0" style="white-space: pre-line;">${evaluacion.diagnostico || 'No especificado'}</p>
         </div>
         
-        <div class="row mb-3">
+        <div class="row">
           <div class="col-md-6">
-            <h6><i class="bi bi-capsule"></i> Medicación Prescrita</h6>
-            <div class="p-3 bg-light rounded">
-              <p style="white-space: pre-line;">${evaluacion.medicacion || 'No prescrita'}</p>
+            <div class="clinical-box">
+              <h6><i class="bi bi-graph-up"></i> Evolución Clínica</h6>
+              <p class="mb-0" style="white-space: pre-line;">${evaluacion.evolucion || 'No registrada'}</p>
             </div>
           </div>
           <div class="col-md-6">
-            <h6><i class="bi bi-clipboard-data"></i> Estudios Solicitados</h6>
-            <div class="p-3 bg-light rounded">
-              <p style="white-space: pre-line;">${evaluacion.estudios_solicitados || 'No solicitados'}</p>
+            <div class="clinical-box">
+              <h6><i class="bi bi-prescription2"></i> Tratamiento Indicado</h6>
+              <p class="mb-0" style="white-space: pre-line;">${evaluacion.tratamiento || 'No especificado'}</p>
             </div>
           </div>
         </div>
         
         <div class="row">
-          <div class="col-12">
-            <h6><i class="bi bi-journal-text"></i> Notas Adicionales</h6>
-            <div class="p-3 bg-light rounded">
-              <p style="white-space: pre-line;">${evaluacion.notas || 'Sin notas adicionales'}</p>
+          <div class="col-md-6">
+            <div class="clinical-box">
+              <h6><i class="bi bi-capsule"></i> Medicación Prescrita</h6>
+              <p class="mb-0" style="white-space: pre-line;">${evaluacion.medicacion || 'No prescrita'}</p>
             </div>
           </div>
+          <div class="col-md-6">
+            <div class="clinical-box">
+              <h6><i class="bi bi-clipboard-data"></i> Estudios Solicitados</h6>
+              <p class="mb-0" style="white-space: pre-line;">${evaluacion.estudios_solicitados || 'No solicitados'}</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="clinical-box" style="border-left-color: #6c757d; background-color: #f8f9fa;">
+          <h6 style="color: #6c757d;"><i class="bi bi-journal-text"></i> Notas Adicionales</h6>
+          <p class="mb-0 text-muted" style="white-space: pre-line;">${evaluacion.notas || 'Sin notas adicionales'}</p>
         </div>
       `;
       
@@ -505,9 +595,98 @@ block content
       }
     }
     
-    // Confirmación antes de eliminar (ya está en el onclick)
+    // Confirmación antes de eliminar y paginado/búsqueda
     document.addEventListener('DOMContentLoaded', function() {
       console.log('Vista de evaluaciones médicas cargada');
+      
+      const buscarInput = document.getElementById('buscarEvaluacionMedico');
+      const tableBody = document.querySelector('.hospital-table tbody');
+      if (!tableBody) return;
+      
+      const originalRows = Array.from(tableBody.querySelectorAll('tr'));
+      const rowsPerPage = 5;
+      let currentPage = 1;
+      let filteredRows = [...originalRows];
+      
+      function renderTable() {
+        const totalRows = filteredRows.length;
+        const totalPages = Math.max(1, Math.ceil(totalRows / rowsPerPage));
+        
+        if (currentPage > totalPages) currentPage = totalPages;
+        if (currentPage < 1) currentPage = 1;
+        
+        const start = (currentPage - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+        
+        originalRows.forEach(row => {
+          row.style.display = 'none';
+        });
+        
+        filteredRows.slice(start, end).forEach(row => {
+          row.style.display = '';
+        });
+        
+        const paginationInfo = document.getElementById('paginationInfo');
+        if (totalRows === 0) {
+          paginationInfo.textContent = 'No se encontraron evaluaciones';
+        } else {
+          paginationInfo.textContent = `Mostrando ${start + 1} a ${Math.min(end, totalRows)} de ${totalRows} evaluación(es)`;
+        }
+        
+        const paginationControl = document.getElementById('paginationControl');
+        paginationControl.innerHTML = '';
+        
+        const liPrev = document.createElement('li');
+        liPrev.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
+        liPrev.innerHTML = `<a class="page-link" href="#">Anterior</a>`;
+        liPrev.addEventListener('click', function(e) {
+          e.preventDefault();
+          if (currentPage > 1) {
+            currentPage--;
+            renderTable();
+          }
+        });
+        paginationControl.appendChild(liPrev);
+        
+        for (let i = 1; i <= totalPages; i++) {
+          const liPage = document.createElement('li');
+          liPage.className = `page-item ${currentPage === i ? 'active' : ''}`;
+          liPage.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+          liPage.addEventListener('click', function(e) {
+            e.preventDefault();
+            currentPage = i;
+            renderTable();
+          });
+          paginationControl.appendChild(liPage);
+        }
+        
+        const liNext = document.createElement('li');
+        liNext.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
+        liNext.innerHTML = `<a class="page-link" href="#">Siguiente</a>`;
+        liNext.addEventListener('click', function(e) {
+          e.preventDefault();
+          if (currentPage < totalPages) {
+            currentPage++;
+            renderTable();
+          }
+        });
+        paginationControl.appendChild(liNext);
+      }
+      
+      buscarInput.addEventListener('input', function() {
+        const query = this.value.toLowerCase().trim();
+        
+        filteredRows = originalRows.filter(row => {
+          const dateCol = row.cells[0].textContent.toLowerCase();
+          const diagCol = row.cells[1].textContent.toLowerCase();
+          const evolCol = row.cells[2].textContent.toLowerCase();
+          const treatCol = row.cells[3].textContent.toLowerCase();
+          return dateCol.includes(query) || diagCol.includes(query) || evolCol.includes(query) || treatCol.includes(query);
+        });
+        
+        currentPage = 1;
+        renderTable();
+      });
       
       // Agregar tooltips a las celdas truncadas
       const truncatedCells = document.querySelectorAll('.text-truncate-cell');
@@ -515,10 +694,11 @@ block content
         cell.addEventListener('mouseenter', function() {
           const originalText = this.getAttribute('title');
           if (originalText && originalText.length > 50) {
-            // Crear tooltip simple si no hay Bootstrap
             this.setAttribute('data-bs-toggle', 'tooltip');
             this.setAttribute('data-bs-title', originalText);
           }
         });
       });
+      
+      renderTable();
     });

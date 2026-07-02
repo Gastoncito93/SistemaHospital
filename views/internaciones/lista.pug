@@ -126,8 +126,8 @@ block content
     
     .action-buttons {
       display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
+      gap: 6px;
+      flex-wrap: nowrap;
     }
     
     .btn-icon {
@@ -260,6 +260,55 @@ block content
         flex-direction: column;
       }
     }
+    
+    /* Estilos personalizados para el paginador premium */
+    #paginationContainer {
+      margin-top: 2rem !important;
+      margin-bottom: 4rem !important;
+      padding: 1rem 1.5rem !important;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+      border: 1px solid #f0f0f0;
+    }
+    
+    .pagination {
+      gap: 5px;
+    }
+    
+    .pagination .page-item .page-link {
+      color: var(--hospital-blue) !important;
+      border: 1px solid #e9ecef;
+      border-radius: 8px !important;
+      padding: 0.5rem 0.9rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      background-color: white;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    }
+    
+    .pagination .page-item:not(.disabled) .page-link:hover {
+      background: linear-gradient(135deg, var(--hospital-blue), var(--hospital-teal));
+      color: white !important;
+      border-color: transparent;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(13, 138, 188, 0.2);
+    }
+    
+    .pagination .page-item.active .page-link {
+      background: linear-gradient(135deg, var(--hospital-blue), var(--hospital-teal)) !important;
+      color: white !important;
+      border-color: transparent !important;
+      font-weight: 600;
+      box-shadow: 0 4px 8px rgba(13, 138, 188, 0.25);
+    }
+    
+    .pagination .page-item.disabled .page-link {
+      color: #ccc !important;
+      background-color: #f8f9fa !important;
+      border-color: #e9ecef !important;
+      cursor: not-allowed;
+    }
 
   //- Contenido principal
   .hospital-header
@@ -275,18 +324,24 @@ block content
         | Nueva Internación
 
   if internaciones.length > 0
+    .mb-3
+      .input-group.shadow-sm
+        span.input-group-text.bg-white.border-end-0
+          i.bi.bi-search.text-muted
+        input#buscarInternacion.form-control.border-start-0(type="text", placeholder="Buscar por paciente, habitación, ala o motivo...")
+
     .table-responsive
-      table.table.table-hover.hospital-table
+      table.table.table-hover.hospital-table(style="table-layout: fixed; width: 100%;")
         thead
           tr
-            th(scope="col") Paciente
-            th(scope="col") Habitación
-            th(scope="col") Ala
-            th(scope="col") Ingreso
-            th(scope="col") Fecha Ingreso
-            th(scope="col") Motivo
-            th(scope="col") Estado
-            th(scope="col") Acciones
+            th(scope="col", style="width: 18%;") Paciente
+            th(scope="col", style="width: 8%;") Habitación
+            th(scope="col", style="width: 8%;") Ala
+            th(scope="col", style="width: 10%;") Ingreso
+            th(scope="col", style="width: 10%;") Fecha Ingreso
+            th(scope="col", style="width: 18%;") Motivo
+            th(scope="col", style="width: 8%;") Estado
+            th(scope="col", style="width: 20%;") Acciones
         tbody
           each internacion in internaciones
             tr
@@ -361,6 +416,12 @@ block content
                       title="Eliminar"
                     )
                       i.bi.bi-trash
+    
+    //- Controles de Paginación
+    #paginationContainer.d-flex.justify-content-between.align-items-center.flex-wrap.mt-3.px-2.gap-2
+      small#paginationInfo.text-muted.fw-semibold Mostrando internaciones
+      nav
+        ul.pagination.pagination-sm.mb-0(id="paginationControl")
   else
     .empty-state
       .empty-state-icon
@@ -383,7 +444,7 @@ block content
       document.head.appendChild(link);
     }
     
-    // Función para formatear fechas mejor
+    // Función para formatear fechas y paginado/búsqueda
     document.addEventListener('DOMContentLoaded', function() {
       const fechaCells = document.querySelectorAll('.fecha-ingreso');
       fechaCells.forEach(cell => {
@@ -395,4 +456,95 @@ block content
           cell.innerHTML = `<i class="bi bi-calendar-check"></i> ${formattedDate}`;
         }
       });
+
+      const buscarInput = document.getElementById('buscarInternacion');
+      const tableBody = document.querySelector('.hospital-table tbody');
+      if (!tableBody) return;
+      
+      const originalRows = Array.from(tableBody.querySelectorAll('tr'));
+      const rowsPerPage = 5;
+      let currentPage = 1;
+      let filteredRows = [...originalRows];
+      
+      function renderTable() {
+        const totalRows = filteredRows.length;
+        const totalPages = Math.max(1, Math.ceil(totalRows / rowsPerPage));
+        
+        if (currentPage > totalPages) currentPage = totalPages;
+        if (currentPage < 1) currentPage = 1;
+        
+        const start = (currentPage - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+        
+        originalRows.forEach(row => {
+          row.style.display = 'none';
+        });
+        
+        filteredRows.slice(start, end).forEach(row => {
+          row.style.display = '';
+        });
+        
+        const paginationInfo = document.getElementById('paginationInfo');
+        if (totalRows === 0) {
+          paginationInfo.textContent = 'No se encontraron internaciones';
+        } else {
+          paginationInfo.textContent = `Mostrando ${start + 1} a ${Math.min(end, totalRows)} de ${totalRows} internación(es)`;
+        }
+        
+        const paginationControl = document.getElementById('paginationControl');
+        paginationControl.innerHTML = '';
+        
+        const liPrev = document.createElement('li');
+        liPrev.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
+        liPrev.innerHTML = `<a class="page-link" href="#">Anterior</a>`;
+        liPrev.addEventListener('click', function(e) {
+          e.preventDefault();
+          if (currentPage > 1) {
+            currentPage--;
+            renderTable();
+          }
+        });
+        paginationControl.appendChild(liPrev);
+        
+        for (let i = 1; i <= totalPages; i++) {
+          const liPage = document.createElement('li');
+          liPage.className = `page-item ${currentPage === i ? 'active' : ''}`;
+          liPage.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+          liPage.addEventListener('click', function(e) {
+            e.preventDefault();
+            currentPage = i;
+            renderTable();
+          });
+          paginationControl.appendChild(liPage);
+        }
+        
+        const liNext = document.createElement('li');
+        liNext.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
+        liNext.innerHTML = `<a class="page-link" href="#">Siguiente</a>`;
+        liNext.addEventListener('click', function(e) {
+          e.preventDefault();
+          if (currentPage < totalPages) {
+            currentPage++;
+            renderTable();
+          }
+        });
+        paginationControl.appendChild(liNext);
+      }
+      
+      buscarInput.addEventListener('input', function() {
+        const query = this.value.toLowerCase().trim();
+        
+        filteredRows = originalRows.filter(row => {
+          const nameCol = row.querySelector('.patient-info strong').textContent.toLowerCase();
+          const roomCol = row.cells[1].textContent.toLowerCase();
+          const alaCol = row.cells[2].textContent.toLowerCase();
+          const motiveCol = row.cells[5].textContent.toLowerCase();
+          return nameCol.includes(query) || roomCol.includes(query) || alaCol.includes(query) || motiveCol.includes(query);
+        });
+        
+        currentPage = 1;
+        renderTable();
+      });
+      
+      renderTable();
     });

@@ -337,6 +337,55 @@ block content
         grid-template-columns: 1fr;
       }
     }
+    
+    /* Estilos personalizados para el paginador premium */
+    #paginationContainer {
+      margin-top: 2rem !important;
+      margin-bottom: 4rem !important;
+      padding: 1rem 1.5rem !important;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+      border: 1px solid #f0f0f0;
+    }
+    
+    .pagination {
+      gap: 5px;
+    }
+    
+    .pagination .page-item .page-link {
+      color: var(--hospital-purple) !important;
+      border: 1px solid #e9ecef;
+      border-radius: 8px !important;
+      padding: 0.5rem 0.9rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      background-color: white;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    }
+    
+    .pagination .page-item:not(.disabled) .page-link:hover {
+      background: linear-gradient(135deg, var(--hospital-purple), #6c5ce7);
+      color: white !important;
+      border-color: transparent;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(155, 89, 182, 0.2);
+    }
+    
+    .pagination .page-item.active .page-link {
+      background: linear-gradient(135deg, var(--hospital-purple), #6c5ce7) !important;
+      color: white !important;
+      border-color: transparent !important;
+      font-weight: 600;
+      box-shadow: 0 4px 8px rgba(155, 89, 182, 0.25);
+    }
+    
+    .pagination .page-item.disabled .page-link {
+      color: #ccc !important;
+      background-color: #f8f9fa !important;
+      border-color: #e9ecef !important;
+      cursor: not-allowed;
+    }
 
   //- Contenido principal
   .admin-welcome
@@ -407,13 +456,13 @@ block content
         input#buscarPaciente.form-control.border-start-0(type="text", placeholder="Buscar por nombre, apellido o DNI...")
 
     .table-responsive
-      table.table.table-hover.hospital-table
+      table.table.table-hover.hospital-table(style="table-layout: fixed; width: 100%;")
         thead
           tr
-            th(scope="col") Paciente
-            th(scope="col") DNI
-            th(scope="col") Sexo
-            th(scope="col") Acciones
+            th(scope="col", style="width: 45%;") Paciente
+            th(scope="col", style="width: 20%;") DNI
+            th(scope="col", style="width: 15%;") Sexo
+            th(scope="col", style="width: 20%;") Acciones
         tbody
           each paciente in pacientes
             tr(data-id=paciente.id)
